@@ -1,0 +1,18 @@
+# === macOS ===
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# === Editor / IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# === Log e file temporanei ===
+*.log
+*.tmp
+Thumbs.db
