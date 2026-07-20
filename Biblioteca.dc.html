@@ -3,92 +3,39 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Biblioteca — base di conoscenza</title>
+
+<!-- ===== CONNETTORE DELLA WIKI — righe fisse, identiche su ogni pagina ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./wiki/wiki.css">
 <script src="./support.js"></script>
+<script src="./wiki/wiki-index.js"></script>
+<script defer src="./wiki/wiki.js"></script>
+<!-- ======================================================================== -->
 </head>
 <body>
 <x-dc>
-<helmet data-dc-atomics>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
-<style>
-body{margin:0;background:#FBFAF5;background-image:linear-gradient(#E9E5D8 1px,transparent 1px),linear-gradient(90deg,#E9E5D8 1px,transparent 1px);background-size:28px 28px;color:#20242C;font-family:'Literata',Georgia,serif;line-height:1.6;font-size:17px}
-a{color:#2456B8;text-decoration:none}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
-<script>
-(function(){
-  var KEY='llm-book-night';
-  function apply(on){
-    document.documentElement.style.background = on ? '#0e0d0b' : '';
-    document.body.style.filter = on ? 'invert(1) hue-rotate(180deg)' : '';
-  }
-  function init(){
-    if(document.getElementById('nightbtn')) return;
-    var on = false;
-    try{ on = localStorage.getItem(KEY)==='1'; }catch(e){}
-    apply(on);
-    var b=document.createElement('button');
-    b.id='nightbtn'; b.type='button';
-    b.setAttribute('aria-label','Modalità notte');
-    b.style.cssText='position:fixed;right:16px;bottom:16px;z-index:70;width:44px;height:44px;border-radius:50%;border:2px solid #20242C;background:#fff;color:#20242C;font-size:20px;line-height:1;cursor:pointer;box-shadow:2px 2px 0 rgba(0,0,0,.15);font-family:system-ui';
-    b.textContent = on ? '\u2600' : '\u263e';
-    b.onclick=function(){ on=!on; try{ localStorage.setItem(KEY, on?'1':'0'); }catch(e){} apply(on); b.textContent = on ? '\u2600' : '\u263e'; };
-    document.documentElement.appendChild(b);
-  }
-  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',init); } else { init(); }
-})();
-</script>
-</helmet>
-<div style="max-width:880px;margin:0 auto;padding:0 20px 90px">
+<div class="w-page">
 
-<header style="padding:64px 0 12px;text-align:center">
-  <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:#C0392B">Base di conoscenza · in crescita</div>
-  <h1 style="font-family:'Caveat',cursive;line-height:1.02;font-size:clamp(48px,10vw,84px);margin:12px 0 4px;font-weight:700">La <span style="border-bottom:6px solid #2456B8">Biblioteca</span></h1>
-  <p style="font-size:19px;color:#6B6F7A;max-width:600px;margin:10px auto 0;font-style:italic">Piccoli libri illustrati per imparare davvero come funzionano le macchine che pensano. Un modulo alla volta, dallo stesso quaderno — oggi poche pagine, domani un'enciclopedia.</p>
-</header>
+  <header class="w-hero a-blu">
+    <div class="w-hero-kicker">Base di conoscenza · in crescita</div>
+    <h1 class="w-hero-title">La <span class="w-mark">Biblioteca</span></h1>
+    <p class="w-hero-sub">Piccoli libri illustrati per imparare davvero come funzionano le macchine che pensano. Un modulo alla volta, dallo stesso quaderno — oggi poche pagine, domani un'enciclopedia.</p>
+  </header>
 
-<div style="display:flex;align-items:center;gap:14px;margin:40px 0 18px">
-  <div style="font-family:'Caveat',cursive;font-size:30px;color:#20242C">Scaffale · Large Language Models</div>
-  <div style="flex:1;height:2px;background:#20242C"></div>
-</div>
+  <!-- Scaffali e card sono generati da wiki.js leggendo wiki/wiki-index.js.
+       Per aggiungere un modulo si modifica QUEL file, non questo. -->
+  <div id="wiki-scaffali"></div>
 
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px">
-
-  <a href="Dentro-la-Macchina.dc.html" style="display:block;background:#fff;border:2px solid #20242C;border-radius:16px;padding:22px;box-shadow:5px 5px 0 rgba(32,36,44,.12);color:#20242C" style-hover="box-shadow:7px 7px 0 rgba(36,86,184,.25);transform:translate(-2px,-2px)">
-    <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.15em;color:#C0392B">MODULO 01</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#2E7D4F">● pronto</span></div>
-    <h2 style="font-family:'Caveat',cursive;font-size:38px;margin:6px 0 4px;line-height:1.02">Dentro la Macchina</h2>
-    <p style="font-size:15px;color:#6B6F7A;margin:0 0 14px">Come un LLM genera testo, passo per passo — dal tasto Invio all'ultima parola. Tokenizer, embedding, attention, KV-cache, sampling.</p>
-    <div style="display:flex;flex-wrap:wrap;gap:6px">
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:#F3F0E6;border-radius:20px;padding:4px 10px">il flusso completo</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:#F3F0E6;border-radius:20px;padding:4px 10px">5 demo interattive</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:#F3F0E6;border-radius:20px;padding:4px 10px">9 tappe</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:#F3F0E6;border-radius:20px;padding:4px 10px">livello: intuitivo → esperto</span>
-    </div>
-  </a>
-
-  <a href="Fondamenti-Matematici-LLM.dc.html" style="display:block;background:#fff;border:2px solid #2456B8;border-radius:16px;padding:22px;box-shadow:5px 5px 0 rgba(36,86,184,.18);color:#20242C" style-hover="box-shadow:7px 7px 0 rgba(36,86,184,.3);transform:translate(-2px,-2px)">
-    <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.15em;color:#C0392B">MODULO 02</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#2E7D4F">● pronto</span></div>
-    <h2 style="font-family:'Caveat',cursive;font-size:38px;margin:6px 0 4px;line-height:1.02">La Matematica nascosta</h2>
-    <p style="font-size:15px;color:#6B6F7A;margin:0 0 14px">Vettori, matrici, softmax, gradienti e attention. La lingua segreta con cui un LLM pensa, con demo interattive e formule vere.</p>
-    <div style="display:flex;flex-wrap:wrap;gap:6px">
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:#EAF0FB;border-radius:20px;padding:4px 10px">7 tappe</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:#EAF0FB;border-radius:20px;padding:4px 10px">6 esperimenti interattivi</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:#EAF0FB;border-radius:20px;padding:4px 10px">algebra → Transformer</span>
-    </div>
-  </a>
-
-  <div style="display:block;background:repeating-linear-gradient(135deg,#fff,#fff 10px,#FBFAF5 10px,#FBFAF5 20px);border:2px dashed #B7B2A2;border-radius:16px;padding:22px;color:#9A958A">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.15em;color:#B7B2A2">MODULO 03</div>
-    <h2 style="font-family:'Caveat',cursive;font-size:38px;margin:6px 0 4px;line-height:1.02;color:#B7B2A2">Prossimo capitolo…</h2>
-    <p style="font-size:15px;margin:0">Lo spazio dove crescerà la base: fine-tuning, RAG, agenti, valutazione… Dillo tu — questo scaffale è fatto per riempirsi.</p>
+  <div class="w-note w-note--info" style="margin-top:56px">
+    <span class="w-note-title">Come è pensata questa biblioteca</span>
+    <p>Ogni modulo è un file autonomo nello stesso stile: si legge da solo ma rimanda agli altri. Così la base cresce senza diventare un unico blocco ingestibile — si aggiungono scaffali e libri, non capitoli infiniti. Consigliato leggere il <a href="Dentro-la-Macchina.dc.html">Modulo 01</a> per la visione d'insieme, poi il <a href="Fondamenti-Matematici-LLM.dc.html">Modulo 02</a> per le fondamenta matematiche.</p>
   </div>
 
-</div>
-
-<div style="margin-top:56px;border:1.5px solid #E9E5D8;border-radius:14px;background:#FDFCF8;padding:20px 24px">
-  <span style="font-family:'Caveat',cursive;font-size:24px;color:#6B6F7A;display:block;margin-bottom:6px">Come è pensata questa biblioteca</span>
-  <p style="margin:0 0 8px;font-size:15px;color:#6B6F7A">Ogni modulo è un file autonomo nello stesso stile: si legge da solo ma rimanda agli altri. Così la base cresce senza diventare un unico blocco ingestibile — si aggiungono scaffali e libri, non capitoli infiniti. Consigliato leggere il <a href="Dentro-la-Macchina.dc.html">Modulo 01</a> per la visione d'insieme, poi il <a href="Fondamenti-Matematici-LLM.dc.html">Modulo 02</a> per le fondamenta matematiche.</p>
-</div>
+  <footer class="w-footer">
+    Tutte le pagine condividono lo stesso design system. Per aggiungerne una: <code>AgentFE.md</code>
+  </footer>
 
 </div>
 </x-dc>

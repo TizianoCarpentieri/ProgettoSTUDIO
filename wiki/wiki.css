@@ -1,0 +1,568 @@
+/* ==========================================================================
+   WIKI · FOGLIO DI STILE UNICO DELLA BIBLIOTECA
+   --------------------------------------------------------------------------
+   Questo file veste TUTTE le pagine della wiki. Non scrivere stili inline
+   nelle pagine: usa le classi definite qui sotto.
+
+   Come è organizzato:
+     1. PARAMETRI      → le manopole. Cambia qui, cambia tutta la wiki.
+     2. TEMA SCURO     → stessi nomi, valori scuri.
+     3. ICONE          → set SVG su misura, tratto a penna.
+     4. BASE           → html, body, testo, link.
+     5. COMPONENTI     → le classi `w-` da usare nelle pagine.
+     6. ANIMAZIONI     → comparse e transizioni.
+
+   Documentazione completa e istruzioni per aggiungere pagine: AgentFE.md
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. PARAMETRI — LE MANOPOLE DELLA WIKI
+   ========================================================================== */
+
+:root {
+
+  /* --- Carta e inchiostro ------------------------------------------------ */
+  --paper:        #FBFAF5;   /* fondo pagina */
+  --paper-raised: #FFFFFF;   /* fondo di card, riquadri, demo */
+  --paper-sunken: #F3F0E6;   /* fondo di etichette e codice inline */
+  --ink:          #20242C;   /* testo principale */
+  --ink-soft:     #6B6F7A;   /* testo secondario, didascalie */
+  --ink-faint:    #B7B2A2;   /* testo disattivato, segnaposto */
+  --rule:         #E9E5D8;   /* righe, bordi tenui, quadretti del quaderno */
+
+  /* --- Tavolozza degli accenti ------------------------------------------- */
+  /* Ogni colore ha un significato costante in tutta la wiki (vedi legenda). */
+  --blu:     #2456B8;   /* calcolo, struttura portante */
+  --rosso:   #C0392B;   /* note a margine, avvertimenti */
+  --verde:   #2E7D4F;   /* memoria, cache, cose che si conservano */
+  --arancio: #D9741E;   /* interazione, demo, dove entra il caso */
+  --viola:   #6B3FA0;   /* livello esperto */
+
+  /* Accento attivo nel sottoalbero corrente.
+     Le classi .a-blu / .a-rosso / .a-verde / .a-arancio / .a-viola
+     lo ridefiniscono: card, riquadri, etichette e icone si adeguano da sole. */
+  --accent: var(--blu);
+
+  /* --- Quaderno ----------------------------------------------------------- */
+  --grid-step: 28px;   /* passo dei quadretti */
+
+  /* --- Tipografia --------------------------------------------------------- */
+  --font-mano:  'Caveat', 'Segoe Script', cursive;          /* titoli scritti a mano */
+  --font-testo: 'Literata', Georgia, serif;                 /* corpo del testo */
+  --font-mono:  'IBM Plex Mono', ui-monospace, monospace;   /* etichette e codice */
+
+  --size-base:  17px;
+  --size-small: 15px;
+  --size-tiny:  12px;
+  --lh:         1.65;
+
+  /* --- Forma -------------------------------------------------------------- */
+  --radius:       14px;
+  --radius-small: 8px;
+  --radius-pill:  20px;
+  --border:       2px;
+  --border-thin:  1.5px;
+  --shadow:       4px 4px 0 rgba(32, 36, 44, .12);   /* ombra solida "a timbro" */
+  --shadow-hover: 7px 7px 0 rgba(32, 36, 44, .18);
+
+  /* --- Ritmo verticale ---------------------------------------------------- */
+  --s1: 4px;  --s2: 8px;  --s3: 14px;
+  --s4: 22px; --s5: 36px; --s6: 66px;
+
+  /* --- Larghezze ---------------------------------------------------------- */
+  --col-testo: 760px;   /* colonna di lettura */
+  --col-toc:   214px;   /* indice laterale */
+
+  /* --- Movimento ---------------------------------------------------------- */
+  --dur-fast: .15s;
+  --dur:      .45s;
+  --ease:     cubic-bezier(.22, .78, .3, 1);
+}
+
+
+/* ==========================================================================
+   2. TEMA SCURO
+   --------------------------------------------------------------------------
+   Nessun filtro `invert`: i colori scuri sono scelti a mano, così gli accenti
+   restano leggibili invece di diventare fluorescenti, e `position: sticky`
+   continua a funzionare (un elemento con `filter` diventa containing block
+   e rompe sticky/fixed dei figli).
+   ========================================================================== */
+
+:root[data-theme="dark"] {
+  --paper:        #14161B;
+  --paper-raised: #1D2027;
+  --paper-sunken: #262A33;
+  --ink:          #E8E6DF;
+  --ink-soft:     #A2A7B3;
+  --ink-faint:    #666C79;
+  --rule:         #2A2E38;
+
+  --blu:     #7EA6F0;
+  --rosso:   #F08C7E;
+  --verde:   #6FC796;
+  --arancio: #F0AC63;
+  --viola:   #B79BE0;
+
+  --shadow:       4px 4px 0 rgba(0, 0, 0, .45);
+  --shadow-hover: 7px 7px 0 rgba(0, 0, 0, .55);
+}
+
+
+/* ==========================================================================
+   3. ICONE — set su misura, tratto a penna irregolare
+   --------------------------------------------------------------------------
+   SVG incorporati: nessuna richiesta di rete, funzionano anche da file://.
+   Applicate con `mask-image`, quindi prendono automaticamente il colore
+   dell'accento e del tema. Per cambiare l'icona di un tipo di riquadro in
+   tutta la wiki basta modificare la riga corrispondente.
+   ========================================================================== */
+
+:root {
+  --ico-orient:  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2.6c5.2 0 9.4 4.2 9.4 9.4S17.2 21.4 12 21.4 2.6 17.2 2.6 12 6.8 2.6 12 2.6z'/%3E%3Cpath d='M15.8 8.2l-2.2 5.6-5.4 2 2.2-5.6z'/%3E%3C/svg%3E");
+  --ico-key:     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8.2' cy='8.4' r='4.6'/%3E%3Cpath d='M11.5 11.7l8.8 8.9M17.6 17.9l1.9-1.9M15.4 15.6l1.9-1.9'/%3E%3C/svg%3E");
+  --ico-warn:    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3.4l9.9 16.2c.3.6-.1 1.2-.8 1.2H2.9c-.7 0-1.1-.6-.8-1.2z'/%3E%3Cpath d='M12 9.4v4.8M12 17.8v.2'/%3E%3C/svg%3E");
+  --ico-bridge:  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.4 18.4c0-6.1 4.4-9.6 9.6-9.6s9.6 3.5 9.6 9.6'/%3E%3Cpath d='M2.4 18.6h19.2M7 18.5v-5.1M12 18.5V9.2M17 18.5v-5.1'/%3E%3C/svg%3E");
+  --ico-demo:    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.4 2.9h5.2M10.5 3v6.3l-5.7 9.3c-.8 1.3.1 2.9 1.6 2.9h11.2c1.5 0 2.4-1.6 1.6-2.9L13.5 9.3V3'/%3E%3Cpath d='M7.3 14.7c2.6-1 6.8 1 9.4 0'/%3E%3C/svg%3E");
+  --ico-formula: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18.4 4.3H6.2l6.5 7.8-6.5 7.7h12.2'/%3E%3Cpath d='M18.4 4.3v2.6M18.4 19.8v-2.7'/%3E%3C/svg%3E");
+  --ico-math:    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='4' r='1.8'/%3E%3Cpath d='M11.4 5.7L6.2 19.9M12.6 5.7l5.2 14.2'/%3E%3Cpath d='M8.7 15.2c2.3 1.3 4.5 1.3 6.8 0'/%3E%3C/svg%3E");
+  --ico-book:    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.2 4.5c2.9-1.1 5.8-1 8.8.9 3-1.9 5.9-2 8.8-.9v14.2c-2.9-1.1-5.8-1-8.8.9-3-1.9-5.9-2-8.8-.9z'/%3E%3Cpath d='M12 5.4v14.2'/%3E%3C/svg%3E");
+  --ico-expert:  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.6 8.7L12 4.3l9.4 4.4L12 13.1z'/%3E%3Cpath d='M6.4 10.8v5.1c0 1.6 2.5 2.9 5.6 2.9s5.6-1.3 5.6-2.9v-5.1'/%3E%3Cpath d='M21.4 8.8v5'/%3E%3C/svg%3E");
+  --ico-paper:   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7.2 2.9h6.4l5 5v11.6c0 .9-.7 1.6-1.6 1.6H7.2c-.9 0-1.6-.7-1.6-1.6V4.5c0-.9.7-1.6 1.6-1.6z'/%3E%3Cpath d='M13.4 3v5.2h5.1M9 13.2h6M9 16.7h4.4'/%3E%3C/svg%3E");
+  --ico-memory:  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4.2' width='18' height='15.6' rx='2'/%3E%3Cpath d='M3.2 9.4h17.6M3.2 14.6h17.6M10 6.8h4M10 12h4M10 17.2h4'/%3E%3C/svg%3E");
+  --ico-idea:    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2.9c-3.5 0-6.3 2.7-6.3 6.1 0 2.2 1.2 3.7 2.2 4.9.8 1 1.1 1.7 1.1 2.5h6c0-.8.3-1.5 1.1-2.5 1-1.2 2.2-2.7 2.2-4.9 0-3.4-2.8-6.1-6.3-6.1z'/%3E%3Cpath d='M9.2 18.3h5.6M10.2 21h3.6'/%3E%3C/svg%3E");
+  --ico-note:    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15.3 3.3l5.5 5.5-3.1 1.1-1.6 5.5-7.4-7.4 5.5-1.6z'/%3E%3Cpath d='M8.6 15.4L3.3 20.7'/%3E%3C/svg%3E");
+  --ico-tappa:   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 21.2V3.2'/%3E%3Cpath d='M5 4.4c4.1-2.1 8.2 2 12.3 0v8.9c-4.1 2.1-8.2-2-12.3 0'/%3E%3C/svg%3E");
+  --ico-arrow:   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.6 12h16.6M14.2 5.9l6.1 6.1-6.1 6.2'/%3E%3C/svg%3E");
+  --ico-check:   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.3 12.7c2.1 1.3 3.8 3 5.2 5.2C13 11.4 16.4 7.4 19.9 6.2'/%3E%3C/svg%3E");
+  --ico-moon:    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20.7 14.3A8.7 8.7 0 019.8 3.4 8.7 8.7 0 1020.7 14.3z'/%3E%3C/svg%3E");
+  --ico-sun:     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='4.4'/%3E%3Cpath d='M12 2.4v2.2M12 19.4v2.2M4.4 12H2.2M21.8 12h-2.2M6.5 6.5L5 5M19 19l-1.5-1.5M17.5 6.5L19 5M5 19l1.5-1.5'/%3E%3C/svg%3E");
+}
+
+/* Motore delle icone: un quadrato mascherato che si colora da solo. */
+.w-ico,
+.w-note::before,
+.w-demo-title::before,
+.w-nav-next::after,
+.w-card-ico {
+  content: "";
+  display: inline-block;
+  width: 1.15em;
+  height: 1.15em;
+  flex-shrink: 0;
+  background-color: var(--accent);
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center;  mask-position: center;
+  -webkit-mask-size: contain;     mask-size: contain;
+}
+
+/* Scorciatoie: <span class="w-ico i-key"></span> */
+.i-orient  { -webkit-mask-image: var(--ico-orient);  mask-image: var(--ico-orient); }
+.i-key     { -webkit-mask-image: var(--ico-key);     mask-image: var(--ico-key); }
+.i-warn    { -webkit-mask-image: var(--ico-warn);    mask-image: var(--ico-warn); }
+.i-bridge  { -webkit-mask-image: var(--ico-bridge);  mask-image: var(--ico-bridge); }
+.i-demo    { -webkit-mask-image: var(--ico-demo);    mask-image: var(--ico-demo); }
+.i-formula { -webkit-mask-image: var(--ico-formula); mask-image: var(--ico-formula); }
+.i-math    { -webkit-mask-image: var(--ico-math);    mask-image: var(--ico-math); }
+.i-book    { -webkit-mask-image: var(--ico-book);    mask-image: var(--ico-book); }
+.i-expert  { -webkit-mask-image: var(--ico-expert);  mask-image: var(--ico-expert); }
+.i-paper   { -webkit-mask-image: var(--ico-paper);   mask-image: var(--ico-paper); }
+.i-memory  { -webkit-mask-image: var(--ico-memory);  mask-image: var(--ico-memory); }
+.i-idea    { -webkit-mask-image: var(--ico-idea);    mask-image: var(--ico-idea); }
+.i-note    { -webkit-mask-image: var(--ico-note);    mask-image: var(--ico-note); }
+.i-tappa   { -webkit-mask-image: var(--ico-tappa);   mask-image: var(--ico-tappa); }
+.i-arrow   { -webkit-mask-image: var(--ico-arrow);   mask-image: var(--ico-arrow); }
+.i-check   { -webkit-mask-image: var(--ico-check);   mask-image: var(--ico-check); }
+.i-moon    { -webkit-mask-image: var(--ico-moon);    mask-image: var(--ico-moon); }
+.i-sun     { -webkit-mask-image: var(--ico-sun);     mask-image: var(--ico-sun); }
+
+
+/* ==========================================================================
+   4. BASE
+   ========================================================================== */
+
+/* I quadretti stanno sull'<html>, non sul <body>: lo sfondo dell'elemento
+   radice viene sempre propagato al canvas del documento e copre l'intera
+   area scorribile, a qualsiasi lunghezza di pagina. Metterlo sul <body>
+   funziona solo finché l'<html> non ha un proprio sfondo — ed è esattamente
+   il motivo per cui, prima, il tema scuro lasciava la pagina nera. */
+html {
+  scroll-behavior: smooth;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--rule) 1px, transparent 1px),
+    linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+  background-size: var(--grid-step) var(--grid-step);
+}
+
+body {
+  margin: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-testo);
+  font-size: var(--size-base);
+  line-height: var(--lh);
+  transition: color var(--dur-fast) linear;
+}
+
+a { color: var(--blu); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--blu) 35%, transparent); }
+a:hover { color: var(--rosso); border-color: color-mix(in srgb, var(--rosso) 45%, transparent); }
+
+h1, h2, h3, h4 { font-family: var(--font-mano); font-weight: 700; }
+
+p { margin: 0 0 1em; }
+
+code, .w-code {
+  font-family: var(--font-mono);
+  font-size: .85em;
+  background: var(--paper-sunken);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--rule);
+}
+
+input[type=range] { accent-color: var(--arancio); width: 100%; }
+
+input[type=text] {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--font-mono);
+  font-size: var(--size-small);
+  padding: 10px 12px;
+  border: var(--border-thin) solid var(--rule);
+  border-radius: var(--radius-small);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+mjx-container { overflow-x: auto; overflow-y: hidden; max-width: 100%; }
+mjx-container[display="true"] { margin: .2em 0 !important; }
+
+/* Modificatori di accento: ridefiniscono --accent per il sottoalbero. */
+.a-blu     { --accent: var(--blu); }
+.a-rosso   { --accent: var(--rosso); }
+.a-verde   { --accent: var(--verde); }
+.a-arancio { --accent: var(--arancio); }
+.a-viola   { --accent: var(--viola); }
+
+
+/* ==========================================================================
+   5. COMPONENTI
+   ========================================================================== */
+
+/* --- Impalcatura della pagina --------------------------------------------- */
+
+.w-page { max-width: 880px; margin: 0 auto; padding: 0 20px 90px; }
+
+/* Variante con indice laterale: l'indice lo genera wiki.js, non si scrive. */
+.w-page--toc { display: flex; justify-content: center; gap: 34px; max-width: none; padding: 0 20px 90px; }
+.w-main { max-width: var(--col-testo); width: 100%; min-width: 0; counter-reset: tappa; }
+
+/* --- Indice laterale (generato) ------------------------------------------- */
+
+.w-toc {
+  position: sticky; top: 0; align-self: flex-start;
+  width: var(--col-toc); flex-shrink: 0;
+  height: 100vh; overflow: auto;
+  padding: 78px 4px 40px;
+  font-family: var(--font-mono); font-size: var(--size-tiny); line-height: 1.5;
+}
+.w-toc-title { color: var(--rosso); letter-spacing: .15em; margin-bottom: 10px; text-transform: uppercase; }
+.w-toc a {
+  display: block; border: none; color: var(--ink-soft);
+  padding: 5px 0 5px 10px;
+  border-left: 2px solid transparent;
+  transition: color var(--dur-fast), border-color var(--dur-fast), padding-left var(--dur-fast);
+}
+.w-toc a:hover { color: var(--ink); padding-left: 14px; }
+.w-toc a.is-current { color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+.w-toc-foot { margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--rule); }
+.w-toc-foot a { color: var(--blu); padding-left: 0; }
+
+@media (max-width: 1080px) { .w-toc { display: none; } }
+
+/* --- Barra di progresso (generata) ---------------------------------------- */
+
+.w-progress {
+  position: fixed; top: 0; left: 0; height: 4px; width: 0;
+  background: var(--blu); z-index: 60;
+  transition: width .1s linear;
+}
+
+/* --- Pulsante tema (generato) --------------------------------------------- */
+
+.w-themebtn {
+  position: fixed; right: 16px; bottom: 16px; z-index: 70;
+  width: 46px; height: 46px; border-radius: 50%;
+  border: var(--border) solid var(--ink);
+  background: var(--paper-raised); color: var(--ink);
+  cursor: pointer; display: grid; place-items: center;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, .18);
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast);
+}
+.w-themebtn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 rgba(0, 0, 0, .22); }
+.w-themebtn .w-ico { width: 20px; height: 20px; background-color: var(--ink); }
+
+/* --- Briciole di pane ------------------------------------------------------ */
+
+.w-nav {
+  display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  padding: 16px 0 0;
+  font-family: var(--font-mono); font-size: var(--size-tiny); letter-spacing: .04em;
+}
+.w-nav-home {
+  border: none; background: var(--ink); color: var(--paper);
+  padding: 6px 12px; border-radius: var(--radius-pill);
+  transition: transform var(--dur-fast) var(--ease);
+}
+.w-nav-home:hover { color: var(--paper); transform: translateX(-3px); }
+.w-nav-sep { color: var(--ink-faint); }
+.w-nav-here { color: var(--ink-soft); }
+.w-nav-next { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; color: var(--accent); border: none; }
+.w-nav-next::after { --accent: currentColor; -webkit-mask-image: var(--ico-arrow); mask-image: var(--ico-arrow); background-color: currentColor; }
+.w-nav-next:hover::after { transform: translateX(3px); }
+.w-nav-next::after { transition: transform var(--dur-fast) var(--ease); }
+
+/* --- Copertina ------------------------------------------------------------- */
+
+.w-hero { padding: 56px 0 30px; text-align: center; }
+.w-hero-kicker {
+  font-family: var(--font-mono); font-size: var(--size-tiny);
+  letter-spacing: .25em; text-transform: uppercase; color: var(--rosso);
+}
+.w-hero-title { line-height: 1.05; font-size: clamp(44px, 9vw, 74px); margin: 14px 0 6px; }
+.w-hero-sub { font-size: 19px; color: var(--ink-soft); max-width: 600px; margin: 10px auto 0; font-style: italic; }
+.w-hero-sign { margin-top: 22px; font-family: var(--font-mano); font-size: 23px; color: var(--accent); }
+
+/* Sottolineatura "a pennarello": si disegna all'apertura della pagina. */
+.w-mark {
+  position: relative;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-repeat: no-repeat;
+  background-position: 0 88%;
+  background-size: 100% 5px;
+}
+/* Senza `both`: prima e dopo l'animazione la sottolineatura è comunque
+   disegnata per intero. Se l'animazione non parte, non si perde nulla. */
+html.w-anim .w-mark { animation: w-draw .9s var(--ease) .1s; }
+@keyframes w-draw { from { background-size: 0 5px; } to { background-size: 100% 5px; } }
+
+/* --- Tappa di studio (sezione) --------------------------------------------- */
+
+.w-tappa {
+  counter-increment: tappa;
+  margin-top: var(--s6);
+  border-top: 3px solid var(--ink);
+  padding-top: var(--s2);
+  scroll-margin-top: 20px;
+}
+.w-tappa--fine { counter-increment: none; }
+
+.w-tappa-kicker {
+  font-family: var(--font-mono); font-size: var(--size-tiny);
+  letter-spacing: .2em; color: var(--rosso); text-transform: uppercase;
+}
+/* Il numero della tappa è automatico: non scriverlo a mano. */
+.w-tappa .w-tappa-kicker::before { content: "Tappa " counter(tappa, decimal-leading-zero) " · "; }
+
+.w-tappa-title { line-height: 1.05; font-size: clamp(34px, 6vw, 46px); margin: 2px 0 4px; }
+.w-tappa-lead { font-size: 18px; font-style: italic; color: var(--ink-soft); margin: 0 0 18px; }
+.w-h3 { line-height: 1.15; font-size: 27px; margin: 26px 0 8px; color: var(--accent); }
+
+/* Capolettera scritto a mano. */
+.w-drop::first-letter {
+  float: left; font-family: var(--font-mano); font-size: 62px;
+  line-height: .78; color: var(--accent); padding: 6px 12px 0 0;
+}
+
+/* --- Riquadri ---------------------------------------------------------------
+   .w-note--info   orientamento, cosa si impara
+   .w-note--key    concetto chiave da ricordare
+   .w-note--warn   trappola, errore frequente
+   .w-note--bridge rimando a un altro modulo
+   .w-note--math   passaggio matematico
+   .w-note--demo   analogia / spiegazione per immagini
+   .w-note--expert livello esperto
+   .w-note--paper  fonti e riferimenti
+   --------------------------------------------------------------------------- */
+
+.w-note {
+  position: relative;
+  border-radius: 12px;
+  padding: 16px 20px 16px 52px;
+  margin: 20px 0;
+  background: var(--paper-raised);
+  border: var(--border-thin) solid var(--accent);
+  box-shadow: 3px 3px 0 color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.w-note::before {
+  position: absolute; left: 18px; top: 18px;
+  width: 20px; height: 20px;
+}
+.w-note-title {
+  font-family: var(--font-mano); font-size: 22px;
+  display: block; margin-bottom: 4px; color: var(--accent);
+}
+.w-note > :last-child { margin-bottom: 0; }
+
+.w-note--info   { --accent: var(--blu); }
+.w-note--info::before   { -webkit-mask-image: var(--ico-orient);  mask-image: var(--ico-orient); }
+.w-note--key    { --accent: var(--verde); }
+.w-note--key::before    { -webkit-mask-image: var(--ico-key);     mask-image: var(--ico-key); }
+.w-note--warn   { --accent: var(--rosso); background: color-mix(in srgb, var(--rosso) 6%, var(--paper-raised)); }
+.w-note--warn::before   { -webkit-mask-image: var(--ico-warn);    mask-image: var(--ico-warn); }
+.w-note--bridge { --accent: var(--blu); background: color-mix(in srgb, var(--blu) 6%, var(--paper-raised)); }
+.w-note--bridge::before { -webkit-mask-image: var(--ico-bridge);  mask-image: var(--ico-bridge); }
+.w-note--math   { --accent: var(--blu); }
+.w-note--math::before   { -webkit-mask-image: var(--ico-math);    mask-image: var(--ico-math); }
+.w-note--demo   { --accent: var(--arancio); }
+.w-note--demo::before   { -webkit-mask-image: var(--ico-idea);    mask-image: var(--ico-idea); }
+.w-note--memory { --accent: var(--verde); }
+.w-note--memory::before { -webkit-mask-image: var(--ico-memory);  mask-image: var(--ico-memory); }
+.w-note--expert { --accent: var(--viola); }
+.w-note--expert::before { -webkit-mask-image: var(--ico-expert);  mask-image: var(--ico-expert); }
+.w-note--paper  { --accent: var(--ink-soft); background: var(--paper); font-size: 14.5px; }
+.w-note--paper::before  { -webkit-mask-image: var(--ico-paper);   mask-image: var(--ico-paper); }
+.w-note--paper ul { margin: 0; padding-left: 18px; }
+.w-note--paper li { margin-bottom: 4px; }
+.w-ref { font-family: var(--font-mono); font-size: 12px; color: var(--rosso); }
+
+/* --- Formula in evidenza ---------------------------------------------------- */
+
+.w-formula {
+  background: var(--paper-raised);
+  border-left: 4px solid var(--accent);
+  padding: 10px 18px; margin: 16px 0; overflow-x: auto;
+}
+.w-formula-note { display: block; font-size: 13.5px; color: var(--ink-soft); font-style: italic; margin-top: 6px; }
+
+/* --- Demo interattiva -------------------------------------------------------- */
+
+.w-demo {
+  --accent: var(--arancio);
+  background: var(--paper-raised);
+  border: var(--border) solid var(--accent);
+  border-radius: var(--radius);
+  padding: 18px; margin: 22px 0;
+  box-shadow: var(--shadow);
+}
+.w-demo-title {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mano); font-size: 24px; color: var(--accent); margin: 0 0 4px;
+}
+.w-demo-title::before { -webkit-mask-image: var(--ico-demo); mask-image: var(--ico-demo); }
+.w-demo-hint { margin: 0 0 10px; font-size: var(--size-small); }
+.w-demo-out {
+  font-family: var(--font-mono); font-size: 13px;
+  background: var(--paper-sunken); border-radius: var(--radius-small); padding: 10px 12px;
+}
+.w-demo-foot { font-size: 12.5px; color: var(--ink-soft); font-style: italic; margin: 8px 0 0; }
+.w-label { font-family: var(--font-mono); font-size: var(--size-tiny); color: var(--accent); }
+
+.w-btn {
+  font-family: var(--font-mono); font-size: 13px;
+  border: var(--border-thin) solid var(--ink); border-radius: var(--radius-pill);
+  padding: 6px 14px; cursor: pointer;
+  background: var(--paper-raised); color: var(--ink);
+  transition: transform var(--dur-fast) var(--ease);
+}
+.w-btn:hover { transform: translateY(-2px); }
+
+/* --- Card e griglie ---------------------------------------------------------- */
+
+.w-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; }
+
+.w-card {
+  display: block;
+  background: var(--paper-raised);
+  border: var(--border) solid var(--accent);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+a.w-card:hover { color: var(--ink); transform: translate(-3px, -3px); box-shadow: var(--shadow-hover); }
+.w-card-head { display: flex; justify-content: space-between; align-items: baseline; }
+.w-card-id { font-family: var(--font-mono); font-size: var(--size-tiny); letter-spacing: .15em; color: var(--accent); }
+.w-card-state { font-family: var(--font-mono); font-size: 11px; color: var(--verde); }
+.w-card-title { font-family: var(--font-mano); font-size: 38px; margin: 6px 0 4px; line-height: 1.02; display: flex; align-items: center; gap: 10px; }
+.w-card-ico { width: 30px; height: 30px; }
+.w-card-sub { font-size: var(--size-small); color: var(--ink-soft); margin: 0 0 14px; }
+
+.w-card--ghost {
+  --accent: var(--ink-faint);
+  border-style: dashed;
+  box-shadow: none;
+  color: var(--ink-faint);
+  background: repeating-linear-gradient(135deg,
+    var(--paper-raised), var(--paper-raised) 10px,
+    var(--paper) 10px, var(--paper) 20px);
+}
+.w-card--ghost .w-card-title { color: var(--ink-faint); }
+
+/* --- Etichette --------------------------------------------------------------- */
+
+.w-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.w-chip {
+  font-family: var(--font-mono); font-size: 11px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--ink);
+  border-radius: var(--radius-pill); padding: 4px 10px;
+}
+
+/* --- Scaffale (homepage) ------------------------------------------------------ */
+
+.w-shelf-title { display: flex; align-items: center; gap: 14px; margin: 40px 0 18px; }
+.w-shelf-title span { font-family: var(--font-mano); font-size: 30px; color: var(--ink); }
+.w-shelf-title::after { content: ""; flex: 1; height: 2px; background: var(--ink); }
+
+/* --- Legenda ------------------------------------------------------------------ */
+
+.w-legend { list-style: none; margin: 0; padding: 0; }
+.w-legend li { display: flex; align-items: center; gap: 10px; padding: 3px 0; font-size: var(--size-small); }
+.w-legend i { width: 34px; height: 5px; border-radius: 3px; flex-shrink: 0; background: var(--accent); }
+
+/* --- Sommario a inizio pagina -------------------------------------------------- */
+
+.w-summary { list-style: none; margin: 0; padding: 0; }
+.w-summary li { padding: 7px 0; border-bottom: 1px dashed var(--rule); }
+.w-summary a { border: none; color: var(--ink); display: flex; gap: 12px; align-items: baseline; transition: padding-left var(--dur-fast) var(--ease); }
+.w-summary a:hover { padding-left: 6px; color: var(--ink); }
+.w-summary-n { font-family: var(--font-mono); font-size: 13px; color: var(--rosso); min-width: 26px; }
+.w-summary-tag { margin-left: auto; font-size: 13px; color: var(--ink-soft); font-style: italic; }
+
+/* --- Tabelle, figure, footer ---------------------------------------------------- */
+
+.w-table { width: 100%; border-collapse: collapse; margin: 16px 0; background: var(--paper-raised); font-size: 14.5px; }
+.w-table th, .w-table td { border: 1px solid var(--rule); padding: 8px 10px; text-align: left; }
+.w-table th { font-family: var(--font-mono); font-size: 12.5px; background: var(--paper-sunken); }
+
+.w-figure { margin: 24px 0; background: var(--paper-raised); border: var(--border) solid var(--ink); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); }
+.w-figure svg { width: 100%; height: auto; display: block; }
+.w-figure figcaption { font-size: 13.5px; color: var(--ink-soft); font-style: italic; margin-top: 8px; text-align: center; }
+
+.w-footer { margin-top: var(--s6); padding-top: var(--s4); border-top: 1px dashed var(--rule); font-size: 14px; color: var(--ink-soft); text-align: center; }
+
+
+/* ==========================================================================
+   6. ANIMAZIONI
+   --------------------------------------------------------------------------
+   `html.w-anim` viene aggiunta da wiki.js solo se il movimento è consentito.
+   Senza JS, o con movimento ridotto, tutto resta visibile e statico: non si
+   può mai perdere del contenuto.
+   ========================================================================== */
+
+html.w-anim .w-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+html.w-anim .w-reveal.is-in { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+  html { scroll-behavior: auto; }
+  .w-reveal { opacity: 1 !important; transform: none !important; }
+}
