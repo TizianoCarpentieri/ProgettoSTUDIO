@@ -3,132 +3,84 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dentro la Macchina - come un LLM genera testo</title>
+
+<!-- ===== CONNETTORE DELLA WIKI - righe fisse, identiche su ogni pagina ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./wiki/wiki.css">
 <script src="./support.js"></script>
+<script defer src="./wiki/wiki.js"></script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<!-- ======================================================================== -->
 </head>
 <body>
 <x-dc>
-<helmet data-dc-atomics>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
-<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},chtml:{scale:1.02}};</script>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-<style>
-html{scroll-behavior:smooth}
-body{margin:0;background:#FBFAF5;background-image:linear-gradient(#E9E5D8 1px,transparent 1px),linear-gradient(90deg,#E9E5D8 1px,transparent 1px);background-size:28px 28px;color:#20242C;font-family:'Literata',Georgia,serif;line-height:1.65;font-size:17px}
-a{color:#2456B8;text-decoration:none;border-bottom:1px solid rgba(36,86,184,.3)}
-a:hover{color:#C0392B;border-color:rgba(192,57,43,.4)}
-input[type=range]{accent-color:#D9741E;width:100%}
-mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
-mjx-container[display="true"]{margin:.2em 0!important}
-@media (max-width:1080px){#sidetoc{display:none!important}}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
-<script>
-(function(){
-  var KEY='llm-book-night';
-  function apply(on){
-    document.documentElement.style.background = on ? '#0e0d0b' : '';
-    document.body.style.filter = on ? 'invert(1) hue-rotate(180deg)' : '';
-  }
-  function init(){
-    if(document.getElementById('nightbtn')) return;
-    var on = false;
-    try{ on = localStorage.getItem(KEY)==='1'; }catch(e){}
-    apply(on);
-    var b=document.createElement('button');
-    b.id='nightbtn'; b.type='button';
-    b.setAttribute('aria-label','Modalità notte');
-    b.style.cssText='position:fixed;right:16px;bottom:16px;z-index:70;width:44px;height:44px;border-radius:50%;border:2px solid #20242C;background:#fff;color:#20242C;font-size:20px;line-height:1;cursor:pointer;box-shadow:2px 2px 0 rgba(0,0,0,.15);font-family:system-ui';
-    b.textContent = on ? '\u2600' : '\u263e';
-    b.onclick=function(){ on=!on; try{ localStorage.setItem(KEY, on?'1':'0'); }catch(e){} apply(on); b.textContent = on ? '\u2600' : '\u263e'; };
-    document.documentElement.appendChild(b);
-  }
-  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',init); } else { init(); }
-})();
-</script>
-</helmet>
 
-<div id="progbar" style="position:fixed;top:0;left:0;height:4px;width:0;background:#2456B8;z-index:60"></div>
 
-<div style="display:flex;justify-content:center;gap:34px;padding:0 20px 90px">
+<div class="w-page--toc">
 
-  <aside id="sidetoc" style="position:sticky;top:0;align-self:flex-start;width:214px;flex-shrink:0;height:100vh;overflow:auto;padding:78px 4px 40px;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.5">
-    <div style="color:#C0392B;letter-spacing:.15em;margin-bottom:10px">MODULO 01 · INDICE</div>
-    <a href="#c1" style="display:block;border:none;color:#20242C;padding:5px 0">01 · Tokenizer</a>
-    <a href="#c2" style="display:block;border:none;color:#20242C;padding:5px 0">02 · Embedding</a>
-    <a href="#c3" style="display:block;border:none;color:#20242C;padding:5px 0">03 · Transformer</a>
-    <a href="#c4" style="display:block;border:none;color:#20242C;padding:5px 0">04 · KV Cache</a>
-    <a href="#c5" style="display:block;border:none;color:#20242C;padding:5px 0">05 · FlashAttention</a>
-    <a href="#c6" style="display:block;border:none;color:#20242C;padding:5px 0">06 · LM Head</a>
-    <a href="#c7" style="display:block;border:none;color:#20242C;padding:5px 0">07 · Sampling</a>
-    <a href="#c8" style="display:block;border:none;color:#20242C;padding:5px 0">08 · Speculative</a>
-    <a href="#c9" style="display:block;border:none;color:#20242C;padding:5px 0">09 · Detokenizer</a>
-    <a href="#fine" style="display:block;border:none;color:#6B6F7A;padding:5px 0">— Epilogo</a>
-    <div style="margin-top:18px;padding-top:14px;border-top:1px dashed #E9E5D8">
-      <a href="Biblioteca.dc.html" style="display:block;border:none;color:#2456B8;padding:4px 0">↩ Biblioteca</a>
-      <a href="Fondamenti-Matematici-LLM.dc.html" style="display:block;border:none;color:#2456B8;padding:4px 0">→ Modulo 02: matematica</a>
-    </div>
-  </aside>
+  <aside class="w-toc" data-titolo="Modulo 01 · Indice" data-pie='<a href="Biblioteca.dc.html">Biblioteca</a><a href="Fondamenti-Matematici-LLM.dc.html">Modulo 02: la matematica</a>'></aside>
 
-  <main style="max-width:760px;width:100%;min-width:0">
+  <main class="w-main">
 
-  <nav style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:16px 0 0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em">
-    <a href="Biblioteca.dc.html" style="border:none;background:#20242C;color:#FBFAF5;padding:6px 12px;border-radius:20px">← BIBLIOTECA</a>
-    <span style="color:#B7B2A2">/</span>
-    <span style="color:#6B6F7A">Modulo 01 · Come genera testo</span>
+  <nav class="w-nav">
+    <a class="w-nav-home" href="Biblioteca.dc.html">← BIBLIOTECA</a>
+    <span class="w-nav-sep">/</span>
+    <span class="w-nav-here">Modulo 01 · Come genera testo</span>
     <a href="Fondamenti-Matematici-LLM.dc.html" style="margin-left:auto;color:#2456B8;border-color:rgba(36,86,184,.3)">Modulo 02: la matematica →</a>
   </nav>
 
-  <header style="padding:56px 0 30px;text-align:center">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.25em;text-transform:uppercase;color:#C0392B">Un piccolo libro illustrato · vol. 1</div>
-    <h1 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(44px,9vw,74px);margin:14px 0 6px;font-weight:700">Dentro la <span style="border-bottom:5px solid #2456B8">Macchina</span></h1>
-    <p style="font-size:19px;color:#6B6F7A;max-width:560px;margin:10px auto 0;font-style:italic">Come un Large Language Model genera testo, passo per passo — dal tasto Invio all'ultima parola. Da conoscenze medie a esperto, con analogie, numeri veri, formule e i paper che lo dimostrano.</p>
-    <div style="margin-top:22px;font-family:'Caveat',cursive;font-size:22px;color:#2456B8">— il tuo maestro di bottega, quaderno alla mano</div>
+  <header class="w-hero">
+    <div class="w-hero-kicker">Un piccolo libro illustrato · vol. 1</div>
+    <h1 class="w-hero-title">Dentro la <span class="w-mark">Macchina</span></h1>
+    <p class="w-hero-sub">Come un Large Language Model genera testo, passo per passo — dal tasto Invio all'ultima parola. Da conoscenze medie a esperto, con analogie, numeri veri, formule e i paper che lo dimostrano.</p>
+    <div class="w-hero-sign">— il tuo maestro di bottega, quaderno alla mano</div>
   </header>
 
   <div style="border:2px solid #20242C;border-radius:14px;background:#fff;padding:18px 22px;margin:34px 0;box-shadow:4px 4px 0 rgba(32,36,44,.12)">
-    <h3 style="font-family:'Caveat',cursive;font-size:26px;margin:0 0 8px">La legenda delle penne ✒️</h3>
-    <p style="font-size:14.5px;margin:0 0 8px">Ogni colore ha un significato, mantenuto per tutto il libro (e nel Modulo 02):</p>
-    <ul style="list-style:none;margin:0;padding:0">
-      <li style="display:flex;align-items:center;gap:10px;padding:3px 0;font-size:15px"><span style="width:34px;height:5px;border-radius:3px;flex-shrink:0;background:#20242C"></span> Struttura e testo — lo scheletro del discorso</li>
-      <li style="display:flex;align-items:center;gap:10px;padding:3px 0;font-size:15px"><span style="width:34px;height:5px;border-radius:3px;flex-shrink:0;background:#2456B8"></span> Calcolo — dove avviene la matematica</li>
-      <li style="display:flex;align-items:center;gap:10px;padding:3px 0;font-size:15px"><span style="width:34px;height:5px;border-radius:3px;flex-shrink:0;background:#C0392B"></span> Note a margine — cose da non dimenticare</li>
-      <li style="display:flex;align-items:center;gap:10px;padding:3px 0;font-size:15px"><span style="width:34px;height:5px;border-radius:3px;flex-shrink:0;background:#2E7D4F"></span> Cache e memoria — ciò che il modello "ricorda"</li>
-      <li style="display:flex;align-items:center;gap:10px;padding:3px 0;font-size:15px"><span style="width:34px;height:5px;border-radius:3px;flex-shrink:0;background:#D9741E"></span> Attivazioni e sampling — dove entra il caso</li>
-      <li style="display:flex;align-items:center;gap:10px;padding:3px 0;font-size:15px"><span style="width:34px;height:5px;border-radius:3px;flex-shrink:0;background:#6B3FA0"></span> Livello esperto — i dettagli da professionisti</li>
+    <h3 class="w-note-title" style="font-size:26px">La legenda delle penne ✒️</h3>
+    <p>Ogni colore ha un significato, mantenuto per tutto il libro (e nel Modulo 02):</p>
+    <ul class="w-legend">
+      <li><i style="background:var(--ink)"></i> Struttura e testo — lo scheletro del discorso</li>
+      <li><i style="background:var(--blu)"></i> Calcolo — dove avviene la matematica</li>
+      <li><i style="background:var(--rosso)"></i> Note a margine — cose da non dimenticare</li>
+      <li><i style="background:var(--verde)"></i> Cache e memoria — ciò che il modello "ricorda"</li>
+      <li><i style="background:var(--arancio)"></i> Attivazioni e sampling — dove entra il caso</li>
+      <li><i style="background:var(--viola)"></i> Livello esperto — i dettagli da professionisti</li>
     </ul>
   </div>
 
   <nav style="margin:30px 0 10px">
-    <h2 style="font-family:'Caveat',cursive;font-size:34px;margin:0 0 10px">Il viaggio in nove tappe</h2>
-    <ol style="list-style:none;margin:0;padding:0">
-      <li style="padding:7px 0;border-bottom:1px dashed #E9E5D8"><a href="#c1" style="border:none;color:#20242C;display:flex;gap:12px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#C0392B;min-width:26px">01</span><span>Il Tokenizer — tagliare il linguaggio in mattoncini</span><span style="margin-left:auto;font-size:13px;color:#6B6F7A;font-style:italic">BPE, vocabolari</span></a></li>
-      <li style="padding:7px 0;border-bottom:1px dashed #E9E5D8"><a href="#c2" style="border:none;color:#20242C;display:flex;gap:12px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#C0392B;min-width:26px">02</span><span>Gli Embedding — dare coordinate al significato</span><span style="margin-left:auto;font-size:13px;color:#6B6F7A;font-style:italic">vettori, RoPE</span></a></li>
-      <li style="padding:7px 0;border-bottom:1px dashed #E9E5D8"><a href="#c3" style="border:none;color:#20242C;display:flex;gap:12px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#C0392B;min-width:26px">03</span><span>Il Blocco Transformer — la riunione delle parole</span><span style="margin-left:auto;font-size:13px;color:#6B6F7A;font-style:italic">attention, FFN</span></a></li>
-      <li style="padding:7px 0;border-bottom:1px dashed #E9E5D8"><a href="#c4" style="border:none;color:#20242C;display:flex;gap:12px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#C0392B;min-width:26px">04</span><span>La KV Cache — non rileggere mai due volte</span><span style="margin-left:auto;font-size:13px;color:#6B6F7A;font-style:italic">prefill vs decode</span></a></li>
-      <li style="padding:7px 0;border-bottom:1px dashed #E9E5D8"><a href="#c5" style="border:none;color:#20242C;display:flex;gap:12px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#C0392B;min-width:26px">05</span><span>FlashAttention — cucinare senza correre in dispensa</span><span style="margin-left:auto;font-size:13px;color:#6B6F7A;font-style:italic">HBM vs SRAM</span></a></li>
-      <li style="padding:7px 0;border-bottom:1px dashed #E9E5D8"><a href="#c6" style="border:none;color:#20242C;display:flex;gap:12px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#C0392B;min-width:26px">06</span><span>LM Head — da 4.096 numeri a 128.000 candidati</span><span style="margin-left:auto;font-size:13px;color:#6B6F7A;font-style:italic">logit, softmax</span></a></li>
-      <li style="padding:7px 0;border-bottom:1px dashed #E9E5D8"><a href="#c7" style="border:none;color:#20242C;display:flex;gap:12px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#C0392B;min-width:26px">07</span><span>Il Sampling — la ruota della fortuna truccata</span><span style="margin-left:auto;font-size:13px;color:#6B6F7A;font-style:italic">top-k, top-p, T</span></a></li>
-      <li style="padding:7px 0;border-bottom:1px dashed #E9E5D8"><a href="#c8" style="border:none;color:#20242C;display:flex;gap:12px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#C0392B;min-width:26px">08</span><span>Speculative Decoding — l'apprendista e il maestro</span><span style="margin-left:auto;font-size:13px;color:#6B6F7A;font-style:italic">draft &amp; verify</span></a></li>
-      <li style="padding:7px 0;border-bottom:1px dashed #E9E5D8"><a href="#c9" style="border:none;color:#20242C;display:flex;gap:12px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#C0392B;min-width:26px">09</span><span>Detokenizer e Streaming — la parola torna al mondo</span><span style="margin-left:auto;font-size:13px;color:#6B6F7A;font-style:italic">+ quantizzazione</span></a></li>
+    <h2 class="w-h2">Il viaggio in nove tappe</h2>
+    <ol class="w-summary">
+      <li><a href="#c1"><span class="w-summary-n">01</span><span>Il Tokenizer — tagliare il linguaggio in mattoncini</span><span class="w-summary-tag">BPE, vocabolari</span></a></li>
+      <li><a href="#c2"><span class="w-summary-n">02</span><span>Gli Embedding — dare coordinate al significato</span><span class="w-summary-tag">vettori, RoPE</span></a></li>
+      <li><a href="#c3"><span class="w-summary-n">03</span><span>Il Blocco Transformer — la riunione delle parole</span><span class="w-summary-tag">attention, FFN</span></a></li>
+      <li><a href="#c4"><span class="w-summary-n">04</span><span>La KV Cache — non rileggere mai due volte</span><span class="w-summary-tag">prefill vs decode</span></a></li>
+      <li><a href="#c5"><span class="w-summary-n">05</span><span>FlashAttention — cucinare senza correre in dispensa</span><span class="w-summary-tag">HBM vs SRAM</span></a></li>
+      <li><a href="#c6"><span class="w-summary-n">06</span><span>LM Head — da 4.096 numeri a 128.000 candidati</span><span class="w-summary-tag">logit, softmax</span></a></li>
+      <li><a href="#c7"><span class="w-summary-n">07</span><span>Il Sampling — la ruota della fortuna truccata</span><span class="w-summary-tag">top-k, top-p, T</span></a></li>
+      <li><a href="#c8"><span class="w-summary-n">08</span><span>Speculative Decoding — l'apprendista e il maestro</span><span class="w-summary-tag">draft &amp; verify</span></a></li>
+      <li><a href="#c9"><span class="w-summary-n">09</span><span>Detokenizer e Streaming — la parola torna al mondo</span><span class="w-summary-tag">+ quantizzazione</span></a></li>
     </ol>
   </nav>
 
-  <div style="background:#FFF8E8;border:1.5px dashed #C0392B;border-radius:10px;padding:12px 16px;margin:18px 0;font-size:15.5px"><b style="color:#C0392B">Filo conduttore.</b> Seguiremo sempre la stessa domanda — <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">What is gravity?</code> — dal momento in cui la digiti fino a quando il modello risponde, un pezzetto alla volta, <em>"Gravity is a fundamental force that…"</em>. Ogni capitolo è una stazione di questo viaggio.</div>
+  <div class="w-note w-note--warn"><b style="color:#C0392B">Filo conduttore.</b> Seguiremo sempre la stessa domanda — <code>What is gravity?</code> — dal momento in cui la digiti fino a quando il modello risponde, un pezzetto alla volta, <em>"Gravity is a fundamental force that…"</em>. Ogni capitolo è una stazione di questo viaggio.</div>
 
   <!-- ============ CAP 01 ============ -->
-  <section id="c1" style="margin-top:66px;border-top:3px solid #20242C;padding-top:8px;scroll-margin-top:20px">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#C0392B;text-transform:uppercase">Tappa 01 · Input → Tokenizer</div>
-    <h2 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(34px,6vw,46px);margin:2px 0 4px">Tagliare il linguaggio in mattoncini</h2>
-    <p style="font-size:18px;font-style:italic;color:#6B6F7A;margin:0 0 18px">Un modello non legge lettere né parole: legge numeri. Il tokenizer è il traduttore che sta sulla porta.</p>
+  <section class="w-tappa" id="c1">
+    <div class="w-tappa-kicker">Input → Tokenizer</div>
+    <h2 class="w-tappa-title">Tagliare il linguaggio in mattoncini</h2>
+    <p class="w-tappa-lead">Un modello non legge lettere né parole: legge numeri. Il tokenizer è il traduttore che sta sulla porta.</p>
 
-    <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">L'idea</h3>
-    <p style="margin:0 0 1em"><span style="float:left;font-family:'Caveat',cursive;font-size:62px;line-height:.78;color:#2456B8;padding:6px 12px 0 0">Q</span>uando scrivi <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">What is gravity?</code>, la prima cosa che accade è che la frase viene spezzata in <strong>token</strong>: unità che possono essere parole intere, pezzi di parola o singoli simboli. Nello schema che stai studiando la frase diventa 5 token — e la parola "gravity", troppo rara per avere un mattoncino tutto suo, si spezza in "grav"+"ity".</p>
+    <h3 class="w-h3">L'idea</h3>
+    <p class="w-drop">Quando scrivi <code>What is gravity?</code>, la prima cosa che accade è che la frase viene spezzata in <strong>token</strong>: unità che possono essere parole intere, pezzi di parola o singoli simboli. Nello schema che stai studiando la frase diventa 5 token — e la parola "gravity", troppo rara per avere un mattoncino tutto suo, si spezza in "grav"+"ity".</p>
 
-    <div style="background:#fff;border:2px solid #D9741E;border-radius:14px;padding:18px;margin:22px 0;box-shadow:4px 4px 0 rgba(217,116,30,.15)">
-      <h4 style="font-family:'Caveat',cursive;font-size:24px;color:#D9741E;margin:0 0 4px">🛠️ Prova tu — il tokenizer dal vivo</h4>
-      <p style="margin:0 0 10px;font-size:15px">Scrivi qualcosa e guarda come viene spezzato in token (illustrativo: parole comuni intere, parole lunghe divise ai suffissi, punteggiatura a parte). Il contatore è ciò che <em>paghi</em> nelle API.</p>
-      <input type="text" value="{{ tokText }}" onChange="{{ setTokText }}" style="width:100%;box-sizing:border-box;font-family:'IBM Plex Mono',monospace;font-size:15px;padding:10px 12px;border:1.5px solid #E0DAC6;border-radius:8px;background:#FDFCF8;color:#20242C">
+    <div class="w-demo">
+      <h4 class="w-demo-title">Prova tu — il tokenizer dal vivo</h4>
+      <p class="w-demo-hint">Scrivi qualcosa e guarda come viene spezzato in token (illustrativo: parole comuni intere, parole lunghe divise ai suffissi, punteggiatura a parte). Il contatore è ciò che <em>paghi</em> nelle API.</p>
+      <input type="text" value="{{ tokText }}" onChange="{{ setTokText }}">
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px">
         <sc-for list="{{ tokens }}" as="tk" hint-placeholder-count="5">
           <div style="text-align:center">
@@ -140,47 +92,47 @@ mjx-container[display="true"]{margin:.2em 0!important}
       <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6B6F7A;margin-top:8px">token: <span style="color:#D9741E;font-weight:600">{{ tokCount }}</span> · caratteri: {{ charCount }} · rapporto ≈ {{ tokRatio }} car/token</div>
     </div>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #D9741E;box-shadow:3px 3px 0 rgba(217,116,30,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#D9741E">🧱 Analogia: la scatola di LEGO</span>
-      <p style="margin:0">Immagina di dover costruire <em>qualsiasi</em> parola di <em>qualsiasi</em> lingua con una scatola di mattoncini prefabbricati. Non puoi avere un mattoncino per ogni parola possibile (sarebbero milioni), né usare solo lettere singole (le sequenze diventerebbero lunghissime). La soluzione: mattoncini per i pezzi <em>frequenti</em> ("What", "is", "grav", "ity") e mattoncini piccoli per i casi rari. Il vocabolario del tokenizer è esattamente questa scatola: tipicamente 32.000–128.000 mattoncini.</p>
+    <div class="w-note w-note--demo">
+      <span class="w-note-title">Analogia: la scatola di LEGO</span>
+      <p>Immagina di dover costruire <em>qualsiasi</em> parola di <em>qualsiasi</em> lingua con una scatola di mattoncini prefabbricati. Non puoi avere un mattoncino per ogni parola possibile (sarebbero milioni), né usare solo lettere singole (le sequenze diventerebbero lunghissime). La soluzione: mattoncini per i pezzi <em>frequenti</em> ("What", "is", "grav", "ity") e mattoncini piccoli per i casi rari. Il vocabolario del tokenizer è esattamente questa scatola: tipicamente 32.000–128.000 mattoncini.</p>
     </div>
 
-    <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">Come funziona davvero: il BPE</h3>
-    <p style="margin:0 0 1em">L'algoritmo dominante è il <strong>Byte-Pair Encoding (BPE)</strong>. In fase di addestramento del tokenizer si parte dai singoli byte e, iterativamente, si <em>fonde</em> la coppia di simboli adiacenti più frequente nel corpus, creando un nuovo token. Si ripete finché il vocabolario raggiunge la dimensione voluta:</p>
-    <div style="background:#fff;border-left:4px solid #2456B8;padding:10px 18px;margin:16px 0;overflow-x:auto"><code style="font-family:'IBM Plex Mono',monospace;font-size:14px">g+r → "gr"  ·  "gr"+a → "gra"  ·  …  → "grav"  |  "gravity" è troppo rara: resta "grav"+"ity"</code><span style="display:block;font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:6px">Le fusioni apprese riflettono le statistiche della lingua: i pezzi comuni diventano token unici, i rari restano composti.</span></div>
-    <p style="margin:0 0 1em">Conseguenze pratiche che un esperto conosce a memoria: (1) lingue poco rappresentate nel corpus producono <em>più token per frase</em> → più costo e meno contesto utile; (2) i numeri e il codice si tokenizzano in modi a volte controintuitivi (ecco perché i modelli storicamente sbagliavano l'aritmetica sulle cifre); (3) lo spazio iniziale fa parte del token: <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">" is"</code> e <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">"is"</code> sono token diversi.</p>
+    <h3 class="w-h3">Come funziona davvero: il BPE</h3>
+    <p>L'algoritmo dominante è il <strong>Byte-Pair Encoding (BPE)</strong>. In fase di addestramento del tokenizer si parte dai singoli byte e, iterativamente, si <em>fonde</em> la coppia di simboli adiacenti più frequente nel corpus, creando un nuovo token. Si ripete finché il vocabolario raggiunge la dimensione voluta:</p>
+    <div class="w-formula"><code style="font-family:'IBM Plex Mono',monospace;font-size:14px">g+r → "gr"  ·  "gr"+a → "gra"  ·  …  → "grav"  |  "gravity" è troppo rara: resta "grav"+"ity"</code><span class="w-formula-note">Le fusioni apprese riflettono le statistiche della lingua: i pezzi comuni diventano token unici, i rari restano composti.</span></div>
+    <p>Conseguenze pratiche che un esperto conosce a memoria: (1) lingue poco rappresentate nel corpus producono <em>più token per frase</em> → più costo e meno contesto utile; (2) i numeri e il codice si tokenizzano in modi a volte controintuitivi (ecco perché i modelli storicamente sbagliavano l'aritmetica sulle cifre); (3) lo spazio iniziale fa parte del token: <code>" is"</code> e <code>"is"</code> sono token diversi.</p>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #6B3FA0;box-shadow:3px 3px 0 rgba(107,63,160,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B3FA0">🎓 Livello esperto</span>
-      <p style="margin:0">I tokenizer moderni (Llama 3, GPT-4) operano a livello di <em>byte</em> (byte-level BPE): qualsiasi input, anche emoji o binario, è rappresentabile senza token "sconosciuto". Llama 3 è passato da 32K a <strong>128K token</strong> di vocabolario proprio per comprimere meglio il multilingua: meno token per frase = inferenza più economica e contesto effettivo più lungo. Il numero di token, non di parole, è ciò che paghi nelle API e ciò che riempie la context window.</p>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>I tokenizer moderni (Llama 3, GPT-4) operano a livello di <em>byte</em> (byte-level BPE): qualsiasi input, anche emoji o binario, è rappresentabile senza token "sconosciuto". Llama 3 è passato da 32K a <strong>128K token</strong> di vocabolario proprio per comprimere meglio il multilingua: meno token per frase = inferenza più economica e contesto effettivo più lungo. Il numero di token, non di parole, è ciò che paghi nelle API e ciò che riempie la context window.</p>
     </div>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#FDFCF8;border:1.5px solid #E9E5D8;font-size:14.5px">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B6F7A">📚 I paper che lo dimostrano</span>
-      <ul style="margin:0;padding-left:18px">
-        <li style="margin-bottom:4px">Sennrich et al., <em>Neural Machine Translation of Rare Words with Subword Units</em> (BPE) — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:1508.07909</span></li>
-        <li>Kudo &amp; Richardson, <em>SentencePiece</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:1808.06226</span></li>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li style="margin-bottom:4px">Sennrich et al., <em>Neural Machine Translation of Rare Words with Subword Units</em> (BPE) — <span class="w-ref">arXiv:1508.07909</span></li>
+        <li>Kudo &amp; Richardson, <em>SentencePiece</em> — <span class="w-ref">arXiv:1808.06226</span></li>
       </ul>
     </div>
   </section>
 
   <!-- ============ CAP 02 ============ -->
-  <section id="c2" style="margin-top:66px;border-top:3px solid #20242C;padding-top:8px;scroll-margin-top:20px">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#C0392B;text-transform:uppercase">Tappa 02 · Embedding Layer</div>
-    <h2 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(34px,6vw,46px);margin:2px 0 4px">Dare coordinate al significato</h2>
-    <p style="font-size:18px;font-style:italic;color:#6B6F7A;margin:0 0 18px">Un ID come 26110 è solo un'etichetta. L'embedding lo trasforma in un punto in uno spazio dove la geometria <em>è</em> il significato.</p>
+  <section class="w-tappa" id="c2">
+    <div class="w-tappa-kicker">Embedding Layer</div>
+    <h2 class="w-tappa-title">Dare coordinate al significato</h2>
+    <p class="w-tappa-lead">Un ID come 26110 è solo un'etichetta. L'embedding lo trasforma in un punto in uno spazio dove la geometria <em>è</em> il significato.</p>
 
-    <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">L'idea</h3>
-    <p style="margin:0 0 1em"><span style="float:left;font-family:'Caveat',cursive;font-size:62px;line-height:.78;color:#2456B8;padding:6px 12px 0 0">O</span>gni token ID viene usato per pescare una riga da una gigantesca tabella, la <strong>matrice di embedding</strong> (vocabolario × \(d_{\text{model}}\)). Nello schema, \(d_{\text{model}}=4096\): ogni token diventa un vettore di <strong>4.096 numeri reali</strong>. La frase da 5 token diventa una matrice \(5\times 4096\).</p>
-    <div style="background:#fff;border-left:4px solid #2456B8;padding:10px 18px;margin:16px 0;overflow-x:auto">\[ \text{ID}=26110 \;\longmapsto\; \mathbf{e}=[e_1,e_2,\dots,e_{4096}]\in\mathbb{R}^{4096} \]<span style="display:block;font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:6px">La distanza e la direzione tra questi vettori codificano la parentela di significato — il tema del Modulo 02, cap. 3.</span></div>
+    <h3 class="w-h3">L'idea</h3>
+    <p class="w-drop">Ogni token ID viene usato per pescare una riga da una gigantesca tabella, la <strong>matrice di embedding</strong> (vocabolario × \(d_{\text{model}}\)). Nello schema, \(d_{\text{model}}=4096\): ogni token diventa un vettore di <strong>4.096 numeri reali</strong>. La frase da 5 token diventa una matrice \(5\times 4096\).</p>
+    <div class="w-formula">\[ \text{ID}=26110 \;\longmapsto\; \mathbf{e}=[e_1,e_2,\dots,e_{4096}]\in\mathbb{R}^{4096} \]<span class="w-formula-note">La distanza e la direzione tra questi vettori codificano la parentela di significato — il tema del Modulo 02, cap. 3.</span></div>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #D9741E;box-shadow:3px 3px 0 rgba(217,116,30,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#D9741E">🗺️ Analogia: il GPS dei concetti</span>
-      <p style="margin:0">Pensa a una mappa in cui ogni parola ha coordinate. "Gatto" e "cane" abitano nello stesso quartiere; "gravità" sta vicino a "forza" e "massa", lontanissimo da "ricetta". Ma servono molte più di 2 dimensioni: con 4.096 assi puoi codificare contemporaneamente genere grammaticale, registro, dominio scientifico, sentiment, lingua… Ogni <em>direzione</em> nello spazio può catturare una sfumatura diversa.</p>
+    <div class="w-note w-note--demo">
+      <span class="w-note-title">Analogia: il GPS dei concetti</span>
+      <p>Pensa a una mappa in cui ogni parola ha coordinate. "Gatto" e "cane" abitano nello stesso quartiere; "gravità" sta vicino a "forza" e "massa", lontanissimo da "ricetta". Ma servono molte più di 2 dimensioni: con 4.096 assi puoi codificare contemporaneamente genere grammaticale, registro, dominio scientifico, sentiment, lingua… Ogni <em>direzione</em> nello spazio può catturare una sfumatura diversa.</p>
     </div>
 
-    <figure style="margin:24px 0;background:#fff;border:2px solid #20242C;border-radius:14px;padding:14px;box-shadow:4px 4px 0 rgba(32,36,44,.12)">
-      <svg viewBox="0 0 700 240" role="img" aria-label="Spazio semantico degli embedding" style="width:100%;height:auto;display:block">
+    <figure class="w-figure">
+      <svg viewBox="0 0 700 240" role="img" aria-label="Spazio semantico degli embedding">
         <line x1="60" y1="200" x2="660" y2="200" stroke="#20242C" stroke-width="2"/>
         <line x1="60" y1="200" x2="60" y2="20" stroke="#20242C" stroke-width="2"/>
         <text x="640" y="222" font-family="IBM Plex Mono" font-size="11" fill="#6B6F7A">dim. 1 (di 4096)</text>
@@ -198,52 +150,52 @@ mjx-container[display="true"]{margin:.2em 0!important}
         <defs><marker id="arrE" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#C0392B" stroke-width="1.5"/></marker></defs>
         <text x="310" y="26" font-family="Caveat" font-size="18" fill="#C0392B">distanza = differenza di significato</text>
       </svg>
-      <figcaption style="font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:8px;text-align:center">Fig. 2 — Proiezione immaginaria in 2D di uno spazio a 4.096 dimensioni: la vicinanza geometrica codifica la parentela semantica.</figcaption>
+      <figcaption>Fig. 2 — Proiezione immaginaria in 2D di uno spazio a 4.096 dimensioni: la vicinanza geometrica codifica la parentela semantica.</figcaption>
     </figure>
 
-    <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">E la posizione? Il problema dell'ordine</h3>
-    <p style="margin:0 0 1em">"Il cane morde l'uomo" ≠ "L'uomo morde il cane", ma l'attention (capitolo 3) di per sé è <em>indifferente all'ordine</em>. Serve iniettare l'informazione posizionale. Il Transformer originale sommava onde sinusoidali agli embedding; i modelli moderni usano quasi tutti <strong>RoPE</strong> (Rotary Position Embedding): invece di sommare, <em>ruotano</em> i vettori Q e K di un angolo proporzionale alla posizione. Il prodotto scalare tra due token finisce così per dipendere dalla loro <em>distanza relativa</em> — una proprietà elegantissima che favorisce anche l'estensione del contesto.</p>
+    <h3 class="w-h3">E la posizione? Il problema dell'ordine</h3>
+    <p>"Il cane morde l'uomo" ≠ "L'uomo morde il cane", ma l'attention (capitolo 3) di per sé è <em>indifferente all'ordine</em>. Serve iniettare l'informazione posizionale. Il Transformer originale sommava onde sinusoidali agli embedding; i modelli moderni usano quasi tutti <strong>RoPE</strong> (Rotary Position Embedding): invece di sommare, <em>ruotano</em> i vettori Q e K di un angolo proporzionale alla posizione. Il prodotto scalare tra due token finisce così per dipendere dalla loro <em>distanza relativa</em> — una proprietà elegantissima che favorisce anche l'estensione del contesto.</p>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #6B3FA0;box-shadow:3px 3px 0 rgba(107,63,160,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B3FA0">🎓 Livello esperto</span>
-      <p style="margin:0">Le famose analogie vettoriali (<em>re − uomo + donna ≈ regina</em>) nascono con word2vec, ma negli LLM gli embedding di input sono solo il punto di partenza: il significato <em>contestuale</em> ("banco" di scuola vs "banco" di pesci) emerge strato dopo strato nel Transformer. Dettaglio da professionisti: molti modelli fanno <strong>weight tying</strong>, cioè riusano la stessa matrice sia come embedding di input sia come proiezione finale del capitolo 6 — risparmiando centinaia di milioni di parametri. E per allungare il contesto oltre l'addestramento si interviene proprio su RoPE (scaling della frequenza base, es. YaRN).</p>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Le famose analogie vettoriali (<em>re − uomo + donna ≈ regina</em>) nascono con word2vec, ma negli LLM gli embedding di input sono solo il punto di partenza: il significato <em>contestuale</em> ("banco" di scuola vs "banco" di pesci) emerge strato dopo strato nel Transformer. Dettaglio da professionisti: molti modelli fanno <strong>weight tying</strong>, cioè riusano la stessa matrice sia come embedding di input sia come proiezione finale del capitolo 6 — risparmiando centinaia di milioni di parametri. E per allungare il contesto oltre l'addestramento si interviene proprio su RoPE (scaling della frequenza base, es. YaRN).</p>
     </div>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#FDFCF8;border:1.5px solid #E9E5D8;font-size:14.5px">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B6F7A">📚 I paper che lo dimostrano</span>
-      <ul style="margin:0;padding-left:18px">
-        <li style="margin-bottom:4px">Mikolov et al., <em>Efficient Estimation of Word Representations</em> (word2vec) — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:1301.3781</span></li>
-        <li style="margin-bottom:4px">Su et al., <em>RoFormer: Rotary Position Embedding</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2104.09864</span></li>
-        <li>Peng et al., <em>YaRN: Efficient Context Window Extension</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2309.00071</span></li>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li style="margin-bottom:4px">Mikolov et al., <em>Efficient Estimation of Word Representations</em> (word2vec) — <span class="w-ref">arXiv:1301.3781</span></li>
+        <li style="margin-bottom:4px">Su et al., <em>RoFormer: Rotary Position Embedding</em> — <span class="w-ref">arXiv:2104.09864</span></li>
+        <li>Peng et al., <em>YaRN: Efficient Context Window Extension</em> — <span class="w-ref">arXiv:2309.00071</span></li>
       </ul>
     </div>
   </section>
 
   <!-- ============ CAP 03 ============ -->
-  <section id="c3" style="margin-top:66px;border-top:3px solid #20242C;padding-top:8px;scroll-margin-top:20px">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#C0392B;text-transform:uppercase">Tappa 03 · Transformer Block (×N)</div>
-    <h2 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(34px,6vw,46px);margin:2px 0 4px">La riunione delle parole</h2>
-    <p style="font-size:18px;font-style:italic;color:#6B6F7A;margin:0 0 18px">Il cuore di tutto: ogni token "guarda" gli altri, decide chi è rilevante, e aggiorna il proprio significato. Ripetuto per decine di strati.</p>
+  <section class="w-tappa" id="c3">
+    <div class="w-tappa-kicker">Transformer Block (×N)</div>
+    <h2 class="w-tappa-title">La riunione delle parole</h2>
+    <p class="w-tappa-lead">Il cuore di tutto: ogni token "guarda" gli altri, decide chi è rilevante, e aggiorna il proprio significato. Ripetuto per decine di strati.</p>
 
-    <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">L'idea: Query, Key, Value</h3>
-    <p style="margin:0 0 1em">Da ogni vettore-token vengono derivate tre proiezioni tramite tre matrici apprese (\(W_Q,W_K,W_V\), ciascuna \(d_{\text{model}}\times d_k\)):</p>
-    <ul style="margin:0 0 1em;padding-left:22px">
+    <h3 class="w-h3">L'idea: Query, Key, Value</h3>
+    <p>Da ogni vettore-token vengono derivate tre proiezioni tramite tre matrici apprese (\(W_Q,W_K,W_V\), ciascuna \(d_{\text{model}}\times d_k\)):</p>
+    <ul>
       <li><strong style="color:#C0392B">Query (Q)</strong> — «che cosa sto cercando?»</li>
       <li><strong style="color:#2E7D4F">Key (K)</strong> — «che cosa offro agli altri?»</li>
       <li><strong style="color:#2456B8">Value (V)</strong> — «che contenuto porto, se qualcuno mi sceglie?»</li>
     </ul>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #D9741E;box-shadow:3px 3px 0 rgba(217,116,30,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#D9741E">🏛️ Analogia: la riunione di redazione</span>
-      <p style="margin:0">Immagina i 5 token seduti a un tavolo. Il token <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">ity</code> alza la sua <em>query</em>: «cerco la radice a cui appartengo». Ogni collega mostra il proprio cartellino <em>key</em>. Il cartellino di <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">grav</code> combacia benissimo → punteggio alto. A quel punto <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">ity</code> prende il suo <em>value</em> in proporzione al punteggio, lo mescola col proprio, e ne esce con un'identità arricchita: «sono il suffisso di <em>gravity</em>, concetto fisico». Questo, per ogni token, verso ogni token, simultaneamente.</p>
+    <div class="w-note w-note--demo">
+      <span class="w-note-title">Analogia: la riunione di redazione</span>
+      <p>Immagina i 5 token seduti a un tavolo. Il token <code>ity</code> alza la sua <em>query</em>: «cerco la radice a cui appartengo». Ogni collega mostra il proprio cartellino <em>key</em>. Il cartellino di <code>grav</code> combacia benissimo → punteggio alto. A quel punto <code>ity</code> prende il suo <em>value</em> in proporzione al punteggio, lo mescola col proprio, e ne esce con un'identità arricchita: «sono il suffisso di <em>gravity</em>, concetto fisico». Questo, per ogni token, verso ogni token, simultaneamente.</p>
     </div>
 
-    <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">La formula più importante del decennio</h3>
-    <div style="background:#fff;border-left:4px solid #2456B8;padding:10px 18px;margin:16px 0;overflow-x:auto">\[ \operatorname{Attention}(Q,K,V)=\operatorname{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d_k}}\right)V \]<span style="display:block;font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:6px">\(QK^{\top}\) misura la compatibilità tra ogni coppia; \(\sqrt{d_k}\) evita che i punteggi esplodano (gradienti sani); la softmax li rende pesi che sommano a 1; \(\cdot V\) produce la media pesata dei contenuti. Smontata pezzo per pezzo nel Modulo 02, cap. 6.</span></div>
+    <h3 class="w-h3">La formula più importante del decennio</h3>
+    <div class="w-formula">\[ \operatorname{Attention}(Q,K,V)=\operatorname{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d_k}}\right)V \]<span class="w-formula-note">\(QK^{\top}\) misura la compatibilità tra ogni coppia; \(\sqrt{d_k}\) evita che i punteggi esplodano (gradienti sani); la softmax li rende pesi che sommano a 1; \(\cdot V\) produce la media pesata dei contenuti. Smontata pezzo per pezzo nel Modulo 02, cap. 6.</span></div>
 
-    <div style="background:#fff;border:2px solid #D9741E;border-radius:14px;padding:18px;margin:22px 0;box-shadow:4px 4px 0 rgba(217,116,30,.15)">
-      <h4 style="font-family:'Caveat',cursive;font-size:24px;color:#D9741E;margin:0 0 4px">🛠️ Prova tu — la matrice di attention</h4>
-      <p style="margin:0 0 12px;font-size:15px">Frase: <b>"What is grav ity ?"</b>. Scegli il token-Query: le barre mostrano quanta attenzione presta a ciascun token <em>precedente</em> (maschera causale: non può guardare il futuro). Nota come <b>"ity"</b> guardi fortissimo <b>"grav"</b>.</p>
+    <div class="w-demo">
+      <h4 class="w-demo-title">Prova tu — la matrice di attention</h4>
+      <p class="w-demo-hint">Frase: <b>"What is grav ity ?"</b>. Scegli il token-Query: le barre mostrano quanta attenzione presta a ciascun token <em>precedente</em> (maschera causale: non può guardare il futuro). Nota come <b>"ity"</b> guardi fortissimo <b>"grav"</b>.</p>
       <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
         <sc-for list="{{ attnToks }}" as="a" hint-placeholder-count="5">
           <button onClick="{{ a.pick }}" style="font-family:'IBM Plex Mono',monospace;font-size:13px;border:1.5px solid #20242C;border-radius:20px;padding:6px 14px;cursor:pointer;background:{{ a.bg }};color:{{ a.fg }}">{{ a.tok }}</button>
@@ -261,102 +213,102 @@ mjx-container[display="true"]{margin:.2em 0!important}
       </div>
     </div>
 
-    <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">Multi-testa, residui e FFN</h3>
-    <p style="margin:0 0 1em"><strong>Multi-Head:</strong> l'operazione non avviene una volta sola ma, per esempio, su 32 "teste" in parallelo, ognuna con le proprie \(W_Q,W_K,W_V\) in un sottospazio più piccolo (\(d_k=4096/32=128\)). Ogni testa si specializza: una segue la sintassi, una le coreferenze ("egli" → chi?), una le parentesi nel codice. I risultati vengono concatenati e riproiettati.</p>
-    <p style="margin:0 0 1em"><strong>Add &amp; Norm:</strong> il risultato viene <em>sommato</em> all'input (connessione residua: «aggiungi informazione, non sostituirla» — ciò che consente di addestrare reti profonde 96 strati senza che il gradiente svanisca) e poi normalizzato.</p>
-    <p style="margin:0 0 1em"><strong>Feed-Forward Network:</strong> dopo la fase "sociale" dell'attention, ogni token passa da solo attraverso un MLP a due strati che espande la dimensione (\(d_{\text{ff}}\approx 4\,d_{\text{model}}\), es. 4096 → 14336), applica una non-linearità (oggi quasi sempre <strong>SwiGLU</strong>, non più ReLU) e ricomprime. È qui che risiede la maggior parte dei parametri — e, secondo l'interpretabilità, gran parte della "conoscenza fattuale" memorizzata.</p>
+    <h3 class="w-h3">Multi-testa, residui e FFN</h3>
+    <p><strong>Multi-Head:</strong> l'operazione non avviene una volta sola ma, per esempio, su 32 "teste" in parallelo, ognuna con le proprie \(W_Q,W_K,W_V\) in un sottospazio più piccolo (\(d_k=4096/32=128\)). Ogni testa si specializza: una segue la sintassi, una le coreferenze ("egli" → chi?), una le parentesi nel codice. I risultati vengono concatenati e riproiettati.</p>
+    <p><strong>Add &amp; Norm:</strong> il risultato viene <em>sommato</em> all'input (connessione residua: «aggiungi informazione, non sostituirla» — ciò che consente di addestrare reti profonde 96 strati senza che il gradiente svanisca) e poi normalizzato.</p>
+    <p><strong>Feed-Forward Network:</strong> dopo la fase "sociale" dell'attention, ogni token passa da solo attraverso un MLP a due strati che espande la dimensione (\(d_{\text{ff}}\approx 4\,d_{\text{model}}\), es. 4096 → 14336), applica una non-linearità (oggi quasi sempre <strong>SwiGLU</strong>, non più ReLU) e ricomprime. È qui che risiede la maggior parte dei parametri — e, secondo l'interpretabilità, gran parte della "conoscenza fattuale" memorizzata.</p>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #D9741E;box-shadow:3px 3px 0 rgba(217,116,30,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#D9741E">🧠 Analogia: riunione + studio individuale</span>
-      <p style="margin:0">Ogni blocco Transformer è un ciclo di due momenti: la <em>riunione</em> (attention: scambio con i colleghi) e lo <em>studio individuale</em> (FFN: ognuno elabora in privato quanto raccolto, consultando la propria enciclopedia interna). Ripeti ~96 volte e da semplici token emergono astrazioni: prima morfologia, poi sintassi, poi semantica, poi ragionamento.</p>
+    <div class="w-note w-note--demo">
+      <span class="w-note-title">Analogia: riunione + studio individuale</span>
+      <p>Ogni blocco Transformer è un ciclo di due momenti: la <em>riunione</em> (attention: scambio con i colleghi) e lo <em>studio individuale</em> (FFN: ognuno elabora in privato quanto raccolto, consultando la propria enciclopedia interna). Ripeti ~96 volte e da semplici token emergono astrazioni: prima morfologia, poi sintassi, poi semantica, poi ragionamento.</p>
     </div>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #6B3FA0;box-shadow:3px 3px 0 rgba(107,63,160,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B3FA0">🎓 Livello esperto</span>
-      <p style="margin:0">Tre aggiornamenti rispetto al paper del 2017: (1) <strong>Pre-norm</strong>: la normalizzazione si applica <em>prima</em> di attention/FFN — stabilizza l'addestramento profondo; (2) <strong>RMSNorm</strong> al posto di LayerNorm: normalizza solo la scala, più veloce e altrettanto efficace; (3) <strong>SwiGLU</strong>: variante gated della non-linearità che a parità di parametri migliora la qualità. Complessità: l'attention costa \(O(n^2 d)\) sulla lunghezza \(n\) — è questo quadratico il nemico dei capitoli 4 e 5.</p>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Tre aggiornamenti rispetto al paper del 2017: (1) <strong>Pre-norm</strong>: la normalizzazione si applica <em>prima</em> di attention/FFN — stabilizza l'addestramento profondo; (2) <strong>RMSNorm</strong> al posto di LayerNorm: normalizza solo la scala, più veloce e altrettanto efficace; (3) <strong>SwiGLU</strong>: variante gated della non-linearità che a parità di parametri migliora la qualità. Complessità: l'attention costa \(O(n^2 d)\) sulla lunghezza \(n\) — è questo quadratico il nemico dei capitoli 4 e 5.</p>
     </div>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#FDFCF8;border:1.5px solid #E9E5D8;font-size:14.5px">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B6F7A">📚 I paper che lo dimostrano</span>
-      <ul style="margin:0;padding-left:18px">
-        <li style="margin-bottom:4px">Vaswani et al., <em>Attention Is All You Need</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:1706.03762</span></li>
-        <li style="margin-bottom:4px">Shazeer, <em>GLU Variants Improve Transformer</em> (SwiGLU) — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2002.05202</span></li>
-        <li style="margin-bottom:4px">Zhang &amp; Sennrich, <em>Root Mean Square Layer Normalization</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:1910.07467</span></li>
-        <li>Xiong et al., <em>On Layer Normalization in the Transformer Architecture</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2002.04745</span></li>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li style="margin-bottom:4px">Vaswani et al., <em>Attention Is All You Need</em> — <span class="w-ref">arXiv:1706.03762</span></li>
+        <li style="margin-bottom:4px">Shazeer, <em>GLU Variants Improve Transformer</em> (SwiGLU) — <span class="w-ref">arXiv:2002.05202</span></li>
+        <li style="margin-bottom:4px">Zhang &amp; Sennrich, <em>Root Mean Square Layer Normalization</em> — <span class="w-ref">arXiv:1910.07467</span></li>
+        <li>Xiong et al., <em>On Layer Normalization in the Transformer Architecture</em> — <span class="w-ref">arXiv:2002.04745</span></li>
       </ul>
     </div>
   </section>
 
   <!-- ============ CAP 04 ============ -->
-  <section id="c4" style="margin-top:66px;border-top:3px solid #20242C;padding-top:8px;scroll-margin-top:20px">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#C0392B;text-transform:uppercase">Tappa 04 · KV Cache · Prefill vs Decode</div>
-    <h2 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(34px,6vw,46px);margin:2px 0 4px">Non rileggere mai due volte</h2>
-    <p style="font-size:18px;font-style:italic;color:#6B6F7A;margin:0 0 18px">Il segreto sporco dell'inferenza: generare il token n. 1000 non deve costare come rileggere da capo i 999 precedenti.</p>
+  <section class="w-tappa" id="c4">
+    <div class="w-tappa-kicker">KV Cache · Prefill vs Decode</div>
+    <h2 class="w-tappa-title">Non rileggere mai due volte</h2>
+    <p class="w-tappa-lead">Il segreto sporco dell'inferenza: generare il token n. 1000 non deve costare come rileggere da capo i 999 precedenti.</p>
 
-    <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">Le due fasi dell'inferenza</h3>
-    <table style="width:100%;border-collapse:collapse;margin:16px 0;background:#fff;font-size:14.5px">
+    <h3 class="w-h3">Le due fasi dell'inferenza</h3>
+    <table class="w-table">
       <tr><th style="border:1px solid #E9E5D8;padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F3F0E6"></th><th style="border:1px solid #E9E5D8;padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F3F0E6;color:#2456B8">Prefill (leggere il prompt)</th><th style="border:1px solid #E9E5D8;padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F3F0E6;color:#2E7D4F">Decode (generare)</th></tr>
-      <tr><td style="border:1px solid #E9E5D8;padding:8px 10px"><b>Cosa fa</b></td><td style="border:1px solid #E9E5D8;padding:8px 10px">Processa <em>tutti</em> i token di input in parallelo</td><td style="border:1px solid #E9E5D8;padding:8px 10px">Genera <em>un token alla volta</em>, in sequenza</td></tr>
-      <tr><td style="border:1px solid #E9E5D8;padding:8px 10px"><b>Collo di bottiglia</b></td><td style="border:1px solid #E9E5D8;padding:8px 10px"><b>Compute-bound</b>: la GPU macina matrici enormi</td><td style="border:1px solid #E9E5D8;padding:8px 10px"><b>Memory-bound</b>: la GPU <em>legge</em> pesi e cache dalla memoria</td></tr>
-      <tr><td style="border:1px solid #E9E5D8;padding:8px 10px"><b>Metrica</b></td><td style="border:1px solid #E9E5D8;padding:8px 10px">TTFT — time to first token</td><td style="border:1px solid #E9E5D8;padding:8px 10px">TPOT — time per output token</td></tr>
+      <tr><td><b>Cosa fa</b></td><td>Processa <em>tutti</em> i token di input in parallelo</td><td>Genera <em>un token alla volta</em>, in sequenza</td></tr>
+      <tr><td><b>Collo di bottiglia</b></td><td><b>Compute-bound</b>: la GPU macina matrici enormi</td><td><b>Memory-bound</b>: la GPU <em>legge</em> pesi e cache dalla memoria</td></tr>
+      <tr><td><b>Metrica</b></td><td>TTFT — time to first token</td><td>TPOT — time per output token</td></tr>
     </table>
 
-    <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">Perché serve la cache</h3>
-    <p style="margin:0 0 1em">Per predire il token successivo, ogni nuova query deve confrontarsi con le Key e i Value di <em>tutti</em> i token precedenti. Senza cache, a ogni passo dovresti ricalcolare K e V dell'intera sequenza: costo totale \(O(n^3)\) per generare \(n\) token. Con la <strong>KV cache</strong>, K e V di ogni token vengono calcolati <em>una sola volta</em> e archiviati (per ogni strato, per ogni testa). Al passo nuovo si calcolano solo Q, K, V del token appena nato e si legge il resto dallo scaffale.</p>
+    <h3 class="w-h3">Perché serve la cache</h3>
+    <p>Per predire il token successivo, ogni nuova query deve confrontarsi con le Key e i Value di <em>tutti</em> i token precedenti. Senza cache, a ogni passo dovresti ricalcolare K e V dell'intera sequenza: costo totale \(O(n^3)\) per generare \(n\) token. Con la <strong>KV cache</strong>, K e V di ogni token vengono calcolati <em>una sola volta</em> e archiviati (per ogni strato, per ogni testa). Al passo nuovo si calcolano solo Q, K, V del token appena nato e si legge il resto dallo scaffale.</p>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #2E7D4F;box-shadow:3px 3px 0 rgba(46,125,79,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#2E7D4F">📝 Analogia: gli appunti del verbale</span>
-      <p style="margin:0">Sei il verbalista di una riunione lunghissima. A ogni nuovo intervento, potresti riascoltare la registrazione dall'inizio (assurdo), oppure consultare gli <em>appunti</em> presi man mano. La KV cache sono quegli appunti: crescono di una riga per token, e non li butti finché la conversazione non finisce. Il rovescio: il quaderno diventa pesante — e portarlo avanti e indietro dalla memoria è, oggi, il vero costo della generazione.</p>
+    <div class="w-note w-note--memory">
+      <span class="w-note-title">Analogia: gli appunti del verbale</span>
+      <p>Sei il verbalista di una riunione lunghissima. A ogni nuovo intervento, potresti riascoltare la registrazione dall'inizio (assurdo), oppure consultare gli <em>appunti</em> presi man mano. La KV cache sono quegli appunti: crescono di una riga per token, e non li butti finché la conversazione non finisce. Il rovescio: il quaderno diventa pesante — e portarlo avanti e indietro dalla memoria è, oggi, il vero costo della generazione.</p>
     </div>
 
-    <div style="background:#fff;border:2px solid #D9741E;border-radius:14px;padding:18px;margin:22px 0;box-shadow:4px 4px 0 rgba(217,116,30,.15)">
-      <h4 style="font-family:'Caveat',cursive;font-size:24px;color:#D9741E;margin:0 0 4px">🛠️ Prova tu — quanto pesano gli appunti?</h4>
-      <p style="margin:0 0 10px;font-size:15px">Modello di riferimento: Llama-3-8B in FP16 → <b>128 KB di cache per token</b>. Sposta il cursore sulla lunghezza del contesto e guarda crescere la memoria: è <em>lineare</em>, ma diventa enorme.</p>
-      <label style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#2E7D4F">contesto = {{ kvTokens }} token</label>
+    <div class="w-demo">
+      <h4 class="w-demo-title">Prova tu — quanto pesano gli appunti?</h4>
+      <p class="w-demo-hint">Modello di riferimento: Llama-3-8B in FP16 → <b>128 KB di cache per token</b>. Sposta il cursore sulla lunghezza del contesto e guarda crescere la memoria: è <em>lineare</em>, ma diventa enorme.</p>
+      <label class="w-label">contesto = {{ kvTokens }} token</label>
       <input type="range" min="128" max="128000" step="128" value="{{ kvTokens }}" onChange="{{ setKv }}">
       <div style="height:26px;background:#EAF3EE;border-radius:6px;overflow:hidden;margin:12px 0 8px;border:1px solid #CDE4D6">
         <div style="height:100%;background:repeating-linear-gradient(90deg,#2E7D4F,#2E7D4F 8px,#3E9A63 8px,#3E9A63 16px);transition:width .15s;width:{{ kvBarPct }}%"></div>
       </div>
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;background:#F3F0E6;border-radius:8px;padding:10px 12px">
+      <div class="w-demo-out">
         cache KV = <span style="color:#2E7D4F;font-weight:600">{{ kvSize }}</span> · pesi modello = 16 GB · totale da leggere/token = <span style="color:#C0392B;font-weight:600">{{ kvTotal }}</span>
       </div>
-      <p style="font-size:12.5px;color:#6B6F7A;font-style:italic;margin:8px 0 0">A ~128K token la sola cache supera i pesi del modello: ecco perché il contesto lungo è così costoso.</p>
+      <p class="w-demo-foot">A ~128K token la sola cache supera i pesi del modello: ecco perché il contesto lungo è così costoso.</p>
     </div>
 
-    <div style="background:#fff;border-left:4px solid #2456B8;padding:10px 18px;margin:16px 0;overflow-x:auto">\[ \text{tempo/token} \;\ge\; \frac{\text{byte dei pesi}+\text{byte della cache}}{\text{banda di memoria}} \]<span style="display:block;font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:6px">8 miliardi di parametri in FP16 ≈ 16 GB. Con banda HBM ~1 TB/s servono ≥16 ms/token anche a calcolo infinito → max ~60 token/s per richiesta. La generazione è limitata dal "trasloco" dei dati, non dai FLOPs.</span></div>
+    <div class="w-formula">\[ \text{tempo/token} \;\ge\; \frac{\text{byte dei pesi}+\text{byte della cache}}{\text{banda di memoria}} \]<span class="w-formula-note">8 miliardi di parametri in FP16 ≈ 16 GB. Con banda HBM ~1 TB/s servono ≥16 ms/token anche a calcolo infinito → max ~60 token/s per richiesta. La generazione è limitata dal "trasloco" dei dati, non dai FLOPs.</span></div>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #6B3FA0;box-shadow:3px 3px 0 rgba(107,63,160,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B3FA0">🎓 Livello esperto</span>
-      <p style="margin:0">Come si doma la cache: (1) <strong>MQA/GQA</strong> — invece di 32 set di K,V se ne condividono 1 (Multi-Query) o pochi gruppi (Grouped-Query, es. 8 in Llama 3): cache ridotta 4–32× con perdita minima; (2) <strong>PagedAttention</strong> (vLLM) — gestisce la cache come la memoria virtuale di un OS, a pagine, eliminando la frammentazione (throughput 2–4×); (3) <strong>continuous batching</strong> — richieste diverse condividono la GPU inserendosi token per token; (4) <strong>prefix caching</strong> — i prompt condivisi (es. il system prompt) si calcolano una volta sola.</p>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Come si doma la cache: (1) <strong>MQA/GQA</strong> — invece di 32 set di K,V se ne condividono 1 (Multi-Query) o pochi gruppi (Grouped-Query, es. 8 in Llama 3): cache ridotta 4–32× con perdita minima; (2) <strong>PagedAttention</strong> (vLLM) — gestisce la cache come la memoria virtuale di un OS, a pagine, eliminando la frammentazione (throughput 2–4×); (3) <strong>continuous batching</strong> — richieste diverse condividono la GPU inserendosi token per token; (4) <strong>prefix caching</strong> — i prompt condivisi (es. il system prompt) si calcolano una volta sola.</p>
     </div>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#FDFCF8;border:1.5px solid #E9E5D8;font-size:14.5px">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B6F7A">📚 I paper che lo dimostrano</span>
-      <ul style="margin:0;padding-left:18px">
-        <li style="margin-bottom:4px">Shazeer, <em>Fast Transformer Decoding</em> (MQA) — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:1911.02150</span></li>
-        <li style="margin-bottom:4px">Ainslie et al., <em>GQA: Grouped-Query Attention</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2305.13245</span></li>
-        <li style="margin-bottom:4px">Kwon et al., <em>PagedAttention</em> (vLLM) — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2309.06180</span></li>
-        <li>Pope et al., <em>Efficiently Scaling Transformer Inference</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2211.05102</span></li>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li style="margin-bottom:4px">Shazeer, <em>Fast Transformer Decoding</em> (MQA) — <span class="w-ref">arXiv:1911.02150</span></li>
+        <li style="margin-bottom:4px">Ainslie et al., <em>GQA: Grouped-Query Attention</em> — <span class="w-ref">arXiv:2305.13245</span></li>
+        <li style="margin-bottom:4px">Kwon et al., <em>PagedAttention</em> (vLLM) — <span class="w-ref">arXiv:2309.06180</span></li>
+        <li>Pope et al., <em>Efficiently Scaling Transformer Inference</em> — <span class="w-ref">arXiv:2211.05102</span></li>
       </ul>
     </div>
   </section>
 
   <!-- ============ CAP 05 ============ -->
-  <section id="c5" style="margin-top:66px;border-top:3px solid #20242C;padding-top:8px;scroll-margin-top:20px">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#C0392B;text-transform:uppercase">Tappa 05 · FlashAttention</div>
-    <h2 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(34px,6vw,46px);margin:2px 0 4px">Cucinare senza correre in dispensa</h2>
-    <p style="font-size:18px;font-style:italic;color:#6B6F7A;margin:0 0 18px">La stessa identica matematica dell'attention, riorganizzata per rispettare la gerarchia della memoria. Risultato: 2–4× più veloce, memoria da \(O(n^2)\) a \(O(n)\).</p>
+  <section class="w-tappa" id="c5">
+    <div class="w-tappa-kicker">FlashAttention</div>
+    <h2 class="w-tappa-title">Cucinare senza correre in dispensa</h2>
+    <p class="w-tappa-lead">La stessa identica matematica dell'attention, riorganizzata per rispettare la gerarchia della memoria. Risultato: 2–4× più veloce, memoria da \(O(n^2)\) a \(O(n)\).</p>
 
-    <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">Il problema</h3>
-    <p style="margin:0 0 1em">Una GPU ha due memorie molto diverse: la <strong>HBM</strong> (decine di GB, ma "lontana") e la <strong>SRAM</strong> on-chip (pochi MB, ma ~10× più veloce). L'implementazione ingenua materializza l'intera matrice \(n\times n\) dei punteggi in HBM, la rilegge per la softmax, la riscrive, la rilegge per moltiplicarla con V… Con \(n=8192\), quella matrice ha 67 milioni di celle <em>per testa per strato</em>. Il tempo se ne va tutto in viaggi.</p>
+    <h3 class="w-h3">Il problema</h3>
+    <p>Una GPU ha due memorie molto diverse: la <strong>HBM</strong> (decine di GB, ma "lontana") e la <strong>SRAM</strong> on-chip (pochi MB, ma ~10× più veloce). L'implementazione ingenua materializza l'intera matrice \(n\times n\) dei punteggi in HBM, la rilegge per la softmax, la riscrive, la rilegge per moltiplicarla con V… Con \(n=8192\), quella matrice ha 67 milioni di celle <em>per testa per strato</em>. Il tempo se ne va tutto in viaggi.</p>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #D9741E;box-shadow:3px 3px 0 rgba(217,116,30,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#D9741E">👨‍🍳 Analogia: il cuoco e la dispensa</span>
-      <p style="margin:0">La HBM è la dispensa in cantina; la SRAM è il piano di lavoro accanto ai fornelli. Il cuoco ingenuo scende in cantina per ogni singolo ingrediente e riporta giù ogni risultato intermedio. FlashAttention è il cuoco esperto: porta su un <em>cestello</em> di ingredienti (un blocco di Q, K, V), completa <em>tutta</em> la ricetta di quel blocco sul piano di lavoro — punteggi, softmax, prodotto con V — e scende in cantina solo per il piatto finito. Stessa ricetta, un decimo dei viaggi.</p>
+    <div class="w-note w-note--demo">
+      <span class="w-note-title">‍🍳 Analogia: il cuoco e la dispensa</span>
+      <p>La HBM è la dispensa in cantina; la SRAM è il piano di lavoro accanto ai fornelli. Il cuoco ingenuo scende in cantina per ogni singolo ingrediente e riporta giù ogni risultato intermedio. FlashAttention è il cuoco esperto: porta su un <em>cestello</em> di ingredienti (un blocco di Q, K, V), completa <em>tutta</em> la ricetta di quel blocco sul piano di lavoro — punteggi, softmax, prodotto con V — e scende in cantina solo per il piatto finito. Stessa ricetta, un decimo dei viaggi.</p>
     </div>
 
-    <figure style="margin:24px 0;background:#fff;border:2px solid #20242C;border-radius:14px;padding:14px;box-shadow:4px 4px 0 rgba(32,36,44,.12)">
-      <svg viewBox="0 0 700 230" role="img" aria-label="Gerarchia di memoria GPU" style="width:100%;height:auto;display:block">
+    <figure class="w-figure">
+      <svg viewBox="0 0 700 230" role="img" aria-label="Gerarchia di memoria GPU">
         <g font-family="IBM Plex Mono" font-size="12">
           <rect x="60" y="150" width="580" height="50" rx="8" fill="#FBE9E7" stroke="#C0392B" stroke-width="2"/>
           <text x="350" y="172" text-anchor="middle" fill="#C0392B" font-size="14">HBM · ~80 GB · ~3 TB/s</text>
@@ -373,75 +325,75 @@ mjx-container[display="true"]{margin:.2em 0!important}
         <path d="M560 95 Q 610 115 590 150" stroke="#D9741E" stroke-width="2.5" fill="none" marker-end="url(#arrF)"/>
         <text x="520" y="70" font-family="Caveat" font-size="18" fill="#D9741E">…scendi col risultato</text>
       </svg>
-      <figcaption style="font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:8px;text-align:center">Fig. 5 — FlashAttention "fonde" (kernel fusion) tutte le operazioni dell'attention in un unico passaggio per blocchi in SRAM.</figcaption>
+      <figcaption>Fig. 5 — FlashAttention "fonde" (kernel fusion) tutte le operazioni dell'attention in un unico passaggio per blocchi in SRAM.</figcaption>
     </figure>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #6B3FA0;box-shadow:3px 3px 0 rgba(107,63,160,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B3FA0">🎓 Livello esperto</span>
-      <p style="margin:0">Il trucco che rende possibile il tiling è la <strong>softmax online</strong>: la softmax richiede massimo e somma globali della riga, ma si possono mantenere <em>statistiche parziali</em> (max corrente \(m\), somma corrente \(\ell\)) e ri-scalare i risultati man mano che arrivano nuovi blocchi — ottenendo il risultato <em>esatto</em>, non approssimato. FlashAttention-2 riorganizza il parallelismo tra warp (~2× su FA1); FlashAttention-3 sfrutta l'asincronia e l'FP8 delle GPU Hopper. Da non confondere con le attention <em>approssimate</em> (Linformer, Performer): qui la matematica è identica, cambia solo l'ordine dei viaggi. Lezione centrale del deep learning odierno: <em>i FLOPs sono economici, la banda di memoria è preziosa</em> (design "IO-aware").</p>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Il trucco che rende possibile il tiling è la <strong>softmax online</strong>: la softmax richiede massimo e somma globali della riga, ma si possono mantenere <em>statistiche parziali</em> (max corrente \(m\), somma corrente \(\ell\)) e ri-scalare i risultati man mano che arrivano nuovi blocchi — ottenendo il risultato <em>esatto</em>, non approssimato. FlashAttention-2 riorganizza il parallelismo tra warp (~2× su FA1); FlashAttention-3 sfrutta l'asincronia e l'FP8 delle GPU Hopper. Da non confondere con le attention <em>approssimate</em> (Linformer, Performer): qui la matematica è identica, cambia solo l'ordine dei viaggi. Lezione centrale del deep learning odierno: <em>i FLOPs sono economici, la banda di memoria è preziosa</em> (design "IO-aware").</p>
     </div>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#FDFCF8;border:1.5px solid #E9E5D8;font-size:14.5px">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B6F7A">📚 I paper che lo dimostrano</span>
-      <ul style="margin:0;padding-left:18px">
-        <li style="margin-bottom:4px">Dao et al., <em>FlashAttention</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2205.14135</span></li>
-        <li style="margin-bottom:4px">Dao, <em>FlashAttention-2</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2307.08691</span></li>
-        <li style="margin-bottom:4px">Shah et al., <em>FlashAttention-3</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2407.08608</span></li>
-        <li>Milakov &amp; Gimelshein, <em>Online normalizer calculation for softmax</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:1805.02867</span></li>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li style="margin-bottom:4px">Dao et al., <em>FlashAttention</em> — <span class="w-ref">arXiv:2205.14135</span></li>
+        <li style="margin-bottom:4px">Dao, <em>FlashAttention-2</em> — <span class="w-ref">arXiv:2307.08691</span></li>
+        <li style="margin-bottom:4px">Shah et al., <em>FlashAttention-3</em> — <span class="w-ref">arXiv:2407.08608</span></li>
+        <li>Milakov &amp; Gimelshein, <em>Online normalizer calculation for softmax</em> — <span class="w-ref">arXiv:1805.02867</span></li>
       </ul>
     </div>
   </section>
 
   <!-- ============ CAP 06 ============ -->
-  <section id="c6" style="margin-top:66px;border-top:3px solid #20242C;padding-top:8px;scroll-margin-top:20px">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#C0392B;text-transform:uppercase">Tappa 06 · Linear + Softmax (LM Head)</div>
-    <h2 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(34px,6vw,46px);margin:2px 0 4px">Da 4.096 numeri a 128.000 candidati</h2>
-    <p style="font-size:18px;font-style:italic;color:#6B6F7A;margin:0 0 18px">Dopo 96 strati, l'ultimo vettore della sequenza contiene tutto ciò che serve per rispondere a una sola domanda: qual è il prossimo token?</p>
+  <section class="w-tappa" id="c6">
+    <div class="w-tappa-kicker">Linear + Softmax (LM Head)</div>
+    <h2 class="w-tappa-title">Da 4.096 numeri a 128.000 candidati</h2>
+    <p class="w-tappa-lead">Dopo 96 strati, l'ultimo vettore della sequenza contiene tutto ciò che serve per rispondere a una sola domanda: qual è il prossimo token?</p>
 
-    <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">L'idea</h3>
-    <p style="margin:0 0 1em"><span style="float:left;font-family:'Caveat',cursive;font-size:62px;line-height:.78;color:#2456B8;padding:6px 12px 0 0">I</span>l vettore finale (4.096 dimensioni) viene moltiplicato per un'ultima matrice — la <strong>LM Head</strong>, \(d_{\text{model}}\times\)vocabolario, cioè \(4096\times 128\text{K}\) — producendo un punteggio grezzo, il <strong>logit</strong>, per <em>ogni</em> token del vocabolario. È come chiedere a 128.000 candidati «quanto saresti adatto a venire dopo "What is gravity?"» e ricevere 128.000 voti su scala arbitraria.</p>
-    <p style="margin:0 0 1em">La <strong>softmax</strong> trasforma i voti in una distribuzione di probabilità vera e propria:</p>
-    <div style="background:#fff;border-left:4px solid #2456B8;padding:10px 18px;margin:16px 0;overflow-x:auto">\[ p_i=\frac{e^{z_i}}{\sum_j e^{z_j}} \]<span style="display:block;font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:6px">L'esponenziale rende tutto positivo e amplifica le differenze; la divisione per la somma fa sommare le probabilità a 1. La distribuzione è ferocemente concentrata: pochi token con probabilità alta, una coda lunghissima di quasi-zero.</span></div>
+    <h3 class="w-h3">L'idea</h3>
+    <p class="w-drop">Il vettore finale (4.096 dimensioni) viene moltiplicato per un'ultima matrice — la <strong>LM Head</strong>, \(d_{\text{model}}\times\)vocabolario, cioè \(4096\times 128\text{K}\) — producendo un punteggio grezzo, il <strong>logit</strong>, per <em>ogni</em> token del vocabolario. È come chiedere a 128.000 candidati «quanto saresti adatto a venire dopo "What is gravity?"» e ricevere 128.000 voti su scala arbitraria.</p>
+    <p>La <strong>softmax</strong> trasforma i voti in una distribuzione di probabilità vera e propria:</p>
+    <div class="w-formula">\[ p_i=\frac{e^{z_i}}{\sum_j e^{z_j}} \]<span class="w-formula-note">L'esponenziale rende tutto positivo e amplifica le differenze; la divisione per la somma fa sommare le probabilità a 1. La distribuzione è ferocemente concentrata: pochi token con probabilità alta, una coda lunghissima di quasi-zero.</span></div>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #D9741E;box-shadow:3px 3px 0 rgba(217,116,30,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#D9741E">🎤 Analogia: il talent show con 128.000 concorrenti</span>
-      <p style="margin:0">Ogni token del vocabolario si presenta al provino per il ruolo di "prossima parola". La giuria (il vettore finale) dà a ognuno un punteggio. Dopo <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">"Gravity is a fundamental"</code>, il candidato <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">force</code> esce col 92%, <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">property</code> col 4%… e <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">banana</code> con 0,0000001%. Il modello non "sceglie" ancora nessuno: produce solo la classifica. La scelta è il prossimo capitolo.</p>
+    <div class="w-note w-note--demo">
+      <span class="w-note-title">Analogia: il talent show con 128.000 concorrenti</span>
+      <p>Ogni token del vocabolario si presenta al provino per il ruolo di "prossima parola". La giuria (il vettore finale) dà a ognuno un punteggio. Dopo <code>"Gravity is a fundamental"</code>, il candidato <code>force</code> esce col 92%, <code>property</code> col 4%… e <code>banana</code> con 0,0000001%. Il modello non "sceglie" ancora nessuno: produce solo la classifica. La scelta è il prossimo capitolo.</p>
     </div>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #6B3FA0;box-shadow:3px 3px 0 rgba(107,63,160,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B3FA0">🎓 Livello esperto</span>
-      <p style="margin:0">Questa moltiplicazione non è banale: con vocabolario 128K, la LM Head pesa ~0,5 miliardi di parametri (da qui il weight tying del cap. 2). Punto profondo: l'intero pre-addestramento minimizza la <em>cross-entropy</em> proprio su questa distribuzione — «tutta l'intelligenza del modello» è compressa nel compito di assegnare bene queste 128.000 probabilità, miliardi di volte. Ed è qui che si misura la <em>perplexity</em>: \(\text{ppl}=e^{\text{cross-entropy}}\), interpretabile come "tra quanti token equiprobabili il modello sta esitando".</p>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Questa moltiplicazione non è banale: con vocabolario 128K, la LM Head pesa ~0,5 miliardi di parametri (da qui il weight tying del cap. 2). Punto profondo: l'intero pre-addestramento minimizza la <em>cross-entropy</em> proprio su questa distribuzione — «tutta l'intelligenza del modello» è compressa nel compito di assegnare bene queste 128.000 probabilità, miliardi di volte. Ed è qui che si misura la <em>perplexity</em>: \(\text{ppl}=e^{\text{cross-entropy}}\), interpretabile come "tra quanti token equiprobabili il modello sta esitando".</p>
     </div>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#FDFCF8;border:1.5px solid #E9E5D8;font-size:14.5px">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B6F7A">📚 I paper che lo dimostrano</span>
-      <ul style="margin:0;padding-left:18px">
-        <li style="margin-bottom:4px">Press &amp; Wolf, <em>Using the Output Embedding to Improve Language Models</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:1608.05859</span></li>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li style="margin-bottom:4px">Press &amp; Wolf, <em>Using the Output Embedding to Improve Language Models</em> — <span class="w-ref">arXiv:1608.05859</span></li>
         <li>Radford et al., <em>Language Models are Unsupervised Multitask Learners</em> (GPT-2) — OpenAI, 2019</li>
       </ul>
     </div>
   </section>
 
   <!-- ============ CAP 07 ============ -->
-  <section id="c7" style="margin-top:66px;border-top:3px solid #20242C;padding-top:8px;scroll-margin-top:20px">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#C0392B;text-transform:uppercase">Tappa 07 · Sampling Strategy</div>
-    <h2 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(34px,6vw,46px);margin:2px 0 4px">La ruota della fortuna truccata</h2>
-    <p style="font-size:18px;font-style:italic;color:#6B6F7A;margin:0 0 18px">Il modello ha prodotto una distribuzione. Come si sceglie, concretamente, il token? Qui entra l'unico vero elemento di caso di tutto il sistema.</p>
+  <section class="w-tappa" id="c7">
+    <div class="w-tappa-kicker">Sampling Strategy</div>
+    <h2 class="w-tappa-title">La ruota della fortuna truccata</h2>
+    <p class="w-tappa-lead">Il modello ha prodotto una distribuzione. Come si sceglie, concretamente, il token? Qui entra l'unico vero elemento di caso di tutto il sistema.</p>
 
-    <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">Le quattro manopole</h3>
-    <table style="width:100%;border-collapse:collapse;margin:16px 0;background:#fff;font-size:14.5px">
+    <h3 class="w-h3">Le quattro manopole</h3>
+    <table class="w-table">
       <tr><th style="border:1px solid #E9E5D8;padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F3F0E6">Strategia</th><th style="border:1px solid #E9E5D8;padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F3F0E6">Come funziona</th><th style="border:1px solid #E9E5D8;padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F3F0E6">Analogia</th></tr>
-      <tr><td style="border:1px solid #E9E5D8;padding:8px 10px"><b>Greedy</b></td><td style="border:1px solid #E9E5D8;padding:8px 10px">Prendi sempre l'argmax, il token più probabile</td><td style="border:1px solid #E9E5D8;padding:8px 10px">Ordinare sempre il piatto n.1: affidabile, ma ti ripeti</td></tr>
-      <tr><td style="border:1px solid #E9E5D8;padding:8px 10px"><b>Top-k</b></td><td style="border:1px solid #E9E5D8;padding:8px 10px">Tieni solo i k migliori (es. 50), rinormalizza, sorteggia</td><td style="border:1px solid #E9E5D8;padding:8px 10px">Rosa di candidati: solo i primi 50 al sorteggio</td></tr>
-      <tr><td style="border:1px solid #E9E5D8;padding:8px 10px"><b>Top-p</b></td><td style="border:1px solid #E9E5D8;padding:8px 10px">Tieni il set minimo con probabilità cumulata &gt; p (es. 0,9)</td><td style="border:1px solid #E9E5D8;padding:8px 10px">Rosa <em>adattiva</em>: 2 se uno domina, 100 se c'è incertezza</td></tr>
-      <tr><td style="border:1px solid #E9E5D8;padding:8px 10px"><b>Temperature</b></td><td style="border:1px solid #E9E5D8;padding:8px 10px">Dividi i logit per T prima della softmax</td><td style="border:1px solid #E9E5D8;padding:8px 10px">La manopola audacia: T→0 notaio, T→1 romanziere</td></tr>
+      <tr><td><b>Greedy</b></td><td>Prendi sempre l'argmax, il token più probabile</td><td>Ordinare sempre il piatto n.1: affidabile, ma ti ripeti</td></tr>
+      <tr><td><b>Top-k</b></td><td>Tieni solo i k migliori (es. 50), rinormalizza, sorteggia</td><td>Rosa di candidati: solo i primi 50 al sorteggio</td></tr>
+      <tr><td><b>Top-p</b></td><td>Tieni il set minimo con probabilità cumulata &gt; p (es. 0,9)</td><td>Rosa <em>adattiva</em>: 2 se uno domina, 100 se c'è incertezza</td></tr>
+      <tr><td><b>Temperature</b></td><td>Dividi i logit per T prima della softmax</td><td>La manopola audacia: T→0 notaio, T→1 romanziere</td></tr>
     </table>
 
-    <div style="background:#fff;border-left:4px solid #2456B8;padding:10px 18px;margin:16px 0;overflow-x:auto">\[ p_i(T)=\frac{e^{z_i/T}}{\sum_j e^{z_j/T}} \]<span style="display:block;font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:6px">\(T<1\) accentua i picchi (verso il determinismo); \(T>1\) appiattisce (più sorpresa). Il nome viene dalla fisica statistica: è la distribuzione di Boltzmann.</span></div>
+    <div class="w-formula">\[ p_i(T)=\frac{e^{z_i/T}}{\sum_j e^{z_j/T}} \]<span class="w-formula-note">\(T<1\) accentua i picchi (verso il determinismo); \(T>1\) appiattisce (più sorpresa). Il nome viene dalla fisica statistica: è la distribuzione di Boltzmann.</span></div>
 
-    <div style="background:#fff;border:2px solid #D9741E;border-radius:14px;padding:18px;margin:22px 0;box-shadow:4px 4px 0 rgba(217,116,30,.15)">
-      <h4 style="font-family:'Caveat',cursive;font-size:24px;color:#D9741E;margin:0 0 4px">🎛️ Prova tu — la manopola della temperatura</h4>
-      <p style="margin:0 0 12px;font-size:15px">Prossimo token dopo <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">"Gravity is a fundamental"</code> — muovi lo slider e guarda la distribuzione cambiare.</p>
+    <div class="w-demo">
+      <h4 class="w-demo-title">Prova tu — la manopola della temperatura</h4>
+      <p class="w-demo-hint">Prossimo token dopo <code>"Gravity is a fundamental"</code> — muovi lo slider e guarda la distribuzione cambiare.</p>
       <div style="display:flex;align-items:flex-end;gap:10px;height:150px;margin:0 0 6px">
         <sc-for list="{{ tbars }}" as="b" hint-placeholder-count="6">
           <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%">
@@ -455,47 +407,47 @@ mjx-container[display="true"]{margin:.2em 0!important}
           <div style="flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#20242C">{{ b.label }}</div>
         </sc-for>
       </div>
-      <label style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#D9741E">temperatura T = {{ temp }}</label>
+      <label class="w-label">temperatura T = {{ temp }}</label>
       <input type="range" min="0.05" max="2" step="0.05" value="{{ temp }}" onChange="{{ setTemp }}">
       <p style="font-size:12.5px;color:#6B6F7A;font-style:italic;margin:6px 0 0">A T=0,05 vince quasi sempre "force". A T=2 perfino "banana" comincia a sperare.</p>
     </div>
 
-    <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">Perché non usare sempre greedy?</h3>
-    <p style="margin:0 0 1em">Sembrerebbe razionale, e invece la ricerca ha dimostrato l'opposto: massimizzare la probabilità produce testo <em>degenerato</em> — ripetitivo, piatto, con loop («I don't know. I don't know…»). Il linguaggio umano reale contiene sorpresa: Holtzman et al. mostrarono che il testo umano ha perplexity <em>più alta</em> di quello greedy. Da qui il nucleus sampling: campiona, ma solo dentro il "nucleo" affidabile, tagliando la coda di token assurdi che, moltiplicata per migliaia di passi, prima o poi produrrebbe un disastro.</p>
+    <h3 class="w-h3">Perché non usare sempre greedy?</h3>
+    <p>Sembrerebbe razionale, e invece la ricerca ha dimostrato l'opposto: massimizzare la probabilità produce testo <em>degenerato</em> — ripetitivo, piatto, con loop («I don't know. I don't know…»). Il linguaggio umano reale contiene sorpresa: Holtzman et al. mostrarono che il testo umano ha perplexity <em>più alta</em> di quello greedy. Da qui il nucleus sampling: campiona, ma solo dentro il "nucleo" affidabile, tagliando la coda di token assurdi che, moltiplicata per migliaia di passi, prima o poi produrrebbe un disastro.</p>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #6B3FA0;box-shadow:3px 3px 0 rgba(107,63,160,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B3FA0">🎓 Livello esperto</span>
-      <p style="margin:0">In produzione le manopole si combinano (ordine tipico: temperature → top-k → top-p) e si aggiungono <em>repetition/frequency penalty</em>. Metodo emergente: <strong>min-p</strong> — soglia dinamica relativa al token più probabile, regge meglio le temperature alte. Sottigliezza: anche con T=0 due run possono differire, per la non-associatività del floating point nelle riduzioni parallele su GPU. Per il ragionamento: <em>self-consistency</em> — campiona N catene e fai votare le risposte.</p>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>In produzione le manopole si combinano (ordine tipico: temperature → top-k → top-p) e si aggiungono <em>repetition/frequency penalty</em>. Metodo emergente: <strong>min-p</strong> — soglia dinamica relativa al token più probabile, regge meglio le temperature alte. Sottigliezza: anche con T=0 due run possono differire, per la non-associatività del floating point nelle riduzioni parallele su GPU. Per il ragionamento: <em>self-consistency</em> — campiona N catene e fai votare le risposte.</p>
     </div>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#FDFCF8;border:1.5px solid #E9E5D8;font-size:14.5px">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B6F7A">📚 I paper che lo dimostrano</span>
-      <ul style="margin:0;padding-left:18px">
-        <li style="margin-bottom:4px">Holtzman et al., <em>The Curious Case of Neural Text Degeneration</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:1904.09751</span></li>
-        <li style="margin-bottom:4px">Fan et al., <em>Hierarchical Neural Story Generation</em> (top-k) — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:1805.04833</span></li>
-        <li style="margin-bottom:4px">Nguyen et al., <em>Turning Up the Heat: Min-p Sampling</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2407.01082</span></li>
-        <li>Wang et al., <em>Self-Consistency Improves Chain of Thought</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2203.11171</span></li>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li style="margin-bottom:4px">Holtzman et al., <em>The Curious Case of Neural Text Degeneration</em> — <span class="w-ref">arXiv:1904.09751</span></li>
+        <li style="margin-bottom:4px">Fan et al., <em>Hierarchical Neural Story Generation</em> (top-k) — <span class="w-ref">arXiv:1805.04833</span></li>
+        <li style="margin-bottom:4px">Nguyen et al., <em>Turning Up the Heat: Min-p Sampling</em> — <span class="w-ref">arXiv:2407.01082</span></li>
+        <li>Wang et al., <em>Self-Consistency Improves Chain of Thought</em> — <span class="w-ref">arXiv:2203.11171</span></li>
       </ul>
     </div>
   </section>
 
   <!-- ============ CAP 08 ============ -->
-  <section id="c8" style="margin-top:66px;border-top:3px solid #20242C;padding-top:8px;scroll-margin-top:20px">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#C0392B;text-transform:uppercase">Tappa 08 · Speculative Decoding</div>
-    <h2 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(34px,6vw,46px);margin:2px 0 4px">L'apprendista e il maestro</h2>
-    <p style="font-size:18px;font-style:italic;color:#6B6F7A;margin:0 0 18px">Il trucco più elegante dell'inferenza moderna: usare un modello piccolo per <em>indovinare</em> e uno grande per <em>verificare</em> — con la garanzia matematica di non cambiare il risultato di una virgola.</p>
+  <section class="w-tappa" id="c8">
+    <div class="w-tappa-kicker">Speculative Decoding</div>
+    <h2 class="w-tappa-title">L'apprendista e il maestro</h2>
+    <p class="w-tappa-lead">Il trucco più elegante dell'inferenza moderna: usare un modello piccolo per <em>indovinare</em> e uno grande per <em>verificare</em> — con la garanzia matematica di non cambiare il risultato di una virgola.</p>
 
-    <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">L'intuizione</h3>
-    <p style="margin:0 0 1em">Ricordi il capitolo 4? Il decode è memory-bound: per generare <em>un</em> token il modello grande deve caricare tutti i suoi pesi dalla memoria. Ma verificarne <em>quattro in parallelo</em> costa quasi lo stesso, perché il carico dei pesi si ammortizza. Idea: fai proporre k token da un modello piccolo e veloce (il <em>draft</em>), poi fai al modello grande <strong>un solo forward pass</strong> che li giudica tutti insieme.</p>
+    <h3 class="w-h3">L'intuizione</h3>
+    <p>Ricordi il capitolo 4? Il decode è memory-bound: per generare <em>un</em> token il modello grande deve caricare tutti i suoi pesi dalla memoria. Ma verificarne <em>quattro in parallelo</em> costa quasi lo stesso, perché il carico dei pesi si ammortizza. Idea: fai proporre k token da un modello piccolo e veloce (il <em>draft</em>), poi fai al modello grande <strong>un solo forward pass</strong> che li giudica tutti insieme.</p>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #D9741E;box-shadow:3px 3px 0 rgba(217,116,30,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#D9741E">✍️ Analogia: la bozza dell'apprendista</span>
-      <p style="margin:0">Un maestro calligrafo impiega un minuto per parola. L'apprendista scrive una bozza di 4 parole in pochi secondi. Il maestro le legge <em>in un colpo d'occhio</em>: «Grav ✓, ity ✓, is ✗ — qui avrei scritto <em>fundamental</em>». Tiene le parole buone, corregge alla prima divergenza, e riparte. Se l'apprendista è bravo (e sui passaggi facili lo è quasi sempre), il maestro produce 2–3× più testo nello stesso tempo — e il manoscritto finale è <em>indistinguibile</em> da uno scritto interamente di suo pugno.</p>
+    <div class="w-note w-note--demo">
+      <span class="w-note-title">Analogia: la bozza dell'apprendista</span>
+      <p>Un maestro calligrafo impiega un minuto per parola. L'apprendista scrive una bozza di 4 parole in pochi secondi. Il maestro le legge <em>in un colpo d'occhio</em>: «Grav ✓, ity ✓, is ✗ — qui avrei scritto <em>fundamental</em>». Tiene le parole buone, corregge alla prima divergenza, e riparte. Se l'apprendista è bravo (e sui passaggi facili lo è quasi sempre), il maestro produce 2–3× più testo nello stesso tempo — e il manoscritto finale è <em>indistinguibile</em> da uno scritto interamente di suo pugno.</p>
     </div>
 
-    <div style="background:#fff;border:2px solid #D9741E;border-radius:14px;padding:18px;margin:22px 0;box-shadow:4px 4px 0 rgba(217,116,30,.15)">
-      <h4 style="font-family:'Caveat',cursive;font-size:24px;color:#D9741E;margin:0 0 4px">🛠️ Prova tu — un round di verifica</h4>
-      <p style="margin:0 0 12px;font-size:15px">Premi <b>round</b>: l'apprendista propone 4 token, il maestro accetta il prefisso corretto (verde) e corregge al primo errore (rosso → viola). Nel tempo, guarda salire la media di token/round.</p>
+    <div class="w-demo">
+      <h4 class="w-demo-title">Prova tu — un round di verifica</h4>
+      <p class="w-demo-hint">Premi <b>round</b>: l'apprendista propone 4 token, il maestro accetta il prefisso corretto (verde) e corregge al primo errore (rosso → viola). Nel tempo, guarda salire la media di token/round.</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;min-height:40px;align-items:center;margin-bottom:12px">
         <sc-if value="{{ hasSpec }}" hint-placeholder-val="{{ true }}">
           <sc-for list="{{ specLast }}" as="d" hint-placeholder-count="4">
@@ -511,80 +463,83 @@ mjx-container[display="true"]{margin:.2em 0!important}
       </div>
     </div>
 
-    <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">La garanzia matematica</h3>
-    <div style="background:#fff;border-left:4px solid #2456B8;padding:10px 18px;margin:16px 0;overflow-x:auto">\[ \text{accetta } x \iff r < \min\!\left(1,\;\frac{p_{\text{target}}(x)}{p_{\text{draft}}(x)}\right),\quad r\sim U(0,1) \]<span style="display:block;font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:6px">È un rejection sampling modificato: se il draft sovrastima un token, viene rifiutato con la probabilità giusta e si ricampiona dalla distribuzione residua. Teorema (Leviathan et al. 2023): la sequenza ha ESATTAMENTE la stessa distribuzione del modello grande. Non è un'approssimazione: è accelerazione a qualità identica.</span></div>
+    <h3 class="w-h3">La garanzia matematica</h3>
+    <div class="w-formula">\[ \text{accetta } x \iff r < \min\!\left(1,\;\frac{p_{\text{target}}(x)}{p_{\text{draft}}(x)}\right),\quad r\sim U(0,1) \]<span class="w-formula-note">È un rejection sampling modificato: se il draft sovrastima un token, viene rifiutato con la probabilità giusta e si ricampiona dalla distribuzione residua. Teorema (Leviathan et al. 2023): la sequenza ha ESATTAMENTE la stessa distribuzione del modello grande. Non è un'approssimazione: è accelerazione a qualità identica.</span></div>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #6B3FA0;box-shadow:3px 3px 0 rgba(107,63,160,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B3FA0">🎓 Livello esperto</span>
-      <p style="margin:0">Lo speedup reale (tip. 2–3×) dipende dal tasso di accettazione \(\alpha\) e dal rapporto di costo draft/target: conviene un draft ~10–50× più piccolo, su distribuzione simile. Evoluzioni: <strong>Medusa</strong> (teste extra sul modello stesso, niente draft separato), <strong>EAGLE</strong> (drafting a livello di feature, stato dell'arte), <strong>self-speculative</strong> (salti di strati come draft), verifica ad <em>albero</em> di candidati. Nota fine: sposta lavoro dal decode (memory-bound) verso il compute-bound — l'ennesima conferma che l'ingegneria dell'inferenza è una guerra contro la banda di memoria.</p>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Lo speedup reale (tip. 2–3×) dipende dal tasso di accettazione \(\alpha\) e dal rapporto di costo draft/target: conviene un draft ~10–50× più piccolo, su distribuzione simile. Evoluzioni: <strong>Medusa</strong> (teste extra sul modello stesso, niente draft separato), <strong>EAGLE</strong> (drafting a livello di feature, stato dell'arte), <strong>self-speculative</strong> (salti di strati come draft), verifica ad <em>albero</em> di candidati. Nota fine: sposta lavoro dal decode (memory-bound) verso il compute-bound — l'ennesima conferma che l'ingegneria dell'inferenza è una guerra contro la banda di memoria.</p>
     </div>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#FDFCF8;border:1.5px solid #E9E5D8;font-size:14.5px">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B6F7A">📚 I paper che lo dimostrano</span>
-      <ul style="margin:0;padding-left:18px">
-        <li style="margin-bottom:4px">Leviathan et al., <em>Fast Inference from Transformers via Speculative Decoding</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2211.17192</span></li>
-        <li style="margin-bottom:4px">Chen et al., <em>Accelerating LLM Decoding with Speculative Sampling</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2302.01318</span></li>
-        <li style="margin-bottom:4px">Cai et al., <em>Medusa</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2401.10774</span></li>
-        <li>Li et al., <em>EAGLE</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2401.15077</span></li>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li style="margin-bottom:4px">Leviathan et al., <em>Fast Inference from Transformers via Speculative Decoding</em> — <span class="w-ref">arXiv:2211.17192</span></li>
+        <li style="margin-bottom:4px">Chen et al., <em>Accelerating LLM Decoding with Speculative Sampling</em> — <span class="w-ref">arXiv:2302.01318</span></li>
+        <li style="margin-bottom:4px">Cai et al., <em>Medusa</em> — <span class="w-ref">arXiv:2401.10774</span></li>
+        <li>Li et al., <em>EAGLE</em> — <span class="w-ref">arXiv:2401.15077</span></li>
       </ul>
     </div>
   </section>
 
   <!-- ============ CAP 09 ============ -->
-  <section id="c9" style="margin-top:66px;border-top:3px solid #20242C;padding-top:8px;scroll-margin-top:20px">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#C0392B;text-transform:uppercase">Tappa 09 · Detokenizer · Streaming · Quantizzazione</div>
-    <h2 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(34px,6vw,46px);margin:2px 0 4px">La parola torna al mondo</h2>
-    <p style="font-size:18px;font-style:italic;color:#6B6F7A;margin:0 0 18px">L'ultimo miglio: da ID numerici a lettere sullo schermo, un frammento alla volta — più il trucco che fa entrare tutto questo nel tuo hardware.</p>
+  <section class="w-tappa" id="c9">
+    <div class="w-tappa-kicker">Detokenizer · Streaming · Quantizzazione</div>
+    <h2 class="w-tappa-title">La parola torna al mondo</h2>
+    <p class="w-tappa-lead">L'ultimo miglio: da ID numerici a lettere sullo schermo, un frammento alla volta — più il trucco che fa entrare tutto questo nel tuo hardware.</p>
 
-    <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">Detokenizer e streaming</h3>
-    <p style="margin:0 0 1em">Il percorso inverso del capitolo 1: ogni ID scelto dal sampling viene riconvertito nel suo frammento di testo — <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">2610→"Gravity"</code>, <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">879→" is"</code>… — e i frammenti vengono concatenati e <em>spediti subito</em> al client (streaming, via server-sent events). Ecco perché vedi la risposta "sgorgare" pezzetto per pezzetto: non è un effetto grafico, è la fisica del decode — il token n+1 letteralmente non esiste ancora mentre leggi il token n. E il token appena scelto viene <em>ri-immesso</em> nell'input (autoregressione): il cerchio si chiude, e si riparte dalla tappa 4 fino al token speciale di stop (EOS).</p>
+    <h3 class="w-h3">Detokenizer e streaming</h3>
+    <p>Il percorso inverso del capitolo 1: ogni ID scelto dal sampling viene riconvertito nel suo frammento di testo — <code>2610→"Gravity"</code>, <code>879→" is"</code>… — e i frammenti vengono concatenati e <em>spediti subito</em> al client (streaming, via server-sent events). Ecco perché vedi la risposta "sgorgare" pezzetto per pezzetto: non è un effetto grafico, è la fisica del decode — il token n+1 letteralmente non esiste ancora mentre leggi il token n. E il token appena scelto viene <em>ri-immesso</em> nell'input (autoregressione): il cerchio si chiude, e si riparte dalla tappa 4 fino al token speciale di stop (EOS).</p>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #D9741E;box-shadow:3px 3px 0 rgba(217,116,30,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#D9741E">📻 Analogia: la radiocronaca</span>
-      <p style="margin:0">Il modello è un radiocronista, non un romanziere: commenta l'azione <em>mentre accade</em>, senza conoscere il finale della partita. Ogni parola pronunciata diventa parte del contesto che condiziona la successiva. (Curiosità: alcuni byte multi-token, come certe emoji, non sono stampabili finché non arrivano tutti i pezzi — i detokenizer di produzione bufferizzano i byte UTF-8 incompleti.)</p>
+    <div class="w-note w-note--demo">
+      <span class="w-note-title">Analogia: la radiocronaca</span>
+      <p>Il modello è un radiocronista, non un romanziere: commenta l'azione <em>mentre accade</em>, senza conoscere il finale della partita. Ogni parola pronunciata diventa parte del contesto che condiziona la successiva. (Curiosità: alcuni byte multi-token, come certe emoji, non sono stampabili finché non arrivano tutti i pezzi — i detokenizer di produzione bufferizzano i byte UTF-8 incompleti.)</p>
     </div>
 
     <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#D9741E">Bonus: la quantizzazione, ovvero far entrare l'elefante nel frigo</h3>
-    <p style="margin:0 0 1em">L'annotazione rossa dello schema — «INT8/INT4 riduce la memoria 2–4×» — merita un capitolo suo. I pesi nascono come numeri a 16 bit; la quantizzazione li rappresenta con interi a 8 o 4 bit più fattori di scala per gruppo:</p>
-    <div style="background:#fff;border-left:4px solid #2456B8;padding:10px 18px;margin:16px 0;overflow-x:auto">\[ \text{peso}\;\approx\;\text{scala}\times\text{intero quantizzato} \]<span style="display:block;font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:6px">8B parametri: FP16 = 16 GB → INT8 = 8 GB → INT4 ≈ 4,5 GB. E siccome il decode è memory-bound (cap. 4), dimezzare i byte da leggere quasi raddoppia la velocità: due piccioni con una fava.</span></div>
+    <p>L'annotazione rossa dello schema — «INT8/INT4 riduce la memoria 2–4×» — merita un capitolo suo. I pesi nascono come numeri a 16 bit; la quantizzazione li rappresenta con interi a 8 o 4 bit più fattori di scala per gruppo:</p>
+    <div class="w-formula">\[ \text{peso}\;\approx\;\text{scala}\times\text{intero quantizzato} \]<span class="w-formula-note">8B parametri: FP16 = 16 GB → INT8 = 8 GB → INT4 ≈ 4,5 GB. E siccome il decode è memory-bound (cap. 4), dimezzare i byte da leggere quasi raddoppia la velocità: due piccioni con una fava.</span></div>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #6B3FA0;box-shadow:3px 3px 0 rgba(107,63,160,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B3FA0">🎓 Livello esperto</span>
-      <p style="margin:0">I metodi chiave: <strong>LLM.int8()</strong> scoprì che poche dimensioni "outlier" ad alta magnitudine vanno tenute in precisione piena, pena il collasso; <strong>GPTQ</strong> quantizza a 4 bit minimizzando l'errore strato per strato con informazione di secondo ordine; <strong>AWQ</strong> protegge l'1% di pesi più "salienti" osservando le attivazioni. Frontiera attuale: FP8 nativo (Hopper/Blackwell), quantizzazione della KV cache stessa, formati sub-4-bit. Degrado tipico a 4 bit ben fatto: pochi decimi di punto sui benchmark — un affare quasi sempre conveniente.</p>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>I metodi chiave: <strong>LLM.int8()</strong> scoprì che poche dimensioni "outlier" ad alta magnitudine vanno tenute in precisione piena, pena il collasso; <strong>GPTQ</strong> quantizza a 4 bit minimizzando l'errore strato per strato con informazione di secondo ordine; <strong>AWQ</strong> protegge l'1% di pesi più "salienti" osservando le attivazioni. Frontiera attuale: FP8 nativo (Hopper/Blackwell), quantizzazione della KV cache stessa, formati sub-4-bit. Degrado tipico a 4 bit ben fatto: pochi decimi di punto sui benchmark — un affare quasi sempre conveniente.</p>
     </div>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#FDFCF8;border:1.5px solid #E9E5D8;font-size:14.5px">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B6F7A">📚 I paper che lo dimostrano</span>
-      <ul style="margin:0;padding-left:18px">
-        <li style="margin-bottom:4px">Dettmers et al., <em>LLM.int8()</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2208.07339</span></li>
-        <li style="margin-bottom:4px">Frantar et al., <em>GPTQ</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2210.17323</span></li>
-        <li>Lin et al., <em>AWQ</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:2306.00978</span></li>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li style="margin-bottom:4px">Dettmers et al., <em>LLM.int8()</em> — <span class="w-ref">arXiv:2208.07339</span></li>
+        <li style="margin-bottom:4px">Frantar et al., <em>GPTQ</em> — <span class="w-ref">arXiv:2210.17323</span></li>
+        <li>Lin et al., <em>AWQ</em> — <span class="w-ref">arXiv:2306.00978</span></li>
       </ul>
     </div>
   </section>
 
   <!-- ============ EPILOGO ============ -->
-  <section id="fine" style="margin-top:66px;border-top:3px solid #20242C;padding-top:8px;scroll-margin-top:20px">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#C0392B;text-transform:uppercase">Epilogo</div>
-    <h2 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(34px,6vw,46px);margin:2px 0 4px">Il viaggio completo, in un respiro</h2>
-    <p style="margin:0 0 1em">Ora puoi rileggere lo schema da cui siamo partiti come una partitura che conosci a memoria: il testo si spezza in <strong>token</strong> (1–2), i token diventano <strong>vettori</strong> con posizione (3), i vettori dialogano e riflettono per ~96 strati di <strong>attention + FFN</strong> (4), evitando ricalcoli grazie alla <strong>KV cache</strong> e viaggi in memoria grazie a <strong>FlashAttention</strong> (note rosse), l'ultimo vettore vota <strong>128.000 candidati</strong> (5), il <strong>sampling</strong> ne estrae uno con la giusta dose di caso (6), lo <strong>speculative decoding</strong> fa proporre le mosse facili a un apprendista (7), il <strong>detokenizer</strong> restituisce lettere (8) che ti arrivano in <strong>streaming</strong> (9) — e il token appena nato rientra dal fondo, finché il modello non pronuncia il suo silenzioso token di stop.</p>
+  <section class="w-tappa w-tappa--fine" id="fine">
+    <div class="w-tappa-kicker">Epilogo</div>
+    <h2 class="w-tappa-title">Il viaggio completo, in un respiro</h2>
+    <p>Ora puoi rileggere lo schema da cui siamo partiti come una partitura che conosci a memoria: il testo si spezza in <strong>token</strong> (1–2), i token diventano <strong>vettori</strong> con posizione (3), i vettori dialogano e riflettono per ~96 strati di <strong>attention + FFN</strong> (4), evitando ricalcoli grazie alla <strong>KV cache</strong> e viaggi in memoria grazie a <strong>FlashAttention</strong> (note rosse), l'ultimo vettore vota <strong>128.000 candidati</strong> (5), il <strong>sampling</strong> ne estrae uno con la giusta dose di caso (6), lo <strong>speculative decoding</strong> fa proporre le mosse facili a un apprendista (7), il <strong>detokenizer</strong> restituisce lettere (8) che ti arrivano in <strong>streaming</strong> (9) — e il token appena nato rientra dal fondo, finché il modello non pronuncia il suo silenzioso token di stop.</p>
 
-    <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #2E7D4F;box-shadow:3px 3px 0 rgba(46,125,79,.15)">
-      <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#2E7D4F">🧭 Dal livello medio all'esperto assoluto: la palestra</span>
+    <div class="w-note w-note--memory">
+      <span class="w-note-title">Dal livello medio all'esperto assoluto: la palestra</span>
       <ol style="margin:0;padding-left:20px">
-        <li style="margin-bottom:6px"><b>Tocca i token:</b> gioca col playground di tiktoken / il tokenizer di Hugging Face; osserva come si spezzano numeri, italiano, emoji.</li>
-        <li style="margin-bottom:6px"><b>Costruisci un GPT da zero:</b> segui <em>nanoGPT / "Let's build GPT"</em> di Karpathy — ~300 righe di PyTorch, attention, maschera causale e sampling a mano.</li>
-        <li style="margin-bottom:6px"><b>Implementa la KV cache</b> nel tuo nanoGPT e misura lo speedup; poi calcola a mano i byte/token per un modello vero.</li>
-        <li style="margin-bottom:6px"><b>Servi un modello:</b> lancia vLLM o llama.cpp, confronta TTFT e TPOT variando batch, contesto e quantizzazione.</li>
+        <li><b>Tocca i token:</b> gioca col playground di tiktoken / il tokenizer di Hugging Face; osserva come si spezzano numeri, italiano, emoji.</li>
+        <li><b>Costruisci un GPT da zero:</b> segui <em>nanoGPT / "Let's build GPT"</em> di Karpathy — ~300 righe di PyTorch, attention, maschera causale e sampling a mano.</li>
+        <li><b>Implementa la KV cache</b> nel tuo nanoGPT e misura lo speedup; poi calcola a mano i byte/token per un modello vero.</li>
+        <li><b>Servi un modello:</b> lancia vLLM o llama.cpp, confronta TTFT e TPOT variando batch, contesto e quantizzazione.</li>
         <li><b>Leggi 5 paper in quest'ordine:</b> Vaswani 2017 → FlashAttention → PagedAttention → Leviathan → GQA. A quel punto questo schema sarà casa tua.</li>
       </ol>
     </div>
 
-    <div style="background:#FFF8E8;border:1.5px dashed #C0392B;border-radius:10px;padding:12px 16px;margin:18px 0;font-size:15.5px"><b style="color:#C0392B">Il ponte col Modulo 02.</b> Qui hai capito <em>cosa</em> succede a ogni tappa. Per capire <em>perché</em> la matematica funziona — vettori, matrici, softmax, gradienti, la formula dell'attention smontata pezzo per pezzo — passa a <a href="Fondamenti-Matematici-LLM.dc.html">"La Matematica nascosta"</a>. I due libri sono la stessa storia a due profondità.</div>
+    <div class="w-note w-note--bridge"><span class="w-note-title">Il ponte col Modulo 02</span>Qui hai capito <em>cosa</em> succede a ogni tappa. Per capire <em>perché</em> la matematica funziona — vettori, matrici, softmax, gradienti, la formula dell'attention smontata pezzo per pezzo — passa a <a href="Fondamenti-Matematici-LLM.dc.html">"La Matematica nascosta"</a>. I due libri sono la stessa storia a due profondità.</div>
 
-    <p style="text-align:center;font-family:'Caveat',cursive;font-size:26px;color:#6B6F7A;margin:46px 0 0">~ · fine del quaderno · ~</p>
-    <p style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;margin:14px 0 0"><a href="Biblioteca.dc.html">↩ torna alla Biblioteca</a></p>
   </section>
+
+  <footer class="w-footer">
+    ~ · fine del quaderno · ~<br>
+    <a href="Biblioteca.dc.html">torna alla Biblioteca</a>
+  </footer>
 
   </main>
 </div>

@@ -3,114 +3,87 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Matematica nascosta - fondamenti matematici degli LLM</title>
+
+<!-- ===== CONNETTORE DELLA WIKI - righe fisse, identiche su ogni pagina ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./wiki/wiki.css">
 <script src="./support.js"></script>
+<script defer src="./wiki/wiki.js"></script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<!-- ======================================================================== -->
 </head>
 <body>
 <x-dc>
-<helmet data-dc-atomics>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
-<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},chtml:{scale:1.02}};</script>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-<style>
-body{margin:0;background:#FBFAF5;background-image:linear-gradient(#E9E5D8 1px,transparent 1px),linear-gradient(90deg,#E9E5D8 1px,transparent 1px);background-size:28px 28px;color:#20242C;font-family:'Literata',Georgia,serif;line-height:1.65;font-size:17px}
-a{color:#2456B8;text-decoration:none;border-bottom:1px solid rgba(36,86,184,.35)}
-a:hover{color:#C0392B;border-color:rgba(192,57,43,.4)}
-input[type=range]{accent-color:#D9741E;width:100%}
-mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
-mjx-container[display="true"]{margin:0!important}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
-<script>
-(function(){
-  var KEY='llm-book-night';
-  function apply(on){
-    document.documentElement.style.background = on ? '#0e0d0b' : '';
-    document.body.style.filter = on ? 'invert(1) hue-rotate(180deg)' : '';
-  }
-  function init(){
-    if(document.getElementById('nightbtn')) return;
-    var on = false;
-    try{ on = localStorage.getItem(KEY)==='1'; }catch(e){}
-    apply(on);
-    var b=document.createElement('button');
-    b.id='nightbtn'; b.type='button';
-    b.setAttribute('aria-label','Modalità notte');
-    b.style.cssText='position:fixed;right:16px;bottom:16px;z-index:70;width:44px;height:44px;border-radius:50%;border:2px solid #20242C;background:#fff;color:#20242C;font-size:20px;line-height:1;cursor:pointer;box-shadow:2px 2px 0 rgba(0,0,0,.15);font-family:system-ui';
-    b.textContent = on ? '\u2600' : '\u263e';
-    b.onclick=function(){ on=!on; try{ localStorage.setItem(KEY, on?'1':'0'); }catch(e){} apply(on); b.textContent = on ? '\u2600' : '\u263e'; };
-    document.documentElement.appendChild(b);
-  }
-  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',init); } else { init(); }
-})();
-</script>
-</helmet>
-<div style="max-width:820px;margin:0 auto;padding:0 20px 90px">
+<div class="w-page--toc">
+<aside class="w-toc" data-titolo="Modulo 02 · Indice" data-pie='<a href="Biblioteca.dc.html">Biblioteca</a><a href="Dentro-la-Macchina.dc.html">Modulo 01: come genera testo</a>'></aside>
+<main class="w-main">
 
-<nav style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:16px 0 0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em">
-  <a href="Biblioteca.dc.html" style="border:none;background:#20242C;color:#FBFAF5;padding:6px 12px;border-radius:20px">← BIBLIOTECA</a>
-  <span style="color:#B7B2A2">/</span>
-  <span style="color:#6B6F7A">Modulo 02 · Fondamenti matematici</span>
+<nav class="w-nav">
+  <a class="w-nav-home" href="Biblioteca.dc.html">← BIBLIOTECA</a>
+  <span class="w-nav-sep">/</span>
+  <span class="w-nav-here">Modulo 02 · Fondamenti matematici</span>
   <a href="Dentro-la-Macchina.dc.html" style="margin-left:auto;color:#6B6F7A;border-color:rgba(107,111,122,.3)">Modulo 01: come genera testo →</a>
 </nav>
 
-<header style="padding:56px 0 30px;text-align:center">
-  <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.25em;text-transform:uppercase;color:#C0392B">Un piccolo libro illustrato · vol. 2</div>
-  <h1 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(44px,9vw,74px);margin:14px 0 6px;font-weight:700">La <span style="border-bottom:5px solid #2456B8">Matematica</span> nascosta</h1>
-  <p style="font-size:19px;color:#6B6F7A;max-width:600px;margin:10px auto 0;font-style:italic">Vettori, matrici, softmax, gradienti e attention — la lingua segreta con cui un LLM pensa. Dal significato come geometria fino alla formula che muove i Transformer. Da conoscenze medie a esperto, un passo alla volta.</p>
-  <div style="margin-top:22px;font-family:'Caveat',cursive;font-size:23px;color:#2456B8">— il tuo maestro di bottega, gessetto alla mano</div>
+<header class="w-hero">
+  <div class="w-hero-kicker">Un piccolo libro illustrato · vol. 2</div>
+  <h1 class="w-hero-title">La <span class="w-mark">Matematica</span> nascosta</h1>
+  <p class="w-hero-sub">Vettori, matrici, softmax, gradienti e attention — la lingua segreta con cui un LLM pensa. Dal significato come geometria fino alla formula che muove i Transformer. Da conoscenze medie a esperto, un passo alla volta.</p>
+  <div class="w-hero-sign">— il tuo maestro di bottega, gessetto alla mano</div>
 </header>
 
 <div style="border:2px solid #20242C;border-radius:14px;background:#fff;padding:18px 22px;margin:30px 0;box-shadow:4px 4px 0 rgba(32,36,44,.12)">
-  <h3 style="font-family:'Caveat',cursive;font-size:26px;margin:0 0 8px">La legenda delle penne ✒️</h3>
-  <p style="font-size:14.5px;margin:0 0 8px">Le stesse del primo quaderno, così i due libri si leggono in coppia:</p>
-  <ul style="list-style:none;margin:0;padding:0">
-    <li style="display:flex;align-items:center;gap:10px;padding:3px 0;font-size:15px"><span style="width:34px;height:5px;border-radius:3px;flex-shrink:0;background:#20242C"></span> Struttura e testo — le idee portanti</li>
-    <li style="display:flex;align-items:center;gap:10px;padding:3px 0;font-size:15px"><span style="width:34px;height:5px;border-radius:3px;flex-shrink:0;background:#2456B8"></span> Calcolo — dove avviene la matematica</li>
-    <li style="display:flex;align-items:center;gap:10px;padding:3px 0;font-size:15px"><span style="width:34px;height:5px;border-radius:3px;flex-shrink:0;background:#C0392B"></span> Note a margine — cose da non dimenticare</li>
-    <li style="display:flex;align-items:center;gap:10px;padding:3px 0;font-size:15px"><span style="width:34px;height:5px;border-radius:3px;flex-shrink:0;background:#D9741E"></span> Prova tu — banchi con gli esperimenti interattivi</li>
-    <li style="display:flex;align-items:center;gap:10px;padding:3px 0;font-size:15px"><span style="width:34px;height:5px;border-radius:3px;flex-shrink:0;background:#6B3FA0"></span> Livello esperto — i dettagli da professionisti</li>
+  <h3 class="w-note-title" style="font-size:26px">La legenda delle penne ✒️</h3>
+  <p>Le stesse del primo quaderno, così i due libri si leggono in coppia:</p>
+  <ul class="w-legend">
+    <li><i style="background:var(--ink)"></i> Struttura e testo — le idee portanti</li>
+    <li><i style="background:var(--blu)"></i> Calcolo — dove avviene la matematica</li>
+    <li><i style="background:var(--rosso)"></i> Note a margine — cose da non dimenticare</li>
+    <li><i style="background:var(--arancio)"></i> Prova tu — banchi con gli esperimenti interattivi</li>
+    <li><i style="background:var(--viola)"></i> Livello esperto — i dettagli da professionisti</li>
   </ul>
 </div>
 
 <nav style="margin:30px 0 10px">
-  <h2 style="font-family:'Caveat',cursive;font-size:34px;margin:0 0 10px">Il viaggio in sette tappe</h2>
-  <ol style="list-style:none;margin:0;padding:0;counter-reset:c">
-    <li style="counter-increment:c;padding:7px 0;border-bottom:1px dashed #E9E5D8"><a href="#c1" style="border:none;color:#20242C;display:flex;gap:12px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#C0392B;min-width:26px">01</span><span>I Vettori — dare coordinate al significato</span><span style="margin-left:auto;font-size:13px;color:#6B6F7A;font-style:italic">norma, prodotto scalare, coseno</span></a></li>
-    <li style="counter-increment:c;padding:7px 0;border-bottom:1px dashed #E9E5D8"><a href="#c2" style="border:none;color:#20242C;display:flex;gap:12px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#C0392B;min-width:26px">02</span><span>Le Matrici — macchine che trasformano lo spazio</span><span style="margin-left:auto;font-size:13px;color:#6B6F7A;font-style:italic">Wx, determinante</span></a></li>
-    <li style="counter-increment:c;padding:7px 0;border-bottom:1px dashed #E9E5D8"><a href="#c3" style="border:none;color:#20242C;display:flex;gap:12px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#C0392B;min-width:26px">03</span><span>Spazi ed Embedding — il significato come geometria</span><span style="margin-left:auto;font-size:13px;color:#6B6F7A;font-style:italic">re − uomo + donna</span></a></li>
-    <li style="counter-increment:c;padding:7px 0;border-bottom:1px dashed #E9E5D8"><a href="#c4" style="border:none;color:#20242C;display:flex;gap:12px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#C0392B;min-width:26px">04</span><span>Softmax — da numeri qualsiasi a probabilità</span><span style="margin-left:auto;font-size:13px;color:#6B6F7A;font-style:italic">esponenziali, temperatura</span></a></li>
-    <li style="counter-increment:c;padding:7px 0;border-bottom:1px dashed #E9E5D8"><a href="#c5" style="border:none;color:#20242C;display:flex;gap:12px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#C0392B;min-width:26px">05</span><span>Derivate e Gradienti — come la macchina impara</span><span style="margin-left:auto;font-size:13px;color:#6B6F7A;font-style:italic">discesa del gradiente</span></a></li>
-    <li style="counter-increment:c;padding:7px 0;border-bottom:1px dashed #E9E5D8"><a href="#c6" style="border:none;color:#20242C;display:flex;gap:12px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#C0392B;min-width:26px">06</span><span>L'Attention — la formula che muove i Transformer</span><span style="margin-left:auto;font-size:13px;color:#6B6F7A;font-style:italic">softmax(QKᵀ/√d)V</span></a></li>
-    <li style="counter-increment:c;padding:7px 0;border-bottom:1px dashed #E9E5D8"><a href="#c7" style="border:none;color:#20242C;display:flex;gap:12px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#C0392B;min-width:26px">07</span><span>Tutto insieme — dall'algebra al Transformer</span><span style="margin-left:auto;font-size:13px;color:#6B6F7A;font-style:italic">le dimensioni vere</span></a></li>
+  <h2 class="w-h2">Il viaggio in sette tappe</h2>
+  <ol class="w-summary">
+    <li><a href="#c1"><span class="w-summary-n">01</span><span>I Vettori — dare coordinate al significato</span><span class="w-summary-tag">norma, prodotto scalare, coseno</span></a></li>
+    <li><a href="#c2"><span class="w-summary-n">02</span><span>Le Matrici — macchine che trasformano lo spazio</span><span class="w-summary-tag">Wx, determinante</span></a></li>
+    <li><a href="#c3"><span class="w-summary-n">03</span><span>Spazi ed Embedding — il significato come geometria</span><span class="w-summary-tag">re − uomo + donna</span></a></li>
+    <li><a href="#c4"><span class="w-summary-n">04</span><span>Softmax — da numeri qualsiasi a probabilità</span><span class="w-summary-tag">esponenziali, temperatura</span></a></li>
+    <li><a href="#c5"><span class="w-summary-n">05</span><span>Derivate e Gradienti — come la macchina impara</span><span class="w-summary-tag">discesa del gradiente</span></a></li>
+    <li><a href="#c6"><span class="w-summary-n">06</span><span>L'Attention — la formula che muove i Transformer</span><span class="w-summary-tag">softmax(QKᵀ/√d)V</span></a></li>
+    <li><a href="#c7"><span class="w-summary-n">07</span><span>Tutto insieme — dall'algebra al Transformer</span><span class="w-summary-tag">le dimensioni vere</span></a></li>
   </ol>
 </nav>
 
-<div style="background:#FFF8E8;border:1.5px dashed #C0392B;border-radius:10px;padding:12px 16px;margin:18px 0;font-size:15.5px"><b style="color:#C0392B">Come leggere questo libro.</b> Ogni concetto arriva prima come <em>immagine mentale</em>, poi come numeri veri, e solo alla fine come formula. I banchi arancioni <b style="color:#D9741E">"Prova tu"</b> sono interattivi: muovi i cursori e guarda la matematica muoversi. Non serve saper già l'algebra lineare — te la costruiamo qui, mattone su mattone.</div>
+<div class="w-note w-note--warn"><b style="color:#C0392B">Come leggere questo libro.</b> Ogni concetto arriva prima come <em>immagine mentale</em>, poi come numeri veri, e solo alla fine come formula. I banchi arancioni <b style="color:#D9741E">"Prova tu"</b> sono interattivi: muovi i cursori e guarda la matematica muoversi. Non serve saper già l'algebra lineare — te la costruiamo qui, mattone su mattone.</div>
 
 <!-- ============ CAP 01 — VETTORI ============ -->
-<section id="c1" style="margin-top:70px;border-top:3px solid #20242C;padding-top:8px">
-  <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#C0392B;text-transform:uppercase">Tappa 01 · L'atomo del significato</div>
-  <h2 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(34px,6vw,46px);margin:2px 0 6px">I Vettori — dare coordinate al significato</h2>
-  <p style="font-size:18px;font-style:italic;color:#6B6F7A;margin:0 0 18px">Un numero da solo dice "quanto". Un vettore dice "quanto" in molte direzioni contemporaneamente. È l'unità con cui l'LLM rappresenta ogni cosa.</p>
+<section class="w-tappa" id="c1">
+  <div class="w-tappa-kicker">L'atomo del significato</div>
+  <h2 class="w-tappa-title">I Vettori — dare coordinate al significato</h2>
+  <p class="w-tappa-lead">Un numero da solo dice "quanto". Un vettore dice "quanto" in molte direzioni contemporaneamente. È l'unità con cui l'LLM rappresenta ogni cosa.</p>
 
-  <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">L'idea: una lista di numeri con una direzione</h3>
-  <p style="margin:0 0 1em">Immagina di descrivere una tazza di caffè con tre numeri: <em>quanto è caldo</em>, <em>quanto è amaro</em>, <em>quanto è pieno</em>. Metti questi tre numeri in fila e ottieni un <strong>vettore</strong>: <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">[82, 7, 0.5]</code>. Non è "un numero grande": è un <em>punto</em> in uno spazio a tre assi — o, in modo equivalente, una <em>freccia</em> che parte dall'origine e arriva a quel punto.</p>
-  <p style="margin:0 0 1em">Un LLM fa esattamente questo con le parole, ma con centinaia o migliaia di numeri invece di tre. Ogni parola diventa una freccia in uno spazio enorme. Per ora restiamo in 2 dimensioni, dove possiamo <em>disegnarle</em>.</p>
+  <h3 class="w-h3">L'idea: una lista di numeri con una direzione</h3>
+  <p>Immagina di descrivere una tazza di caffè con tre numeri: <em>quanto è caldo</em>, <em>quanto è amaro</em>, <em>quanto è pieno</em>. Metti questi tre numeri in fila e ottieni un <strong>vettore</strong>: <code>[82, 7, 0.5]</code>. Non è "un numero grande": è un <em>punto</em> in uno spazio a tre assi — o, in modo equivalente, una <em>freccia</em> che parte dall'origine e arriva a quel punto.</p>
+  <p>Un LLM fa esattamente questo con le parole, ma con centinaia o migliaia di numeri invece di tre. Ogni parola diventa una freccia in uno spazio enorme. Per ora restiamo in 2 dimensioni, dove possiamo <em>disegnarle</em>.</p>
 
-  <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #D9741E;box-shadow:3px 3px 0 rgba(217,116,30,.15)">
-    <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#D9741E">🧭 Analogia: la mappa del tesoro</span>
-    <p style="margin:0">"Cammina 3 passi a est e 2 a nord" è un vettore: <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">[3, 2]</code>. Ha una <em>direzione</em> (verso dove) e una <em>lunghezza</em> (quanti passi in totale). Cambiare l'ordine — [2, 3] — ti porta in un posto diverso: nei vettori la posizione conta.</p>
+  <div class="w-note w-note--demo">
+    <span class="w-note-title">Analogia: la mappa del tesoro</span>
+    <p>"Cammina 3 passi a est e 2 a nord" è un vettore: <code>[3, 2]</code>. Ha una <em>direzione</em> (verso dove) e una <em>lunghezza</em> (quanti passi in totale). Cambiare l'ordine — [2, 3] — ti porta in un posto diverso: nei vettori la posizione conta.</p>
   </div>
 
-  <div style="background:#fff;border:2px solid #D9741E;border-radius:14px;padding:18px;margin:22px 0;box-shadow:4px 4px 0 rgba(217,116,30,.15)">
-    <h4 style="font-family:'Caveat',cursive;font-size:24px;color:#D9741E;margin:0 0 4px">🛠️ Prova tu — costruisci un vettore</h4>
-    <p style="margin:0 0 10px;font-size:15px">Muovi i cursori: la freccia cambia direzione e lunghezza. La <strong>norma</strong> \(\lVert\mathbf{v}\rVert\) è quanto è lunga la freccia — il teorema di Pitagora applicato alle componenti.</p>
+  <div class="w-demo">
+    <h4 class="w-demo-title">Prova tu — costruisci un vettore</h4>
+    <p class="w-demo-hint">Muovi i cursori: la freccia cambia direzione e lunghezza. La <strong>norma</strong> \(\lVert\mathbf{v}\rVert\) è quanto è lunga la freccia — il teorema di Pitagora applicato alle componenti.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center">
       <div>
-        <label style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#2456B8">x (est) = {{ vx }}</label>
+        <label class="w-label">x (est) = {{ vx }}</label>
         <input type="range" min="-5" max="5" step="0.5" value="{{ vx }}" onChange="{{ setVx }}">
-        <label style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#2E7D4F">y (nord) = {{ vy }}</label>
+        <label class="w-label">y (nord) = {{ vy }}</label>
         <input type="range" min="-5" max="5" step="0.5" value="{{ vy }}" onChange="{{ setVy }}">
         <div style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:13px;background:#F3F0E6;border-radius:8px;padding:10px 12px">
           v = [{{ vx }}, {{ vy }}]<br>
@@ -129,21 +102,21 @@ mjx-container[display="true"]{margin:0!important}
     </div>
   </div>
 
-  <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">Sommare e allungare</h3>
-  <p style="margin:0 0 1em">Due operazioni bastano per quasi tutto. <strong>Sommare</strong> due vettori significa incollare la seconda freccia in coda alla prima: <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">[3,2]+[1,4]=[4,6]</code>, componente per componente. <strong>Moltiplicare per un numero</strong> (uno "scalare") allunga o accorcia la freccia senza ruotarla: <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">2·[3,2]=[6,4]</code>. Tutta la rete neurale è, in fondo, una lunga sequenza di "somma e allunga".</p>
-  <div style="background:#fff;border-left:4px solid #2456B8;padding:10px 18px;margin:16px 0;overflow-x:auto">\[ \lVert\mathbf{v}\rVert=\sqrt{v_1^2+v_2^2+\dots+v_n^2}\qquad \mathbf{a}+\mathbf{b}=[a_1+b_1,\;\dots,\;a_n+b_n] \]<span style="display:block;font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:6px">La norma è la lunghezza; la somma avviene componente per componente. In \(n\) dimensioni cambia solo quanti termini sommi.</span></div>
+  <h3 class="w-h3">Sommare e allungare</h3>
+  <p>Due operazioni bastano per quasi tutto. <strong>Sommare</strong> due vettori significa incollare la seconda freccia in coda alla prima: <code>[3,2]+[1,4]=[4,6]</code>, componente per componente. <strong>Moltiplicare per un numero</strong> (uno "scalare") allunga o accorcia la freccia senza ruotarla: <code>2·[3,2]=[6,4]</code>. Tutta la rete neurale è, in fondo, una lunga sequenza di "somma e allunga".</p>
+  <div class="w-formula">\[ \lVert\mathbf{v}\rVert=\sqrt{v_1^2+v_2^2+\dots+v_n^2}\qquad \mathbf{a}+\mathbf{b}=[a_1+b_1,\;\dots,\;a_n+b_n] \]<span class="w-formula-note">La norma è la lunghezza; la somma avviene componente per componente. In \(n\) dimensioni cambia solo quanti termini sommi.</span></div>
 
-  <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">Il prodotto scalare: quanto due frecce vanno d'accordo</h3>
-  <p style="margin:0 0 1em">Qui nasce la magia. Il <strong>prodotto scalare</strong> (dot product) prende due vettori e restituisce <em>un solo numero</em> che misura quanto puntano nella stessa direzione. Moltiplichi le componenti a coppie e sommi:</p>
-  <div style="background:#fff;border-left:4px solid #2456B8;padding:10px 18px;margin:16px 0;overflow-x:auto">\[ \mathbf{a}\cdot\mathbf{b}=\sum_{i} a_i b_i = a_1b_1+a_2b_2+\dots+a_nb_n = \lVert\mathbf{a}\rVert\,\lVert\mathbf{b}\rVert\cos\theta \]<span style="display:block;font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:6px">Grande e positivo → stessa direzione. Zero → perpendicolari (indipendenti). Negativo → opposte. Questo unico numero è il cuore dell'attention del capitolo 6.</span></div>
-  <p style="margin:0 0 1em">Se togliamo l'effetto della lunghezza dividendo per le due norme, resta solo l'angolo: la <strong>similarità coseno</strong>. Vale +1 se le frecce sono allineate, 0 se perpendicolari, −1 se opposte. È così che un LLM decide che "re" e "regina" sono <em>vicini</em> di significato anche se sono parole diverse.</p>
+  <h3 class="w-h3">Il prodotto scalare: quanto due frecce vanno d'accordo</h3>
+  <p>Qui nasce la magia. Il <strong>prodotto scalare</strong> (dot product) prende due vettori e restituisce <em>un solo numero</em> che misura quanto puntano nella stessa direzione. Moltiplichi le componenti a coppie e sommi:</p>
+  <div class="w-formula">\[ \mathbf{a}\cdot\mathbf{b}=\sum_{i} a_i b_i = a_1b_1+a_2b_2+\dots+a_nb_n = \lVert\mathbf{a}\rVert\,\lVert\mathbf{b}\rVert\cos\theta \]<span class="w-formula-note">Grande e positivo → stessa direzione. Zero → perpendicolari (indipendenti). Negativo → opposte. Questo unico numero è il cuore dell'attention del capitolo 6.</span></div>
+  <p>Se togliamo l'effetto della lunghezza dividendo per le due norme, resta solo l'angolo: la <strong>similarità coseno</strong>. Vale +1 se le frecce sono allineate, 0 se perpendicolari, −1 se opposte. È così che un LLM decide che "re" e "regina" sono <em>vicini</em> di significato anche se sono parole diverse.</p>
 
-  <div style="background:#fff;border:2px solid #D9741E;border-radius:14px;padding:18px;margin:22px 0;box-shadow:4px 4px 0 rgba(217,116,30,.15)">
-    <h4 style="font-family:'Caveat',cursive;font-size:24px;color:#D9741E;margin:0 0 4px">🛠️ Prova tu — la similarità coseno</h4>
-    <p style="margin:0 0 10px;font-size:15px">Ruota la freccia rossa. Quando è allineata alla blu, coseno ≈ 1 (stesso significato). A 90° il coseno è 0 (nessuna relazione). Oltre, diventa negativo (significati opposti).</p>
+  <div class="w-demo">
+    <h4 class="w-demo-title">Prova tu — la similarità coseno</h4>
+    <p class="w-demo-hint">Ruota la freccia rossa. Quando è allineata alla blu, coseno ≈ 1 (stesso significato). A 90° il coseno è 0 (nessuna relazione). Oltre, diventa negativo (significati opposti).</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center">
       <div>
-        <label style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">angolo θ = {{ cosDeg }}°</label>
+        <label class="w-ref">angolo θ = {{ cosDeg }}°</label>
         <input type="range" min="0" max="180" step="1" value="{{ cosDeg }}" onChange="{{ setCos }}">
         <div style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:13px;background:#F3F0E6;border-radius:8px;padding:10px 12px">
           cos θ = <span style="color:#D9741E;font-weight:600">{{ cosV }}</span><br>
@@ -164,34 +137,34 @@ mjx-container[display="true"]{margin:0!important}
     </div>
   </div>
 
-  <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #6B3FA0;box-shadow:3px 3px 0 rgba(107,63,160,.15)">
-    <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B3FA0">🎓 Livello esperto</span>
-    <p style="margin:0 0 6px">In alta dimensione accade una cosa contro-intuitiva (la <em>maledizione della dimensionalità</em>): due vettori casuali sono quasi sempre <strong>quasi ortogonali</strong>, con coseno vicino a 0. Questo è un regalo, non un problema: significa che uno spazio a \(d\) dimensioni può ospitare un numero enorme di concetti "quasi indipendenti" — molti più di \(d\). È la base della <em>superposizione</em>, per cui un modello immagazzina più feature che neuroni.</p>
-    <p style="margin:0">Nota pratica: nei modelli si normalizzano spesso i vettori a norma 1 (con la <em>RMSNorm</em>). Così il prodotto scalare <em>è</em> direttamente il coseno, e i conti restano stabili strato dopo strato.</p>
+  <div class="w-note w-note--expert">
+    <span class="w-note-title">Livello esperto</span>
+    <p>In alta dimensione accade una cosa contro-intuitiva (la <em>maledizione della dimensionalità</em>): due vettori casuali sono quasi sempre <strong>quasi ortogonali</strong>, con coseno vicino a 0. Questo è un regalo, non un problema: significa che uno spazio a \(d\) dimensioni può ospitare un numero enorme di concetti "quasi indipendenti" — molti più di \(d\). È la base della <em>superposizione</em>, per cui un modello immagazzina più feature che neuroni.</p>
+    <p>Nota pratica: nei modelli si normalizzano spesso i vettori a norma 1 (con la <em>RMSNorm</em>). Così il prodotto scalare <em>è</em> direttamente il coseno, e i conti restano stabili strato dopo strato.</p>
   </div>
 </section>
 
 <!-- ============ CAP 02 — MATRICI ============ -->
-<section id="c2" style="margin-top:70px;border-top:3px solid #20242C;padding-top:8px">
-  <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#C0392B;text-transform:uppercase">Tappa 02 · La macchina universale</div>
-  <h2 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(34px,6vw,46px);margin:2px 0 6px">Le Matrici — macchine che trasformano lo spazio</h2>
-  <p style="font-size:18px;font-style:italic;color:#6B6F7A;margin:0 0 18px">Se un vettore è una freccia, una matrice è una <em>macchina</em> che prende in ingresso una freccia e ne restituisce un'altra. Ruotata, stirata, ribaltata. Ogni "strato" di un LLM è, in prima battuta, una matrice.</p>
+<section class="w-tappa" id="c2">
+  <div class="w-tappa-kicker">La macchina universale</div>
+  <h2 class="w-tappa-title">Le Matrici — macchine che trasformano lo spazio</h2>
+  <p class="w-tappa-lead">Se un vettore è una freccia, una matrice è una <em>macchina</em> che prende in ingresso una freccia e ne restituisce un'altra. Ruotata, stirata, ribaltata. Ogni "strato" di un LLM è, in prima battuta, una matrice.</p>
 
-  <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">L'idea: una griglia di numeri che agisce</h3>
-  <p style="margin:0 0 1em">Una <strong>matrice</strong> è semplicemente una tabella di numeri. Ma il suo vero significato è un <em>verbo</em>, non un sostantivo: descrive una trasformazione. Moltiplicare una matrice \(W\) per un vettore \(\mathbf{x}\) produce un nuovo vettore \(\mathbf{y}=W\mathbf{x}\). Ogni riga della matrice è una "domanda" che si fa al vettore in ingresso tramite un prodotto scalare (sì, quello del capitolo 1!):</p>
-  <div style="background:#fff;border-left:4px solid #2456B8;padding:10px 18px;margin:16px 0;overflow-x:auto">\[ \begin{bmatrix} w_{11} & w_{12} \\ w_{21} & w_{22} \end{bmatrix}\!\begin{bmatrix} x_1 \\ x_2 \end{bmatrix}=\begin{bmatrix} w_{11}x_1+w_{12}x_2 \\ w_{21}x_1+w_{22}x_2 \end{bmatrix} \]<span style="display:block;font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:6px">Ogni componente del risultato è il prodotto scalare tra una riga di \(W\) e il vettore \(\mathbf{x}\). Una matrice \(m\times n\) trasforma vettori di \(n\) numeri in vettori di \(m\) numeri: cambia anche la dimensione dello spazio.</span></div>
+  <h3 class="w-h3">L'idea: una griglia di numeri che agisce</h3>
+  <p>Una <strong>matrice</strong> è semplicemente una tabella di numeri. Ma il suo vero significato è un <em>verbo</em>, non un sostantivo: descrive una trasformazione. Moltiplicare una matrice \(W\) per un vettore \(\mathbf{x}\) produce un nuovo vettore \(\mathbf{y}=W\mathbf{x}\). Ogni riga della matrice è una "domanda" che si fa al vettore in ingresso tramite un prodotto scalare (sì, quello del capitolo 1!):</p>
+  <div class="w-formula">\[ \begin{bmatrix} w_{11} & w_{12} \\ w_{21} & w_{22} \end{bmatrix}\!\begin{bmatrix} x_1 \\ x_2 \end{bmatrix}=\begin{bmatrix} w_{11}x_1+w_{12}x_2 \\ w_{21}x_1+w_{22}x_2 \end{bmatrix} \]<span class="w-formula-note">Ogni componente del risultato è il prodotto scalare tra una riga di \(W\) e il vettore \(\mathbf{x}\). Una matrice \(m\times n\) trasforma vettori di \(n\) numeri in vettori di \(m\) numeri: cambia anche la dimensione dello spazio.</span></div>
 
-  <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #D9741E;box-shadow:3px 3px 0 rgba(217,116,30,.15)">
-    <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#D9741E">⚙️ Analogia: il pastificio</span>
-    <p style="margin:0">Metti dentro l'impasto (il vettore) e la trafila (la matrice) lo trasforma: la stessa pasta base diventa spaghetti, penne o fusilli a seconda dello stampo. La matrice <em>è</em> lo stampo. Cambi i numeri della griglia, cambi la forma in uscita — ma l'operazione, "spingi e stira in modo lineare", resta sempre la stessa.</p>
+  <div class="w-note w-note--demo">
+    <span class="w-note-title">Analogia: il pastificio</span>
+    <p>Metti dentro l'impasto (il vettore) e la trafila (la matrice) lo trasforma: la stessa pasta base diventa spaghetti, penne o fusilli a seconda dello stampo. La matrice <em>è</em> lo stampo. Cambi i numeri della griglia, cambi la forma in uscita — ma l'operazione, "spingi e stira in modo lineare", resta sempre la stessa.</p>
   </div>
 
-  <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">Guardarla come deformazione dello spazio</h3>
-  <p style="margin:0 0 1em">Il modo più illuminante di capire una matrice \(2\times2\) è chiedersi: <em>dove finiscono i due vettori base</em>? La prima colonna dice dove va la freccia orizzontale \([1,0]\); la seconda dove va quella verticale \([0,1]\). Tutto il resto dello spazio segue rigidamente. Il quadratino unitario diventa un parallelogramma: la sua area è il <strong>determinante</strong>. Se il determinante è negativo, lo spazio è stato <em>ribaltato</em>; se è zero, è stato schiacciato su una linea (informazione persa).</p>
+  <h3 class="w-h3">Guardarla come deformazione dello spazio</h3>
+  <p>Il modo più illuminante di capire una matrice \(2\times2\) è chiedersi: <em>dove finiscono i due vettori base</em>? La prima colonna dice dove va la freccia orizzontale \([1,0]\); la seconda dove va quella verticale \([0,1]\). Tutto il resto dello spazio segue rigidamente. Il quadratino unitario diventa un parallelogramma: la sua area è il <strong>determinante</strong>. Se il determinante è negativo, lo spazio è stato <em>ribaltato</em>; se è zero, è stato schiacciato su una linea (informazione persa).</p>
 
-  <div style="background:#fff;border:2px solid #D9741E;border-radius:14px;padding:18px;margin:22px 0;box-shadow:4px 4px 0 rgba(217,116,30,.15)">
-    <h4 style="font-family:'Caveat',cursive;font-size:24px;color:#D9741E;margin:0 0 4px">🛠️ Prova tu — deforma lo spazio</h4>
-    <p style="margin:0 0 10px;font-size:15px">I quattro cursori sono la matrice. Il quadrato azzurro è \([1,0]\)/\([0,1]\) di partenza; il parallelogramma arancione è dove finiscono. Guarda l'area (il determinante) crescere, invertirsi o azzerarsi.</p>
+  <div class="w-demo">
+    <h4 class="w-demo-title">Prova tu — deforma lo spazio</h4>
+    <p class="w-demo-hint">I quattro cursori sono la matrice. Il quadrato azzurro è \([1,0]\)/\([0,1]\) di partenza; il parallelogramma arancione è dove finiscono. Guarda l'area (il determinante) crescere, invertirsi o azzerarsi.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center">
       <div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 14px">
@@ -202,7 +175,7 @@ mjx-container[display="true"]{margin:0!important}
         </div>
         <div style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:13px;background:#F3F0E6;border-radius:8px;padding:10px 12px">
           W = [[{{ ma }}, {{ mb }}], [{{ mc }}, {{ md }}]]<br>
-          det(W) = ad − bc = <span style="color:#D9741E;font-weight:600">{{ det }}</span> <span style="color:#6B6F7A">(area)</span>
+          det(W) = ad − bc = <span style="color:#D9741E;font-weight:600">{{ det }}</span> <span class="w-nav-here">(area)</span>
         </div>
         <button onClick="{{ identity }}" style="margin-top:10px;font-family:'IBM Plex Mono',monospace;font-size:12px;border:1.5px solid #20242C;background:#fff;border-radius:8px;padding:6px 12px;cursor:pointer">↺ identità</button>
       </div>
@@ -218,36 +191,36 @@ mjx-container[display="true"]{margin:0!important}
     </div>
   </div>
 
-  <p style="margin:0 0 1em">Perché tutto questo importa? Perché <strong>una rete neurale è una catena di queste macchine</strong>: \(\mathbf{x} \to W_1\mathbf{x} \to W_2(\dots) \to \dots\). Se fossero solo matrici, però, l'intera catena collasserebbe in <em>una sola</em> matrice (il prodotto di tutte) — e potrebbe fare solo trasformazioni lineari, cioè rette. Serve un ingrediente non-lineare tra uno strato e l'altro: lo incontreremo al capitolo 5.</p>
+  <p>Perché tutto questo importa? Perché <strong>una rete neurale è una catena di queste macchine</strong>: \(\mathbf{x} \to W_1\mathbf{x} \to W_2(\dots) \to \dots\). Se fossero solo matrici, però, l'intera catena collasserebbe in <em>una sola</em> matrice (il prodotto di tutte) — e potrebbe fare solo trasformazioni lineari, cioè rette. Serve un ingrediente non-lineare tra uno strato e l'altro: lo incontreremo al capitolo 5.</p>
 
-  <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #6B3FA0;box-shadow:3px 3px 0 rgba(107,63,160,.15)">
-    <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B3FA0">🎓 Livello esperto</span>
-    <p style="margin:0 0 6px">I "pesi" di un LLM <em>sono</em> matrici. In un blocco Transformer le più importanti sono \(W_Q, W_K, W_V\) (proiettano l'embedding in <em>query, key, value</em>) e le due matrici enormi della FFN (\(W_{\text{up}}\) e \(W_{\text{down}}\), spesso 4× più larghe). Un modello da 8 miliardi di parametri <em>è</em>, letteralmente, ~8·10⁹ numeri sistemati dentro qualche centinaio di queste griglie.</p>
-    <p style="margin:0">Il costo di far girare il modello è dominato dalle moltiplicazioni matrice×matrice (GEMM): è per questo che le GPU, macchine specializzate proprio in questo, sono indispensabili. La <em>decomposizione</em> di queste matrici (es. LoRA: \(W+BA\) con \(B,A\) piccole) è la chiave del fine-tuning economico.</p>
+  <div class="w-note w-note--expert">
+    <span class="w-note-title">Livello esperto</span>
+    <p>I "pesi" di un LLM <em>sono</em> matrici. In un blocco Transformer le più importanti sono \(W_Q, W_K, W_V\) (proiettano l'embedding in <em>query, key, value</em>) e le due matrici enormi della FFN (\(W_{\text{up}}\) e \(W_{\text{down}}\), spesso 4× più larghe). Un modello da 8 miliardi di parametri <em>è</em>, letteralmente, ~8·10⁹ numeri sistemati dentro qualche centinaio di queste griglie.</p>
+    <p>Il costo di far girare il modello è dominato dalle moltiplicazioni matrice×matrice (GEMM): è per questo che le GPU, macchine specializzate proprio in questo, sono indispensabili. La <em>decomposizione</em> di queste matrici (es. LoRA: \(W+BA\) con \(B,A\) piccole) è la chiave del fine-tuning economico.</p>
   </div>
 </section>
 
 <!-- ============ CAP 03 — EMBEDDING ============ -->
-<section id="c3" style="margin-top:70px;border-top:3px solid #20242C;padding-top:8px">
-  <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#C0392B;text-transform:uppercase">Tappa 03 · Il significato ha una forma</div>
-  <h2 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(34px,6vw,46px);margin:2px 0 6px">Spazi ed Embedding — il significato come geometria</h2>
-  <p style="font-size:18px;font-style:italic;color:#6B6F7A;margin:0 0 18px">Se ogni parola è un vettore, allora il vocabolario è una <em>mappa</em>. E su quella mappa le distanze e le direzioni <strong>hanno un senso</strong>: è qui che i numeri diventano comprensione.</p>
+<section class="w-tappa" id="c3">
+  <div class="w-tappa-kicker">Il significato ha una forma</div>
+  <h2 class="w-tappa-title">Spazi ed Embedding — il significato come geometria</h2>
+  <p class="w-tappa-lead">Se ogni parola è un vettore, allora il vocabolario è una <em>mappa</em>. E su quella mappa le distanze e le direzioni <strong>hanno un senso</strong>: è qui che i numeri diventano comprensione.</p>
 
-  <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">Tante dimensioni, un'unica idea</h3>
-  <p style="margin:0 0 1em">Un LLM non usa 2 numeri per parola, ma tipicamente da 768 a oltre 12.000. Ogni dimensione è un "asse di significato" appreso automaticamente: uno potrebbe correlare con "reale ↔ astratto", un altro con "positivo ↔ negativo", un altro con "singolare ↔ plurale". Nessuno li programma: emergono dall'addestramento. L'insieme di tutte le frecce-parola è lo <strong>spazio degli embedding</strong>.</p>
-  <div style="background:#fff;border-left:4px solid #2456B8;padding:10px 18px;margin:16px 0;overflow-x:auto">\[ \text{"gatto"} \;\longmapsto\; \mathbf{e}_{\text{gatto}}=[0.21,\,-1.34,\,0.08,\,\dots,\,0.77]\in\mathbb{R}^{d} \]<span style="display:block;font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:6px">La tabella degli embedding è una gigantesca matrice: una riga per ogni token del vocabolario (es. 128.000 righe × \(d\) colonne). "Guardare" una parola significa leggere la sua riga.</span></div>
+  <h3 class="w-h3">Tante dimensioni, un'unica idea</h3>
+  <p>Un LLM non usa 2 numeri per parola, ma tipicamente da 768 a oltre 12.000. Ogni dimensione è un "asse di significato" appreso automaticamente: uno potrebbe correlare con "reale ↔ astratto", un altro con "positivo ↔ negativo", un altro con "singolare ↔ plurale". Nessuno li programma: emergono dall'addestramento. L'insieme di tutte le frecce-parola è lo <strong>spazio degli embedding</strong>.</p>
+  <div class="w-formula">\[ \text{"gatto"} \;\longmapsto\; \mathbf{e}_{\text{gatto}}=[0.21,\,-1.34,\,0.08,\,\dots,\,0.77]\in\mathbb{R}^{d} \]<span class="w-formula-note">La tabella degli embedding è una gigantesca matrice: una riga per ogni token del vocabolario (es. 128.000 righe × \(d\) colonne). "Guardare" una parola significa leggere la sua riga.</span></div>
 
-  <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #D9741E;box-shadow:3px 3px 0 rgba(217,116,30,.15)">
-    <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#D9741E">🗺️ Analogia: la biblioteca infinita</span>
-    <p style="margin:0">Immagina una biblioteca dove i libri non sono ordinati per titolo, ma per <em>argomento</em>: i romanzi gialli vicini, la poesia in un'altra ala, i manuali di cucina tutti insieme. Cammini di tre passi e passi da "spaghetti" a "carbonara". Lo spazio degli embedding è questa biblioteca: <strong>la posizione codifica il significato</strong>, e concetti simili sono vicini di scaffale.</p>
+  <div class="w-note w-note--demo">
+    <span class="w-note-title">Analogia: la biblioteca infinita</span>
+    <p>Immagina una biblioteca dove i libri non sono ordinati per titolo, ma per <em>argomento</em>: i romanzi gialli vicini, la poesia in un'altra ala, i manuali di cucina tutti insieme. Cammini di tre passi e passi da "spaghetti" a "carbonara". Lo spazio degli embedding è questa biblioteca: <strong>la posizione codifica il significato</strong>, e concetti simili sono vicini di scaffale.</p>
   </div>
 
-  <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">La direzione racconta una relazione</h3>
-  <p style="margin:0 0 1em">La scoperta sorprendente: non conta solo <em>dove</em> sono le parole, ma anche le <strong>direzioni tra loro</strong>. La freccia che va da "uomo" a "re" è quasi la stessa che va da "donna" a "regina". È il celebre esempio dell'aritmetica dei concetti:</p>
-  <div style="background:#fff;border-left:4px solid #2456B8;padding:10px 18px;margin:16px 0;overflow-x:auto">\[ \mathbf{e}_{\text{re}}-\mathbf{e}_{\text{uomo}}+\mathbf{e}_{\text{donna}}\;\approx\;\mathbf{e}_{\text{regina}} \]<span style="display:block;font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:6px">Una direzione dello spazio codifica "regalità", un'altra il "genere". Si sommano e si sottraggono come vettori qualsiasi (cap. 1). Il significato è diventato algebra.</span></div>
+  <h3 class="w-h3">La direzione racconta una relazione</h3>
+  <p>La scoperta sorprendente: non conta solo <em>dove</em> sono le parole, ma anche le <strong>direzioni tra loro</strong>. La freccia che va da "uomo" a "re" è quasi la stessa che va da "donna" a "regina". È il celebre esempio dell'aritmetica dei concetti:</p>
+  <div class="w-formula">\[ \mathbf{e}_{\text{re}}-\mathbf{e}_{\text{uomo}}+\mathbf{e}_{\text{donna}}\;\approx\;\mathbf{e}_{\text{regina}} \]<span class="w-formula-note">Una direzione dello spazio codifica "regalità", un'altra il "genere". Si sommano e si sottraggono come vettori qualsiasi (cap. 1). Il significato è diventato algebra.</span></div>
 
-  <figure style="margin:24px 0;background:#fff;border:2px solid #20242C;border-radius:14px;padding:14px;box-shadow:4px 4px 0 rgba(32,36,44,.12)">
-    <svg viewBox="0 0 640 260" role="img" aria-label="uomo re donna regina come parallelogramma nello spazio" style="width:100%;height:auto;display:block">
+  <figure class="w-figure">
+    <svg viewBox="0 0 640 260" role="img" aria-label="uomo re donna regina come parallelogramma nello spazio">
       <line x1="40" y1="230" x2="600" y2="230" stroke="#E0DAC6" stroke-width="1.5"/>
       <line x1="90" y1="20" x2="90" y2="240" stroke="#E0DAC6" stroke-width="1.5"/>
       <defs><marker id="ap" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#6B3FA0"/></marker></defs>
@@ -259,34 +232,34 @@ mjx-container[display="true"]{margin:0!important}
       <line x1="280" y1="150" x2="460" y2="80" stroke="#6B3FA0" stroke-width="2.5" stroke-dasharray="5 4" marker-end="url(#ap)"/>
       <text x="250" y="150" font-family="Caveat" font-size="19" fill="#6B3FA0" transform="rotate(-21 250 150)">+ regalità →</text>
     </svg>
-    <figcaption style="font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:8px;text-align:center">Fig. 3 — Le due frecce viola sono (quasi) parallele e uguali: la stessa "direzione di regalità" collega entrambe le coppie. Le relazioni sono geometria.</figcaption>
+    <figcaption>Fig. 3 — Le due frecce viola sono (quasi) parallele e uguali: la stessa "direzione di regalità" collega entrambe le coppie. Le relazioni sono geometria.</figcaption>
   </figure>
 
-  <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #6B3FA0;box-shadow:3px 3px 0 rgba(107,63,160,.15)">
-    <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B3FA0">🎓 Livello esperto</span>
-    <p style="margin:0 0 6px">Attenzione a due sfumature. Primo: gli embedding "statici" (Word2Vec, GloVe) danno <em>una</em> freccia per parola; dentro un Transformer gli embedding sono <strong>contestuali</strong> — "banca" del fiume e "banca" dei soldi finiscono in punti diversi dopo che l'attention li ha rielaborati. Secondo: la posizione nella frase non è nell'embedding di partenza; va iniettata a parte con il <em>positional encoding</em> (oggi quasi sempre <strong>RoPE</strong>, che <em>ruota</em> ogni coppia di dimensioni di un angolo proporzionale alla posizione — di nuovo pura geometria).</p>
-    <p style="margin:0">Per vedere questo spazio in 2D si usano proiezioni come <em>PCA</em>, <em>t-SNE</em> o <em>UMAP</em>: comprimono \(d\) dimensioni in 2 mantenendo le vicinanze. Ricorda però che sono ombre: la vera struttura vive nelle centinaia di dimensioni originali.</p>
+  <div class="w-note w-note--expert">
+    <span class="w-note-title">Livello esperto</span>
+    <p>Attenzione a due sfumature. Primo: gli embedding "statici" (Word2Vec, GloVe) danno <em>una</em> freccia per parola; dentro un Transformer gli embedding sono <strong>contestuali</strong> — "banca" del fiume e "banca" dei soldi finiscono in punti diversi dopo che l'attention li ha rielaborati. Secondo: la posizione nella frase non è nell'embedding di partenza; va iniettata a parte con il <em>positional encoding</em> (oggi quasi sempre <strong>RoPE</strong>, che <em>ruota</em> ogni coppia di dimensioni di un angolo proporzionale alla posizione — di nuovo pura geometria).</p>
+    <p>Per vedere questo spazio in 2D si usano proiezioni come <em>PCA</em>, <em>t-SNE</em> o <em>UMAP</em>: comprimono \(d\) dimensioni in 2 mantenendo le vicinanze. Ricorda però che sono ombre: la vera struttura vive nelle centinaia di dimensioni originali.</p>
   </div>
 </section>
 
 <!-- ============ CAP 04 — SOFTMAX ============ -->
-<section id="c4" style="margin-top:70px;border-top:3px solid #20242C;padding-top:8px">
-  <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#C0392B;text-transform:uppercase">Tappa 04 · Da opinioni a scelte</div>
-  <h2 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(34px,6vw,46px);margin:2px 0 6px">Softmax — da numeri qualsiasi a probabilità</h2>
-  <p style="font-size:18px;font-style:italic;color:#6B6F7A;margin:0 0 18px">Il modello produce numeri grezzi, positivi e negativi, senza vincoli. La softmax è l'imbuto che li trasforma in probabilità pulite che sommano a 1. È l'ultimo gesto prima di scegliere una parola.</p>
+<section class="w-tappa" id="c4">
+  <div class="w-tappa-kicker">Da opinioni a scelte</div>
+  <h2 class="w-tappa-title">Softmax — da numeri qualsiasi a probabilità</h2>
+  <p class="w-tappa-lead">Il modello produce numeri grezzi, positivi e negativi, senza vincoli. La softmax è l'imbuto che li trasforma in probabilità pulite che sommano a 1. È l'ultimo gesto prima di scegliere una parola.</p>
 
-  <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">Il problema: come si vota tra 128.000 candidati?</h3>
-  <p style="margin:0 0 1em">Alla fine, per ogni prossima parola, il modello assegna a ciascun token del vocabolario un punteggio grezzo chiamato <strong>logit</strong>: può essere +6.0, −4.0, qualunque cosa. Non sono probabilità: non sono tra 0 e 1, non sommano a nulla di sensato. La softmax risolve tutto in due mosse: <em>esponenziale</em> (rende tutto positivo e amplifica i più grandi) e <em>normalizzazione</em> (divide per la somma, così il totale fa 1).</p>
-  <div style="background:#fff;border-left:4px solid #2456B8;padding:10px 18px;margin:16px 0;overflow-x:auto">\[ p_i=\operatorname{softmax}(z)_i=\frac{e^{\,z_i/T}}{\displaystyle\sum_{j} e^{\,z_j/T}} \]<span style="display:block;font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:6px">\(z_i\) sono i logit; \(T\) è la <em>temperatura</em>. L'esponenziale fa sì che una piccola differenza tra logit diventi una grande differenza tra probabilità: è una gara dove il primo prende quasi tutto.</span></div>
+  <h3 class="w-h3">Il problema: come si vota tra 128.000 candidati?</h3>
+  <p>Alla fine, per ogni prossima parola, il modello assegna a ciascun token del vocabolario un punteggio grezzo chiamato <strong>logit</strong>: può essere +6.0, −4.0, qualunque cosa. Non sono probabilità: non sono tra 0 e 1, non sommano a nulla di sensato. La softmax risolve tutto in due mosse: <em>esponenziale</em> (rende tutto positivo e amplifica i più grandi) e <em>normalizzazione</em> (divide per la somma, così il totale fa 1).</p>
+  <div class="w-formula">\[ p_i=\operatorname{softmax}(z)_i=\frac{e^{\,z_i/T}}{\displaystyle\sum_{j} e^{\,z_j/T}} \]<span class="w-formula-note">\(z_i\) sono i logit; \(T\) è la <em>temperatura</em>. L'esponenziale fa sì che una piccola differenza tra logit diventi una grande differenza tra probabilità: è una gara dove il primo prende quasi tutto.</span></div>
 
-  <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #D9741E;box-shadow:3px 3px 0 rgba(217,116,30,.15)">
-    <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#D9741E">🏛️ Analogia: il consiglio comunale</span>
-    <p style="margin:0">Cinque consiglieri gridano proposte con diversa convinzione (i logit). La softmax converte quel vociare in una torta di voti: chi grida un po' più forte non prende un po' più di torta, ne prende <em>molta</em> di più (colpa dell'esponenziale). La <strong>temperatura</strong> è quanto è surriscaldata la sala: alta = tutti contano di più, decisione incerta; bassa = vince solo chi urla più forte, decisione netta.</p>
+  <div class="w-note w-note--demo">
+    <span class="w-note-title">Analogia: il consiglio comunale</span>
+    <p>Cinque consiglieri gridano proposte con diversa convinzione (i logit). La softmax converte quel vociare in una torta di voti: chi grida un po' più forte non prende un po' più di torta, ne prende <em>molta</em> di più (colpa dell'esponenziale). La <strong>temperatura</strong> è quanto è surriscaldata la sala: alta = tutti contano di più, decisione incerta; bassa = vince solo chi urla più forte, decisione netta.</p>
   </div>
 
-  <div style="background:#fff;border:2px solid #D9741E;border-radius:14px;padding:18px;margin:22px 0;box-shadow:4px 4px 0 rgba(217,116,30,.15)">
-    <h4 style="font-family:'Caveat',cursive;font-size:24px;color:#D9741E;margin:0 0 4px">🛠️ Prova tu — softmax dal vivo</h4>
-    <p style="margin:0 0 12px;font-size:15px">Cambia i logit (l'"entusiasmo" di ogni candidato) e la temperatura. Le barre sono le probabilità: sommano sempre a 100%.</p>
+  <div class="w-demo">
+    <h4 class="w-demo-title">Prova tu — softmax dal vivo</h4>
+    <p class="w-demo-hint">Cambia i logit (l'"entusiasmo" di ogni candidato) e la temperatura. Le barre sono le probabilità: sommano sempre a 100%.</p>
     <div style="display:flex;align-items:flex-end;gap:10px;height:170px;margin:0 0 6px">
       <sc-for list="{{ bars }}" as="b" hint-placeholder-count="5">
         <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%">
@@ -305,34 +278,34 @@ mjx-container[display="true"]{margin:0!important}
         <div><label style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#2456B8">"{{ b.label }}" logit = {{ b.z }}</label><input type="range" min="-5" max="8" step="0.5" value="{{ b.z }}" onChange="{{ b.set }}"></div>
       </sc-for>
     </div>
-    <div style="margin-top:12px;padding-top:10px;border-top:1px dashed #E9E5D8"><label style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#D9741E">temperatura T = {{ temp }}</label><input type="range" min="0.1" max="2.5" step="0.05" value="{{ temp }}" onChange="{{ setTemp }}"><span style="font-size:13px;color:#6B6F7A;font-style:italic">↓ verso 0.1: quasi sempre il migliore · ↑ verso 2.5: quasi sorteggio</span></div>
+    <div style="margin-top:12px;padding-top:10px;border-top:1px dashed #E9E5D8"><label class="w-label">temperatura T = {{ temp }}</label><input type="range" min="0.1" max="2.5" step="0.05" value="{{ temp }}" onChange="{{ setTemp }}"><span style="font-size:13px;color:#6B6F7A;font-style:italic">↓ verso 0.1: quasi sempre il migliore · ↑ verso 2.5: quasi sorteggio</span></div>
   </div>
 
-  <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #6B3FA0;box-shadow:3px 3px 0 rgba(107,63,160,.15)">
-    <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B3FA0">🎓 Livello esperto</span>
-    <p style="margin:0 0 6px">Tre dettagli che distinguono chi ha davvero implementato una softmax. <strong>(1) Stabilità numerica:</strong> \(e^{z}\) esplode facilmente, perciò si sottrae sempre il massimo — \(e^{z_i-\max z}\) — senza cambiare il risultato ma evitando l'overflow. <strong>(2)</strong> La softmax appare due volte nel modello: qui in uscita (sul vocabolario) e <em>dentro</em> ogni testa di attention (cap. 6). <strong>(3)</strong> In addestramento non si guarda la probabilità ma il suo logaritmo, tramite la <em>cross-entropy</em>: \(L=-\log p_{\text{corretto}}\). Predire bene = grande \(p\) = piccola perdita.</p>
-    <p style="margin:0">La coppia log-softmax + cross-entropy si semplifica in una forma numericamente comoda (il famoso <em>logsumexp</em>): è il motivo per cui le librerie offrono <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">cross_entropy</code> come singola funzione ottimizzata.</p>
+  <div class="w-note w-note--expert">
+    <span class="w-note-title">Livello esperto</span>
+    <p>Tre dettagli che distinguono chi ha davvero implementato una softmax. <strong>(1) Stabilità numerica:</strong> \(e^{z}\) esplode facilmente, perciò si sottrae sempre il massimo — \(e^{z_i-\max z}\) — senza cambiare il risultato ma evitando l'overflow. <strong>(2)</strong> La softmax appare due volte nel modello: qui in uscita (sul vocabolario) e <em>dentro</em> ogni testa di attention (cap. 6). <strong>(3)</strong> In addestramento non si guarda la probabilità ma il suo logaritmo, tramite la <em>cross-entropy</em>: \(L=-\log p_{\text{corretto}}\). Predire bene = grande \(p\) = piccola perdita.</p>
+    <p>La coppia log-softmax + cross-entropy si semplifica in una forma numericamente comoda (il famoso <em>logsumexp</em>): è il motivo per cui le librerie offrono <code>cross_entropy</code> come singola funzione ottimizzata.</p>
   </div>
 </section>
 
 <!-- ============ CAP 05 — GRADIENTI ============ -->
-<section id="c5" style="margin-top:70px;border-top:3px solid #20242C;padding-top:8px">
-  <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#C0392B;text-transform:uppercase">Tappa 05 · Come nasce la competenza</div>
-  <h2 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(34px,6vw,46px);margin:2px 0 6px">Derivate e Gradienti — come la macchina impara</h2>
-  <p style="font-size:18px;font-style:italic;color:#6B6F7A;margin:0 0 18px">Fin qui il modello <em>calcola</em>. Ma da dove vengono i numeri giusti dentro le matrici? Da milioni di piccole correzioni, ognuna guidata da una domanda: "in quale direzione devo spingere questo peso per sbagliare un po' meno?". Quella direzione è il gradiente.</p>
+<section class="w-tappa" id="c5">
+  <div class="w-tappa-kicker">Come nasce la competenza</div>
+  <h2 class="w-tappa-title">Derivate e Gradienti — come la macchina impara</h2>
+  <p class="w-tappa-lead">Fin qui il modello <em>calcola</em>. Ma da dove vengono i numeri giusti dentro le matrici? Da milioni di piccole correzioni, ognuna guidata da una domanda: "in quale direzione devo spingere questo peso per sbagliare un po' meno?". Quella direzione è il gradiente.</p>
 
-  <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">La derivata: la pendenza sotto i piedi</h3>
-  <p style="margin:0 0 1em">La <strong>derivata</strong> di una funzione in un punto è la sua <em>pendenza</em> lì: di quanto cambia l'uscita se muovi di pochissimo l'ingresso. Positiva = sto salendo, negativa = sto scendendo, zero = sono in piano (una cima o una valle).</p>
-  <div style="background:#fff;border-left:4px solid #2456B8;padding:10px 18px;margin:16px 0;overflow-x:auto">\[ f'(x)=\lim_{h\to 0}\frac{f(x+h)-f(x)}{h}\qquad \text{per } f(x)=x^2:\; f'(x)=2x \]<span style="display:block;font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:6px">Il <strong>gradiente</strong> \(\nabla\) è solo la derivata quando le variabili sono tante (miliardi, nel nostro caso): un vettore che punta nella direzione di massima salita. Per scendere, vai all'opposto.</span></div>
+  <h3 class="w-h3">La derivata: la pendenza sotto i piedi</h3>
+  <p>La <strong>derivata</strong> di una funzione in un punto è la sua <em>pendenza</em> lì: di quanto cambia l'uscita se muovi di pochissimo l'ingresso. Positiva = sto salendo, negativa = sto scendendo, zero = sono in piano (una cima o una valle).</p>
+  <div class="w-formula">\[ f'(x)=\lim_{h\to 0}\frac{f(x+h)-f(x)}{h}\qquad \text{per } f(x)=x^2:\; f'(x)=2x \]<span class="w-formula-note">Il <strong>gradiente</strong> \(\nabla\) è solo la derivata quando le variabili sono tante (miliardi, nel nostro caso): un vettore che punta nella direzione di massima salita. Per scendere, vai all'opposto.</span></div>
 
-  <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #D9741E;box-shadow:3px 3px 0 rgba(217,116,30,.15)">
-    <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#D9741E">🏔️ Analogia: scendere nella nebbia</span>
-    <p style="margin:0">Sei su una montagna, nebbia fittissima, devi raggiungere il fondovalle. Non vedi nulla, ma puoi <em>sentire la pendenza sotto i piedi</em>. Fai un passo nella direzione più ripida verso il basso. Ricontrolli. Un altro passo. Ripeti. Questa è la <strong>discesa del gradiente</strong>. L'altezza è l'<em>errore</em> del modello; il fondovalle è il modello che sbaglia il meno possibile.</p>
+  <div class="w-note w-note--demo">
+    <span class="w-note-title">Analogia: scendere nella nebbia</span>
+    <p>Sei su una montagna, nebbia fittissima, devi raggiungere il fondovalle. Non vedi nulla, ma puoi <em>sentire la pendenza sotto i piedi</em>. Fai un passo nella direzione più ripida verso il basso. Ricontrolli. Un altro passo. Ripeti. Questa è la <strong>discesa del gradiente</strong>. L'altezza è l'<em>errore</em> del modello; il fondovalle è il modello che sbaglia il meno possibile.</p>
   </div>
 
-  <div style="background:#fff;border:2px solid #D9741E;border-radius:14px;padding:18px;margin:22px 0;box-shadow:4px 4px 0 rgba(217,116,30,.15)">
-    <h4 style="font-family:'Caveat',cursive;font-size:24px;color:#D9741E;margin:0 0 4px">🛠️ Prova tu — discesa del gradiente</h4>
-    <p style="margin:0 0 10px;font-size:15px">La curva è l'errore \(f(x)=x^2\); il punto è il valore attuale del "peso". Premi <b>passo</b>: il peso si sposta contro il gradiente. Il <em>learning rate</em> \(\eta\) è la lunghezza del passo — troppo piccolo = lentissimo, troppo grande = rimbalza e diverge.</p>
+  <div class="w-demo">
+    <h4 class="w-demo-title">Prova tu — discesa del gradiente</h4>
+    <p class="w-demo-hint">La curva è l'errore \(f(x)=x^2\); il punto è il valore attuale del "peso". Premi <b>passo</b>: il peso si sposta contro il gradiente. Il <em>learning rate</em> \(\eta\) è la lunghezza del passo — troppo piccolo = lentissimo, troppo grande = rimbalza e diverge.</p>
     <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;align-items:center">
       <svg viewBox="0 0 320 220" style="width:100%;height:auto;background:#FDFCF8;border-radius:8px">
         <polyline points="{{ paraPts }}" fill="none" stroke="#2456B8" stroke-width="2.5"/>
@@ -343,7 +316,7 @@ mjx-container[display="true"]{margin:0!important}
         <circle cx="{{ gpx }}" cy="{{ gpy }}" r="6" fill="#D9741E" stroke="#20242C" stroke-width="1.5"/>
       </svg>
       <div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;background:#F3F0E6;border-radius:8px;padding:10px 12px">
+        <div class="w-demo-out">
           x = <span style="color:#D9741E;font-weight:600">{{ gx }}</span><br>
           errore f(x) = {{ gfx }}<br>
           gradiente f'(x) = {{ gGrad }}
@@ -354,46 +327,46 @@ mjx-container[display="true"]{margin:0!important}
           <button onClick="{{ stepGD }}" style="flex:1;font-family:'IBM Plex Mono',monospace;font-size:13px;border:none;background:#D9741E;color:#fff;border-radius:8px;padding:9px;cursor:pointer">▶ passo</button>
           <button onClick="{{ resetGD }}" style="font-family:'IBM Plex Mono',monospace;font-size:13px;border:1.5px solid #20242C;background:#fff;border-radius:8px;padding:9px 12px;cursor:pointer">↺</button>
         </div>
-        <p style="font-size:12.5px;color:#6B6F7A;font-style:italic;margin:8px 0 0">Prova η ≈ 1.0: il punto scavalca il fondo e oscilla. È l'instabilità che rovina l'addestramento.</p>
+        <p class="w-demo-foot">Prova η ≈ 1.0: il punto scavalca il fondo e oscilla. È l'instabilità che rovina l'addestramento.</p>
       </div>
     </div>
   </div>
 
-  <div style="background:#fff;border-left:4px solid #2456B8;padding:10px 18px;margin:16px 0;overflow-x:auto">\[ \theta \;\leftarrow\; \theta-\eta\,\nabla_\theta L \]<span style="display:block;font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:6px">La regola di aggiornamento, identica per <em>tutti</em> gli ~8·10⁹ parametri \(\theta\): sposta ogni peso di un passetto \(\eta\) nella direzione opposta al gradiente della perdita \(L\). Ripeti per migliaia di miliardi di token.</span></div>
+  <div class="w-formula">\[ \theta \;\leftarrow\; \theta-\eta\,\nabla_\theta L \]<span class="w-formula-note">La regola di aggiornamento, identica per <em>tutti</em> gli ~8·10⁹ parametri \(\theta\): sposta ogni peso di un passetto \(\eta\) nella direzione opposta al gradiente della perdita \(L\). Ripeti per migliaia di miliardi di token.</span></div>
 
-  <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #6B3FA0;box-shadow:3px 3px 0 rgba(107,63,160,.15)">
-    <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B3FA0">🎓 Livello esperto</span>
-    <p style="margin:0 0 6px">Come si calcola il gradiente rispetto a miliardi di pesi senza impazzire? Con la <strong>backpropagation</strong>: la regola della catena \((f\circ g)'=f'\!\cdot g'\) applicata all'indietro lungo tutta la rete, riusando i risultati intermedi. Un solo passaggio all'indietro dà <em>tutte</em> le derivate. In pratica non si usa la discesa "pura" ma <strong>Adam/AdamW</strong>, che tiene una media mobile di gradiente e sua varianza per dare a ogni peso il proprio passo adattivo.</p>
-    <p style="margin:0">Due parole chiave che ora hanno un senso preciso: la non-linearità tra gli strati (cap. 2) — <em>ReLU</em>, <em>GELU</em>, <em>SwiGLU</em> — serve proprio perché la sua derivata non è costante, permettendo alla catena di apprendere curve e non solo rette. E il <em>learning rate schedule</em> (warmup + decadimento) è la versione professionale del cursore \(\eta\) che hai appena mosso.</p>
+  <div class="w-note w-note--expert">
+    <span class="w-note-title">Livello esperto</span>
+    <p>Come si calcola il gradiente rispetto a miliardi di pesi senza impazzire? Con la <strong>backpropagation</strong>: la regola della catena \((f\circ g)'=f'\!\cdot g'\) applicata all'indietro lungo tutta la rete, riusando i risultati intermedi. Un solo passaggio all'indietro dà <em>tutte</em> le derivate. In pratica non si usa la discesa "pura" ma <strong>Adam/AdamW</strong>, che tiene una media mobile di gradiente e sua varianza per dare a ogni peso il proprio passo adattivo.</p>
+    <p>Due parole chiave che ora hanno un senso preciso: la non-linearità tra gli strati (cap. 2) — <em>ReLU</em>, <em>GELU</em>, <em>SwiGLU</em> — serve proprio perché la sua derivata non è costante, permettendo alla catena di apprendere curve e non solo rette. E il <em>learning rate schedule</em> (warmup + decadimento) è la versione professionale del cursore \(\eta\) che hai appena mosso.</p>
   </div>
 </section>
 
 <!-- ============ CAP 06 — ATTENTION ============ -->
-<section id="c6" style="margin-top:70px;border-top:3px solid #20242C;padding-top:8px">
-  <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#C0392B;text-transform:uppercase">Tappa 06 · Il cuore del Transformer</div>
-  <h2 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(34px,6vw,46px);margin:2px 0 6px">L'Attention — la formula che muove i Transformer</h2>
-  <p style="font-size:18px;font-style:italic;color:#6B6F7A;margin:0 0 18px">Adesso hai tutti i pezzi: vettori, prodotto scalare, matrici, softmax. L'attention è il modo elegante in cui si combinano per far sì che le parole <em>si parlino tra loro</em>. È una sola riga di algebra — e regge tutta l'IA moderna.</p>
+<section class="w-tappa" id="c6">
+  <div class="w-tappa-kicker">Il cuore del Transformer</div>
+  <h2 class="w-tappa-title">L'Attention — la formula che muove i Transformer</h2>
+  <p class="w-tappa-lead">Adesso hai tutti i pezzi: vettori, prodotto scalare, matrici, softmax. L'attention è il modo elegante in cui si combinano per far sì che le parole <em>si parlino tra loro</em>. È una sola riga di algebra — e regge tutta l'IA moderna.</p>
 
-  <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">Query, Key, Value: la ricerca in biblioteca</h3>
-  <p style="margin:0 0 1em">Ogni parola, dal suo embedding, genera tre vettori diversi moltiplicando per tre matrici apprese (cap. 2): la <strong>Query</strong> (\(Q=W_Q\mathbf{x}\), "cosa sto cercando?"), la <strong>Key</strong> (\(K=W_K\mathbf{x}\), "cosa offro io?") e il <strong>Value</strong> (\(V=W_V\mathbf{x}\), "l'informazione che porto"). Per capire una parola, si confronta la sua Query con le Key di tutte le altre.</p>
+  <h3 class="w-h3">Query, Key, Value: la ricerca in biblioteca</h3>
+  <p>Ogni parola, dal suo embedding, genera tre vettori diversi moltiplicando per tre matrici apprese (cap. 2): la <strong>Query</strong> (\(Q=W_Q\mathbf{x}\), "cosa sto cercando?"), la <strong>Key</strong> (\(K=W_K\mathbf{x}\), "cosa offro io?") e il <strong>Value</strong> (\(V=W_V\mathbf{x}\), "l'informazione che porto"). Per capire una parola, si confronta la sua Query con le Key di tutte le altre.</p>
 
-  <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #D9741E;box-shadow:3px 3px 0 rgba(217,116,30,.15)">
-    <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#D9741E">🔎 Analogia: la ricerca perfetta</span>
-    <p style="margin:0">La <em>Query</em> è quello che digiti nella barra di ricerca. Le <em>Key</em> sono le etichette di tutti i documenti in archivio. Il motore calcola quanto la tua query somiglia a ogni etichetta (prodotto scalare!), dà più peso ai documenti più pertinenti, e ti restituisce un riassunto pesato dei loro contenuti (i <em>Value</em>). L'attention fa questo per <strong>ogni parola verso tutte le altre</strong>, simultaneamente.</p>
+  <div class="w-note w-note--demo">
+    <span class="w-note-title">Analogia: la ricerca perfetta</span>
+    <p>La <em>Query</em> è quello che digiti nella barra di ricerca. Le <em>Key</em> sono le etichette di tutti i documenti in archivio. Il motore calcola quanto la tua query somiglia a ogni etichetta (prodotto scalare!), dà più peso ai documenti più pertinenti, e ti restituisce un riassunto pesato dei loro contenuti (i <em>Value</em>). L'attention fa questo per <strong>ogni parola verso tutte le altre</strong>, simultaneamente.</p>
   </div>
 
-  <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">La formula, smontata pezzo per pezzo</h3>
-  <div style="background:#fff;border-left:4px solid #2456B8;padding:10px 18px;margin:16px 0;overflow-x:auto">\[ \operatorname{Attention}(Q,K,V)=\operatorname{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d_k}}\right)V \]</div>
+  <h3 class="w-h3">La formula, smontata pezzo per pezzo</h3>
+  <div class="w-formula">\[ \operatorname{Attention}(Q,K,V)=\operatorname{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d_k}}\right)V \]</div>
   <ul style="margin:0 0 1em;padding-left:20px">
-    <li style="margin-bottom:6px"><b style="color:#2456B8">\(QK^{\top}\)</b> — ogni Query fa il prodotto scalare con ogni Key: una matrice di <em>punteggi di rilevanza</em> (parola × parola). Cap. 1, all'opera.</li>
-    <li style="margin-bottom:6px"><b style="color:#C0392B">\(/\sqrt{d_k}\)</b> — si divide per la radice della dimensione. Senza, con \(d_k\) grande i prodotti scalari diventano enormi e la softmax si "satura" (un solo 1, tutti 0), uccidendo i gradienti. È un semplice riscalamento che tiene i numeri gestibili.</li>
-    <li style="margin-bottom:6px"><b style="color:#D9741E">\(\operatorname{softmax}(\cdot)\)</b> — cap. 4: trasforma i punteggi di ogni riga in <em>pesi</em> che sommano a 1. Ecco "quanta attenzione" dedicare a ciascuna parola.</li>
-    <li style="margin-bottom:6px"><b style="color:#2E7D4F">\(\cdots\,V\)</b> — si fa la media dei Value pesata da quei pesi. Il risultato è il nuovo vettore della parola, <em>arricchito dal contesto</em>.</li>
+    <li><b style="color:#2456B8">\(QK^{\top}\)</b> — ogni Query fa il prodotto scalare con ogni Key: una matrice di <em>punteggi di rilevanza</em> (parola × parola). Cap. 1, all'opera.</li>
+    <li><b style="color:#C0392B">\(/\sqrt{d_k}\)</b> — si divide per la radice della dimensione. Senza, con \(d_k\) grande i prodotti scalari diventano enormi e la softmax si "satura" (un solo 1, tutti 0), uccidendo i gradienti. È un semplice riscalamento che tiene i numeri gestibili.</li>
+    <li><b style="color:#D9741E">\(\operatorname{softmax}(\cdot)\)</b> — cap. 4: trasforma i punteggi di ogni riga in <em>pesi</em> che sommano a 1. Ecco "quanta attenzione" dedicare a ciascuna parola.</li>
+    <li><b style="color:#2E7D4F">\(\cdots\,V\)</b> — si fa la media dei Value pesata da quei pesi. Il risultato è il nuovo vettore della parola, <em>arricchito dal contesto</em>.</li>
   </ul>
 
-  <div style="background:#fff;border:2px solid #D9741E;border-radius:14px;padding:18px;margin:22px 0;box-shadow:4px 4px 0 rgba(217,116,30,.15)">
-    <h4 style="font-family:'Caveat',cursive;font-size:24px;color:#D9741E;margin:0 0 4px">🛠️ Prova tu — a chi guarda una parola?</h4>
-    <p style="margin:0 0 12px;font-size:15px">Frase: <b>"Il gatto dorme stanco"</b>. Scegli la parola-Query: le barre mostrano quanta attenzione riceve ciascuna parola (i pesi dopo softmax(Q·Kᵀ/√d)). La parola stessa di solito prende molto — ma non solo lei.</p>
+  <div class="w-demo">
+    <h4 class="w-demo-title">Prova tu — a chi guarda una parola?</h4>
+    <p class="w-demo-hint">Frase: <b>"Il gatto dorme stanco"</b>. Scegli la parola-Query: le barre mostrano quanta attenzione riceve ciascuna parola (i pesi dopo softmax(Q·Kᵀ/√d)). La parola stessa di solito prende molto — ma non solo lei.</p>
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
       <sc-for list="{{ attn }}" as="a" hint-placeholder-count="4">
         <button onClick="{{ a.pick }}" style="font-family:'IBM Plex Mono',monospace;font-size:13px;border:1.5px solid #20242C;border-radius:20px;padding:6px 14px;cursor:pointer;background:{{ a.qbg }};color:{{ a.qfg }}">{{ a.tok }}</button>
@@ -411,21 +384,21 @@ mjx-container[display="true"]{margin:0!important}
     </div>
   </div>
 
-  <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #6B3FA0;box-shadow:3px 3px 0 rgba(107,63,160,.15)">
-    <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B3FA0">🎓 Livello esperto</span>
-    <p style="margin:0 0 6px"><strong>Multi-head:</strong> non c'è una sola attention ma decine in parallelo (le <em>teste</em>), ognuna con le sue \(W_Q,W_K,W_V\): una può seguire l'accordo soggetto-verbo, un'altra i riferimenti pronominali. I risultati si concatenano e si proiettano con \(W_O\). <strong>Maschera causale:</strong> nei modelli generativi ogni parola può guardare solo quelle precedenti — si mette \(-\infty\) sui punteggi "futuri" prima della softmax (che li azzera). <strong>Costo:</strong> \(QK^{\top}\) è \(n\times n\), quindi cresce col <em>quadrato</em> della lunghezza del contesto — il vero collo di bottiglia, che FlashAttention e la KV-cache (Modulo 01) attaccano.</p>
-    <p style="margin:0">Varianti moderne che sentirai nominare: <em>GQA/MQA</em> (teste che condividono Key e Value per risparmiare memoria), <em>RoPE</em> per la posizione dentro Q e K, e l'attention "a finestra" per contesti lunghissimi. Tutte, però, ruotano attorno a questa singola formula.</p>
+  <div class="w-note w-note--expert">
+    <span class="w-note-title">Livello esperto</span>
+    <p><strong>Multi-head:</strong> non c'è una sola attention ma decine in parallelo (le <em>teste</em>), ognuna con le sue \(W_Q,W_K,W_V\): una può seguire l'accordo soggetto-verbo, un'altra i riferimenti pronominali. I risultati si concatenano e si proiettano con \(W_O\). <strong>Maschera causale:</strong> nei modelli generativi ogni parola può guardare solo quelle precedenti — si mette \(-\infty\) sui punteggi "futuri" prima della softmax (che li azzera). <strong>Costo:</strong> \(QK^{\top}\) è \(n\times n\), quindi cresce col <em>quadrato</em> della lunghezza del contesto — il vero collo di bottiglia, che FlashAttention e la KV-cache (Modulo 01) attaccano.</p>
+    <p>Varianti moderne che sentirai nominare: <em>GQA/MQA</em> (teste che condividono Key e Value per risparmiare memoria), <em>RoPE</em> per la posizione dentro Q e K, e l'attention "a finestra" per contesti lunghissimi. Tutte, però, ruotano attorno a questa singola formula.</p>
   </div>
 </section>
 
 <!-- ============ CAP 07 — SINTESI ============ -->
-<section id="c7" style="margin-top:70px;border-top:3px solid #20242C;padding-top:8px">
-  <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#C0392B;text-transform:uppercase">Tappa 07 · La partitura completa</div>
-  <h2 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(34px,6vw,46px);margin:2px 0 6px">Tutto insieme — dall'algebra al Transformer</h2>
-  <p style="font-size:18px;font-style:italic;color:#6B6F7A;margin:0 0 18px">Rimettiamo i pezzi in fila. Segui una parola che entra come testo ed esce come probabilità: ogni freccia di questo percorso è uno dei concetti che hai appena imparato.</p>
+<section class="w-tappa" id="c7">
+  <div class="w-tappa-kicker">La partitura completa</div>
+  <h2 class="w-tappa-title">Tutto insieme — dall'algebra al Transformer</h2>
+  <p class="w-tappa-lead">Rimettiamo i pezzi in fila. Segui una parola che entra come testo ed esce come probabilità: ogni freccia di questo percorso è uno dei concetti che hai appena imparato.</p>
 
   <figure style="margin:24px 0;background:#fff;border:2px solid #20242C;border-radius:14px;padding:16px;box-shadow:4px 4px 0 rgba(32,36,44,.12)">
-    <svg viewBox="0 0 700 250" role="img" aria-label="flusso dai token alle probabilita" style="width:100%;height:auto;display:block">
+    <svg viewBox="0 0 700 250" role="img" aria-label="flusso dai token alle probabilita">
       <defs><marker id="fl" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#C0392B" stroke-width="1.5"/></marker></defs>
       <g font-family="IBM Plex Mono" font-size="12.5">
         <rect x="12" y="105" width="94" height="42" rx="8" fill="#fff" stroke="#20242C" stroke-width="2"/><text x="59" y="123" text-anchor="middle">token</text><text x="59" y="138" text-anchor="middle" fill="#6B6F7A" font-size="10">interi</text>
@@ -441,58 +414,62 @@ mjx-container[display="true"]{margin:0!important}
       <path d="M353 162 Q353 205 250 205 L250 175" fill="none" stroke="#2E7D4F" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#fl)"/>
       <text x="300" y="222" font-family="Caveat" font-size="17" fill="#2E7D4F">×N strati (≈32–96)</text>
     </svg>
-    <figcaption style="font-size:13.5px;color:#6B6F7A;font-style:italic;margin-top:8px;text-align:center">Fig. 7 — Il flusso completo. I blocchi arancione+viola (attention + FFN) si ripetono per decine di strati prima della softmax finale. Ogni parola di questa figura è un capitolo di questo libro.</figcaption>
+    <figcaption>Fig. 7 — Il flusso completo. I blocchi arancione+viola (attention + FFN) si ripetono per decine di strati prima della softmax finale. Ogni parola di questa figura è un capitolo di questo libro.</figcaption>
   </figure>
 
-  <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#2456B8">Le dimensioni vere (Llama 3 8B)</h3>
-  <table style="width:100%;border-collapse:collapse;margin:16px 0;background:#fff;font-size:14.5px">
+  <h3 class="w-h3">Le dimensioni vere (Llama 3 8B)</h3>
+  <table class="w-table">
     <thead><tr><th style="border:1px solid #E9E5D8;padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F3F0E6">Grandezza</th><th style="border:1px solid #E9E5D8;padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F3F0E6">Valore</th><th style="border:1px solid #E9E5D8;padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F3F0E6">Concetto</th></tr></thead>
     <tbody>
-      <tr><td style="border:1px solid #E9E5D8;padding:8px 10px">dimensione embedding \(d\)</td><td style="border:1px solid #E9E5D8;padding:8px 10px;font-family:'IBM Plex Mono',monospace">4096</td><td style="border:1px solid #E9E5D8;padding:8px 10px">lunghezza di ogni vettore-parola (c.1,3)</td></tr>
-      <tr><td style="border:1px solid #E9E5D8;padding:8px 10px">vocabolario</td><td style="border:1px solid #E9E5D8;padding:8px 10px;font-family:'IBM Plex Mono',monospace">128.256</td><td style="border:1px solid #E9E5D8;padding:8px 10px">righe softmax finale (c.4)</td></tr>
-      <tr><td style="border:1px solid #E9E5D8;padding:8px 10px">strati (attention+FFN)</td><td style="border:1px solid #E9E5D8;padding:8px 10px;font-family:'IBM Plex Mono',monospace">32</td><td style="border:1px solid #E9E5D8;padding:8px 10px">quante volte si ripete il blocco (c.6,2)</td></tr>
-      <tr><td style="border:1px solid #E9E5D8;padding:8px 10px">teste di attention</td><td style="border:1px solid #E9E5D8;padding:8px 10px;font-family:'IBM Plex Mono',monospace">32</td><td style="border:1px solid #E9E5D8;padding:8px 10px">ricerche in parallelo (c.6)</td></tr>
-      <tr><td style="border:1px solid #E9E5D8;padding:8px 10px">parametri totali</td><td style="border:1px solid #E9E5D8;padding:8px 10px;font-family:'IBM Plex Mono',monospace">~8·10⁹</td><td style="border:1px solid #E9E5D8;padding:8px 10px">numeri nelle matrici, aggiustati dai gradienti (c.2,5)</td></tr>
+      <tr><td>dimensione embedding \(d\)</td><td>4096</td><td>lunghezza di ogni vettore-parola (c.1,3)</td></tr>
+      <tr><td>vocabolario</td><td>128.256</td><td>righe softmax finale (c.4)</td></tr>
+      <tr><td>strati (attention+FFN)</td><td>32</td><td>quante volte si ripete il blocco (c.6,2)</td></tr>
+      <tr><td>teste di attention</td><td>32</td><td>ricerche in parallelo (c.6)</td></tr>
+      <tr><td>parametri totali</td><td>~8·10⁹</td><td>numeri nelle matrici, aggiustati dai gradienti (c.2,5)</td></tr>
     </tbody>
   </table>
 
-  <div style="background:#FFF8E8;border:1.5px dashed #C0392B;border-radius:10px;padding:12px 16px;margin:18px 0;font-size:15.5px"><b style="color:#C0392B">Il ponte col Modulo 01.</b> Ora che padroneggi la matematica, rileggi <a href="Dentro-la-Macchina.dc.html">"Dentro la Macchina"</a>: quello che lì era descritto a parole — token, embedding, attention, KV-cache, softmax, sampling — qui ha una formula precisa. I due libri sono la stessa storia raccontata a due profondità.</div>
+  <div class="w-note w-note--warn"><b style="color:#C0392B">Il ponte col Modulo 01.</b> Ora che padroneggi la matematica, rileggi <a href="Dentro-la-Macchina.dc.html">"Dentro la Macchina"</a>: quello che lì era descritto a parole — token, embedding, attention, KV-cache, softmax, sampling — qui ha una formula precisa. I due libri sono la stessa storia raccontata a due profondità.</div>
 </section>
 
 <!-- ============ EPILOGO ============ -->
-<section id="fine" style="margin-top:70px;border-top:3px solid #20242C;padding-top:8px">
-  <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#C0392B;text-transform:uppercase">Epilogo</div>
-  <h2 style="font-family:'Caveat',cursive;line-height:1.05;font-size:clamp(34px,6vw,46px);margin:2px 0 6px">Da conoscenze medie a esperto assoluto</h2>
-  <p style="margin:0 0 1em">Sei partito da "vettore = lista di numeri" e sei arrivato a leggere \(\operatorname{softmax}(QK^{\top}/\sqrt{d_k})V\) come una frase in una lingua che ora capisci. Non è poco: quella riga è il motore di ogni modello che usi. Ecco come trasformare questa comprensione in vera padronanza.</p>
+<section class="w-tappa w-tappa--fine" id="fine">
+  <div class="w-tappa-kicker">Epilogo</div>
+  <h2 class="w-tappa-title">Da conoscenze medie a esperto assoluto</h2>
+  <p>Sei partito da "vettore = lista di numeri" e sei arrivato a leggere \(\operatorname{softmax}(QK^{\top}/\sqrt{d_k})V\) come una frase in una lingua che ora capisci. Non è poco: quella riga è il motore di ogni modello che usi. Ecco come trasformare questa comprensione in vera padronanza.</p>
 
-  <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#fff;border:1.5px solid #2E7D4F;box-shadow:3px 3px 0 rgba(46,125,79,.15)">
-    <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#2E7D4F">🧭 La palestra, in ordine</span>
+  <div class="w-note w-note--memory">
+    <span class="w-note-title">La palestra, in ordine</span>
     <ol style="margin:0;padding-left:20px">
-      <li style="margin-bottom:6px"><b>Rifai i conti a mano:</b> prendi due vettori di 3 numeri, calcola norma, prodotto scalare e coseno con carta e penna. Poi una softmax su 3 logit.</li>
-      <li style="margin-bottom:6px"><b>Impara NumPy:</b> reimplementa gli stessi conti in 5 righe; verifica che tornino. Aggiungi la moltiplicazione matrice×vettore.</li>
-      <li style="margin-bottom:6px"><b>Attention da zero:</b> scrivi <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;background:#EFEBDD;padding:2px 6px;border-radius:4px;border:1px solid #E0DAC6">softmax(Q@K.T/sqrt(d))@V</code> in NumPy su una frase di 4 parole. È letteralmente una riga.</li>
-      <li style="margin-bottom:6px"><b>La discesa del gradiente:</b> minimizza \(f(x)=x^2\) in un ciclo Python; poi una regressione lineare con gradiente calcolato a mano.</li>
-      <li style="margin-bottom:6px"><b>Costruisci un GPT:</b> segui <em>"Let's build GPT"</em> di Karpathy — vedrai ogni formula di questo libro diventare codice PyTorch.</li>
+      <li><b>Rifai i conti a mano:</b> prendi due vettori di 3 numeri, calcola norma, prodotto scalare e coseno con carta e penna. Poi una softmax su 3 logit.</li>
+      <li><b>Impara NumPy:</b> reimplementa gli stessi conti in 5 righe; verifica che tornino. Aggiungi la moltiplicazione matrice×vettore.</li>
+      <li><b>Attention da zero:</b> scrivi <code>softmax(Q@K.T/sqrt(d))@V</code> in NumPy su una frase di 4 parole. È letteralmente una riga.</li>
+      <li><b>La discesa del gradiente:</b> minimizza \(f(x)=x^2\) in un ciclo Python; poi una regressione lineare con gradiente calcolato a mano.</li>
+      <li><b>Costruisci un GPT:</b> segui <em>"Let's build GPT"</em> di Karpathy — vedrai ogni formula di questo libro diventare codice PyTorch.</li>
       <li><b>Formalizza:</b> un corso di algebra lineare (3Blue1Brown per l'intuizione, Strang per il rigore) e poi i paper originali.</li>
     </ol>
   </div>
 
-  <div style="border-radius:12px;padding:16px 20px;margin:20px 0;background:#FDFCF8;border:1.5px solid #E9E5D8;font-size:14.5px">
-    <span style="font-family:'Caveat',cursive;font-size:22px;display:block;margin-bottom:4px;color:#6B6F7A">📚 Per andare a fondo</span>
-    <ul style="margin:0;padding-left:18px">
-      <li style="margin-bottom:4px">Vaswani et al., <em>Attention Is All You Need</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:1706.03762</span> (la formula del cap. 6)</li>
-      <li style="margin-bottom:4px">Mikolov et al., <em>Efficient Estimation of Word Representations</em> (Word2Vec) — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:1301.3781</span> (re−uomo+donna, cap. 3)</li>
-      <li style="margin-bottom:4px">Kingma &amp; Ba, <em>Adam: A Method for Stochastic Optimization</em> — <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0392B">arXiv:1412.6980</span> (cap. 5)</li>
+  <div class="w-note w-note--paper">
+    <span class="w-note-title">Per andare a fondo</span>
+    <ul>
+      <li style="margin-bottom:4px">Vaswani et al., <em>Attention Is All You Need</em> — <span class="w-ref">arXiv:1706.03762</span> (la formula del cap. 6)</li>
+      <li style="margin-bottom:4px">Mikolov et al., <em>Efficient Estimation of Word Representations</em> (Word2Vec) — <span class="w-ref">arXiv:1301.3781</span> (re−uomo+donna, cap. 3)</li>
+      <li style="margin-bottom:4px">Kingma &amp; Ba, <em>Adam: A Method for Stochastic Optimization</em> — <span class="w-ref">arXiv:1412.6980</span> (cap. 5)</li>
       <li style="margin-bottom:4px">Elhage et al., <em>Toy Models of Superposition</em> — Anthropic, 2022 (la geometria dello spazio, cap. 1,3)</li>
       <li>G. Strang, <em>Introduction to Linear Algebra</em>; 3Blue1Brown, <em>Essence of Linear Algebra</em> (le basi, visivamente)</li>
     </ul>
   </div>
 
-  <p style="text-align:center;font-family:'Caveat',cursive;font-size:26px;color:#6B6F7A;margin:46px 0 0">~ · fine del quaderno · ~</p>
-  <p style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;margin:14px 0 0"><a href="Biblioteca.dc.html">↩ torna alla Biblioteca</a></p>
 </section>
 
+  <footer class="w-footer">
+    ~ · fine del quaderno · ~<br>
+    <a href="Biblioteca.dc.html">torna alla Biblioteca</a>
+  </footer>
+
 <!-- SENTINEL_APPEND -->
+</main>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
