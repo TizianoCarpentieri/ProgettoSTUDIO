@@ -17,11 +17,13 @@ graph TD
         CDN3["cdn.jsdelivr.net<br/>MathJax 3"]
     end
 
+    IDX["index.html<br/>(redirect per GitHub Pages)"]
     BIB["Biblioteca.dc.html<br/>(indice / homepage)"]
     M1["Dentro-la-Macchina.dc.html<br/>Modulo 01 — 9 tappe"]
     M2["Fondamenti-Matematici-LLM.dc.html<br/>Modulo 02 — 7 tappe"]
     M3["Modulo 03<br/>(card 'prossimo capitolo', non esiste ancora)"]
 
+    IDX -->|meta refresh| BIB
     BIB -->|link| M1
     BIB -->|link| M2
     BIB -.->|placeholder, nessun file| M3
@@ -50,6 +52,9 @@ graph TD
 | `Fondamenti-Matematici-LLM.dc.html` | **Modulo 02**: le basi matematiche dietro il Modulo 01 — vettori, matrici, embedding come geometria, softmax, derivate/gradienti, la formula dell'attention `softmax(QKᵀ/√d)V`, e una sintesi finale. 7 tappe, con formule LaTeX vere via MathJax. |
 | `support.js` | Runtime condiviso (~1840 righe, minificato/bundlato). Gestisce: parsing del tag `<x-dc>`, montaggio dei componenti React, un mini-linguaggio di espressioni/binding per il markup dichiarativo, caricamento dinamico di React/ReactDOM/Babel da CDN (con integrità SRI), gestione di import esterni (`x-import`) con trasformazione JSX via Babel in-browser. |
 | `screenshots/` + `.thumbnail` | Immagini di anteprima (modalità notte, thumbnail webp) usate presumibilmente dallo strumento di authoring esterno che ha generato il progetto — **non sono linkate da nessuno dei file `.html`**. |
+| `README.md` | Front page pubblica della repo GitHub: cos'è, come si legge, tabella dei moduli, roadmap. Rimanda a questo `OVERVIEW.md` per la mappa tecnica di dettaglio. |
+| `index.html` | Redirect (`meta refresh`) verso `Biblioteca.dc.html`. Esiste solo per dare un URL pulito su GitHub Pages: `…/ProgettoSTUDIO/` apre direttamente la Biblioteca invece di mostrare un elenco di file. |
+| `.gitignore` | Esclude dal versionamento i file di sistema e di editor (`.DS_Store`, `.vscode/`, `.idea/`, file temporanei). |
 
 ## Come si legge
 
@@ -62,12 +67,31 @@ graph TD
 - **Rendering formule**: MathJax 3 via CDN, presente solo nei due moduli (non serve in `Biblioteca.dc.html`).
 - **Componenti interattivi**: ogni file definisce una `class Component extends DCLogic` con uno `state` React-like e un metodo `renderVals()` che calcola i valori derivati (token, barre di probabilità, dimensione della KV cache, ecc.) usati dal template dichiarativo.
 
+## Pubblicazione su GitHub e versionamento
+
+Il progetto è ora versionato con **git** e pubblicato su GitHub.
+
+- **Repository**: <https://github.com/TizianoCarpentieri/ProgettoSTUDIO> — visibilità **pubblica**.
+- **Branch principale**: `main`. Due commit iniziali: il primo con tutti i contenuti già esistenti più `README.md` e `.gitignore`, il secondo con `index.html` per le GitHub Pages.
+- **Autenticazione (questo Mac)**: chiave **SSH ed25519** in `~/.ssh/id_ed25519`, con la parte pubblica registrata sull'account GitHub. Il remote `origin` punta all'URL SSH `git@github.com:TizianoCarpentieri/ProgettoSTUDIO.git`, quindi `git push` funziona senza password né token a scadenza.
+- **GitHub Pages**: predisposte per servire dalla **radice del branch `main`**. Grazie al redirect di `index.html`, l'indirizzo pubblico <https://tizianocarpentieri.github.io/ProgettoSTUDIO/> apre direttamente la Biblioteca. L'attivazione va fatta una sola volta da *Settings → Pages → Source: Deploy from a branch → `main` / `(root)`*.
+
+### Flussi tipici
+
+| Obiettivo | Come |
+|---|---|
+| Aggiornare il progetto da questo Mac | `git add .` → `git commit -m "…"` → `git push` |
+| Solo leggere/consultare, su qualsiasi dispositivo | Aprire l'URL di GitHub Pages — nessuna installazione, funziona anche da telefono |
+| Lavorarci da un altro PC | `git clone git@github.com:TizianoCarpentieri/ProgettoSTUDIO.git` (sul nuovo PC va prima generata e registrata una sua chiave SSH) |
+
+> Divisione dei ruoli fra i due documenti: `README.md` è la vetrina pubblica (accogliente, orientata a chi apre la repo per la prima volta); `OVERVIEW.md` — questo file — resta la mappa tecnica interna con struttura, dipendenze e note di manutenzione.
+
 ## Correzioni e incoerenze trovate
 
 1. **Il Modulo 02 non ha il sommario laterale fisso né la barra di avanzamento lettura che ha il Modulo 01.** `Dentro-la-Macchina.dc.html` usa un layout a due colonne con `<aside id="sidetoc">` (indice sempre visibile durante lo scroll) più `<div id="progbar">` (barra di progresso in alto). `Fondamenti-Matematici-LLM.dc.html` non ha né l'uno né l'altro: solo un elenco puntato statico in cima alla pagina. La Biblioteca dichiara esplicitamente che "ogni modulo è un file autonomo nello stesso stile" — qui lo stile non è allineato. È la correzione più concreta e visibile da fare.
 2. **Script della modalità notte duplicato tre volte identico** (in `Biblioteca.dc.html`, `Dentro-la-Macchina.dc.html`, `Fondamenti-Matematici-LLM.dc.html`) invece di vivere una sola volta dentro `support.js`. Funziona, ma ogni futura modifica (bugfix, sincronizzazione fra tab, accessibilità) va replicata a mano in tre punti — rischio concreto di divergenza nel tempo.
 3. **`support.js` dichiara "GENERATED from dc-runtime/src/*.ts — do not edit. Rebuild with `cd dc-runtime && bun run build`"**, ma la cartella `dc-runtime/` con il sorgente TypeScript e la build non è presente in questo progetto. Se in futuro serve modificare il runtime (non solo i contenuti), oggi non è ricostruibile da questa cartella: bisognerebbe recuperare il sorgente dallo strumento/repo originale.
-4. **Asset orfani**: le tre immagini in `screenshots/` e il file `.thumbnail` (WebP senza estensione) non sono referenziati da nessun file `.html` del progetto. Sembrano artefatti dello strumento di authoring esterno (anteprime generate automaticamente) più che contenuti del "libro": da tenere se servono a quello strumento, da rimuovere se il progetto è inteso come pacchetto autonomo da distribuire.
+4. **Asset orfani**: le tre immagini in `screenshots/` e il file `.thumbnail` (WebP senza estensione) non sono referenziati da nessun file `.html` del progetto. Sembrano artefatti dello strumento di authoring esterno (anteprime generate automaticamente) più che contenuti del "libro". Al momento sono stati **mantenuti** nel repository (pesano ~136 KB in tutto): si possono rimuovere in qualunque momento se il progetto va inteso come pacchetto autonomo da distribuire.
 5. **Piccola incoerenza cosmetica nella freccia di navigazione**: nel Modulo 02, il link verso il Modulo 01 è etichettato "Modulo 01: come genera testo →" con freccia verso destra, pur essendo di fatto un "torna indietro" nell'ordine di lettura consigliato (01 → 02). Nel Modulo 01 la freccia verso il Modulo 02 è invece coerente (in avanti). Dettaglio minore, ma vale un controllo se si cura la coerenza dell'esperienza.
 6. **Modulo 03 non è un bug ma un placeholder dichiarato** ("Prossimo capitolo…", fine-tuning/RAG/agenti/valutazione): nessuna azione necessaria, è già segnalato come lavoro futuro nella UI stessa.
 
