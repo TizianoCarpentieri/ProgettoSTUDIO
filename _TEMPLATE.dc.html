@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<!--
+  ===========================================================================
+  MODELLO DI PAGINA DELLA WIKI
+  ---------------------------------------------------------------------------
+  Copia questo file, rinominalo con il nome della tematica e riempi le parti
+  fra [ parentesi quadre ]. Non cambiare la struttura: è la stessa per ogni
+  argomento della biblioteca.
+
+  REGOLE, IN ORDINE DI IMPORTANZA:
+    1. Non scrivere MAI attributi style="...". Usa le classi w- .
+    2. Non scrivere colori a mano. Usa le classi a-blu / a-rosso / a-verde /
+       a-arancio / a-viola, oppure i token var(--blu) e simili.
+    3. Non scrivere il numero delle tappe: lo genera il foglio di stile.
+    4. Non scrivere l'indice laterale né la barra di progresso: li genera
+       wiki.js leggendo le sezioni di questa pagina.
+    5. Non copiare script da altre pagine. Tutto ciò che serve è nel
+       connettore.
+
+  Quando la pagina è pronta, aggiungi una voce in wiki/wiki-index.js:
+  senza quella, la pagina esiste ma non compare nella Biblioteca.
+
+  Elenco completo delle classi e delle icone: AgentFE.md
+  ===========================================================================
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[Titolo della pagina] — [nome della biblioteca]</title>
+
+<!-- ===== CONNETTORE DELLA WIKI - righe fisse, non modificarle ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./wiki/wiki.css">
+<script src="./support.js"></script>
+<script defer src="./wiki/wiki.js"></script>
+<!-- Riga seguente SOLO se la pagina contiene formule matematiche: -->
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<!-- =============================================================== -->
+</head>
+<body>
+<x-dc>
+
+<div class="w-page--toc">
+
+  <!-- L'indice si riempie da solo leggendo le sezioni qui sotto. -->
+  <aside class="w-toc"
+         data-titolo="Modulo [NN] · Indice"
+         data-pie='<a href="Biblioteca.dc.html">Biblioteca</a><a href="[altro-modulo].dc.html">[Modulo collegato]</a>'></aside>
+
+  <main class="w-main">
+
+    <!-- ===== BRICIOLE DI PANE ===== -->
+    <nav class="w-nav">
+      <a class="w-nav-home" href="Biblioteca.dc.html">← BIBLIOTECA</a>
+      <span class="w-nav-sep">/</span>
+      <span class="w-nav-here">Modulo [NN] · [Titolo breve]</span>
+      <a class="w-nav-next" href="[modulo-successivo].dc.html">[Modulo successivo]</a>
+    </nav>
+
+    <!-- ===== COPERTINA ===== -->
+    <header class="w-hero a-blu">
+      <div class="w-hero-kicker">Un piccolo libro illustrato · vol. [N]</div>
+      <h1 class="w-hero-title">[Titolo con una <span class="w-mark">parola</span> sottolineata]</h1>
+      <p class="w-hero-sub">[Due o tre righe che dicono di cosa parla la pagina e a chi si rivolge.]</p>
+      <div class="w-hero-sign">— [firma, es. il tuo maestro di bottega]</div>
+    </header>
+
+    <!-- ===== COSA SI IMPARA QUI ===== -->
+    <div class="w-note w-note--info">
+      <span class="w-note-title">Cosa impari in questa pagina</span>
+      <p>[Le tre o quattro cose che il lettore saprà fare alla fine.]</p>
+    </div>
+
+    <!-- ===== SOMMARIO ===== -->
+    <h2 class="w-h2">Il viaggio in [numero] tappe</h2>
+    <ol class="w-summary">
+      <li><a href="#c1"><span class="w-summary-n">01</span><span>[Titolo della tappa]</span><span class="w-summary-tag">[parole chiave]</span></a></li>
+      <li><a href="#c2"><span class="w-summary-n">02</span><span>[Titolo della tappa]</span><span class="w-summary-tag">[parole chiave]</span></a></li>
+    </ol>
+
+
+    <!-- ======================= TAPPA 01 ======================= -->
+    <section class="w-tappa" id="c1">
+
+      <!-- Il numero "Tappa 01 ·" lo mette il CSS: qui va solo il sottotitolo. -->
+      <div class="w-tappa-kicker">[Sottotitolo tecnico della tappa]</div>
+      <h2 class="w-tappa-title">[Titolo della tappa]</h2>
+      <p class="w-tappa-lead">[Una frase che spiega perché questa tappa esiste.]</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">[Paragrafo di apertura. La prima lettera diventa un capolettera scritto a mano.]</p>
+
+      <!-- Analogia o spiegazione per immagini -->
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: [nome dell'analogia]</span>
+        <p>[L'idea difficile raccontata con qualcosa di familiare.]</p>
+      </div>
+
+      <!-- Concetto da ricordare -->
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>[La cosa che, se il lettore dimentica tutto il resto, deve restare.]</p>
+      </div>
+
+      <!-- Errore frequente -->
+      <div class="w-note w-note--warn">
+        <span class="w-note-title">Attenzione</span>
+        <p>[L'equivoco in cui cascano tutti.]</p>
+      </div>
+
+      <!-- Formula (serve MathJax nel <head>) -->
+      <div class="w-formula">
+        \[ [la\ formula] \]
+        <span class="w-formula-note">[Che cosa significa, a parole.]</span>
+      </div>
+
+      <!-- Demo interattiva: i binding {{ }} si collegano alla classe
+           Component in fondo al file. -->
+      <div class="w-demo">
+        <h4 class="w-demo-title">Prova tu — [che cosa si prova]</h4>
+        <p class="w-demo-hint">[Che cosa deve fare il lettore e cosa deve osservare.]</p>
+        <label class="w-label">[etichetta] = {{ valore }}</label>
+        <input type="range" min="0" max="100" value="{{ valore }}" onChange="{{ setValore }}">
+        <div class="w-demo-out">[risultato] = {{ risultato }}</div>
+        <p class="w-demo-foot">[La cosa da notare nel risultato.]</p>
+      </div>
+
+      <!-- Approfondimento per chi ne sa già -->
+      <div class="w-note w-note--expert">
+        <span class="w-note-title">Livello esperto</span>
+        <p>[I dettagli che interessano a chi lavora nel campo.]</p>
+      </div>
+
+      <!-- Fonti -->
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">Le fonti</span>
+        <ul>
+          <li>[Autore], <em>[Titolo]</em> — <span class="w-ref">[riferimento]</span></li>
+        </ul>
+      </div>
+
+    </section>
+
+
+    <!-- ======================= TAPPA 02 ======================= -->
+    <section class="w-tappa" id="c2">
+      <div class="w-tappa-kicker">[Sottotitolo tecnico]</div>
+      <h2 class="w-tappa-title">[Titolo della tappa]</h2>
+      <p class="w-tappa-lead">[Frase di apertura.]</p>
+      <p>[Contenuto.]</p>
+    </section>
+
+
+    <!-- ===== EPILOGO — non viene numerato ===== -->
+    <section class="w-tappa w-tappa--fine" id="fine">
+      <div class="w-tappa-kicker">Tutto insieme</div>
+      <h2 class="w-tappa-title">[Titolo della sintesi]</h2>
+      <p class="w-tappa-lead">[Il filo che lega tutte le tappe.]</p>
+
+      <div class="w-note w-note--bridge">
+        <span class="w-note-title">Il ponte con [altro modulo]</span>
+        <p>[Che cosa continua altrove.] Vai a <a href="[altro-modulo].dc.html">[titolo]</a>.</p>
+      </div>
+    </section>
+
+    <footer class="w-footer">
+      ~ · fine del quaderno · ~<br>
+      <a href="Biblioteca.dc.html">torna alla Biblioteca</a>
+    </footer>
+
+  </main>
+</div>
+
+</x-dc>
+
+<!-- Logica delle demo interattive. Togli l'intero blocco se la pagina non
+     ne ha nessuna. -->
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { valore: 50 }
+
+  renderVals() {
+    var self = this, s = this.state;
+    return {
+      valore: s.valore,
+      risultato: (s.valore * 2),
+      setValore: function (e) { self.setState({ valore: parseInt(e.target.value, 10) }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -24,7 +24,7 @@
   <a class="w-nav-home" href="Biblioteca.dc.html">← BIBLIOTECA</a>
   <span class="w-nav-sep">/</span>
   <span class="w-nav-here">Modulo 02 · Fondamenti matematici</span>
-  <a href="Dentro-la-Macchina.dc.html" style="margin-left:auto;color:#6B6F7A;border-color:rgba(107,111,122,.3)">Modulo 01: come genera testo →</a>
+  <a href="Dentro-la-Macchina.dc.html" style="margin-left:auto;color:var(--ink-soft);border-color:rgba(107,111,122,.3)">Modulo 01: come genera testo →</a>
 </nav>
 
 <header class="w-hero">
@@ -34,7 +34,7 @@
   <div class="w-hero-sign">— il tuo maestro di bottega, gessetto alla mano</div>
 </header>
 
-<div style="border:2px solid #20242C;border-radius:14px;background:#fff;padding:18px 22px;margin:30px 0;box-shadow:4px 4px 0 rgba(32,36,44,.12)">
+<div style="border:2px solid var(--ink);border-radius:14px;background:var(--paper-raised);padding:18px 22px;margin:30px 0;box-shadow:4px 4px 0 rgba(32,36,44,.12)">
   <h3 class="w-note-title" style="font-size:26px">La legenda delle penne ✒️</h3>
   <p>Le stesse del primo quaderno, così i due libri si leggono in coppia:</p>
   <ul class="w-legend">
@@ -59,7 +59,7 @@
   </ol>
 </nav>
 
-<div class="w-note w-note--warn"><b style="color:#C0392B">Come leggere questo libro.</b> Ogni concetto arriva prima come <em>immagine mentale</em>, poi come numeri veri, e solo alla fine come formula. I banchi arancioni <b style="color:#D9741E">"Prova tu"</b> sono interattivi: muovi i cursori e guarda la matematica muoversi. Non serve saper già l'algebra lineare — te la costruiamo qui, mattone su mattone.</div>
+<div class="w-note w-note--warn"><b style="color:var(--rosso)">Come leggere questo libro.</b> Ogni concetto arriva prima come <em>immagine mentale</em>, poi come numeri veri, e solo alla fine come formula. I banchi arancioni <b style="color:var(--arancio)">"Prova tu"</b> sono interattivi: muovi i cursori e guarda la matematica muoversi. Non serve saper già l'algebra lineare — te la costruiamo qui, mattone su mattone.</div>
 
 <!-- ============ CAP 01 — VETTORI ============ -->
 <section class="w-tappa" id="c1">
@@ -85,19 +85,19 @@
         <input type="range" min="-5" max="5" step="0.5" value="{{ vx }}" onChange="{{ setVx }}">
         <label class="w-label">y (nord) = {{ vy }}</label>
         <input type="range" min="-5" max="5" step="0.5" value="{{ vy }}" onChange="{{ setVy }}">
-        <div style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:13px;background:#F3F0E6;border-radius:8px;padding:10px 12px">
+        <div style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:13px;background:var(--paper-sunken);border-radius:8px;padding:10px 12px">
           v = [{{ vx }}, {{ vy }}]<br>
-          |v| = √({{ vxSq }} + {{ vySq }}) = <span style="color:#D9741E;font-weight:600">{{ vecNorm }}</span>
+          |v| = √({{ vxSq }} + {{ vySq }}) = <span style="color:var(--arancio);font-weight:600">{{ vecNorm }}</span>
         </div>
       </div>
-      <svg viewBox="0 0 260 240" style="width:100%;height:auto;background:#FDFCF8;border-radius:8px">
-        <defs><marker id="av" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2456B8"/></marker></defs>
-        <line x1="15" y1="170" x2="245" y2="170" stroke="#E0DAC6" stroke-width="1.5"/>
-        <line x1="60" y1="20" x2="60" y2="225" stroke="#E0DAC6" stroke-width="1.5"/>
-        <line x1="60" y1="170" x2="{{ vecX2 }}" y2="{{ vecY2 }}" stroke="#2456B8" stroke-width="3" marker-end="url(#av)"/>
-        <line x1="{{ vecX2 }}" y1="170" x2="{{ vecX2 }}" y2="{{ vecY2 }}" stroke="#2E7D4F" stroke-width="1.5" stroke-dasharray="4 3"/>
-        <line x1="60" y1="{{ vecY2 }}" x2="{{ vecX2 }}" y2="{{ vecY2 }}" stroke="#C0392B" stroke-width="1.5" stroke-dasharray="4 3"/>
-        <circle cx="60" cy="170" r="3" fill="#20242C"/>
+      <svg viewBox="0 0 260 240" style="width:100%;height:auto;background:var(--paper-raised);border-radius:8px">
+        <defs><marker id="av" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--blu)"/></marker></defs>
+        <line x1="15" y1="170" x2="245" y2="170" stroke="var(--rule)" stroke-width="1.5"/>
+        <line x1="60" y1="20" x2="60" y2="225" stroke="var(--rule)" stroke-width="1.5"/>
+        <line x1="60" y1="170" x2="{{ vecX2 }}" y2="{{ vecY2 }}" stroke="var(--blu)" stroke-width="3" marker-end="url(#av)"/>
+        <line x1="{{ vecX2 }}" y1="170" x2="{{ vecX2 }}" y2="{{ vecY2 }}" stroke="var(--verde)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <line x1="60" y1="{{ vecY2 }}" x2="{{ vecX2 }}" y2="{{ vecY2 }}" stroke="var(--rosso)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <circle cx="60" cy="170" r="3" fill="var(--ink)"/>
       </svg>
     </div>
   </div>
@@ -118,21 +118,21 @@
       <div>
         <label class="w-ref">angolo θ = {{ cosDeg }}°</label>
         <input type="range" min="0" max="180" step="1" value="{{ cosDeg }}" onChange="{{ setCos }}">
-        <div style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:13px;background:#F3F0E6;border-radius:8px;padding:10px 12px">
-          cos θ = <span style="color:#D9741E;font-weight:600">{{ cosV }}</span><br>
-          a · b = |a||b|cos θ = <span style="color:#2456B8;font-weight:600">{{ dotV }}</span>
+        <div style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:13px;background:var(--paper-sunken);border-radius:8px;padding:10px 12px">
+          cos θ = <span style="color:var(--arancio);font-weight:600">{{ cosV }}</span><br>
+          a · b = |a||b|cos θ = <span style="color:var(--blu);font-weight:600">{{ dotV }}</span>
         </div>
       </div>
-      <svg viewBox="0 0 260 240" style="width:100%;height:auto;background:#FDFCF8;border-radius:8px">
+      <svg viewBox="0 0 260 240" style="width:100%;height:auto;background:var(--paper-raised);border-radius:8px">
         <defs>
-          <marker id="ab" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2456B8"/></marker>
-          <marker id="ar" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#C0392B"/></marker>
+          <marker id="ab" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--blu)"/></marker>
+          <marker id="ar" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--rosso)"/></marker>
         </defs>
-        <line x1="15" y1="200" x2="245" y2="200" stroke="#E0DAC6" stroke-width="1.5"/>
-        <line x1="60" y1="30" x2="60" y2="225" stroke="#E0DAC6" stroke-width="1.5"/>
-        <line x1="60" y1="200" x2="{{ aX }}" y2="{{ aY }}" stroke="#2456B8" stroke-width="3" marker-end="url(#ab)"/>
-        <line x1="60" y1="200" x2="{{ bX }}" y2="{{ bY }}" stroke="#C0392B" stroke-width="3" marker-end="url(#ar)"/>
-        <circle cx="60" cy="200" r="3" fill="#20242C"/>
+        <line x1="15" y1="200" x2="245" y2="200" stroke="var(--rule)" stroke-width="1.5"/>
+        <line x1="60" y1="30" x2="60" y2="225" stroke="var(--rule)" stroke-width="1.5"/>
+        <line x1="60" y1="200" x2="{{ aX }}" y2="{{ aY }}" stroke="var(--blu)" stroke-width="3" marker-end="url(#ab)"/>
+        <line x1="60" y1="200" x2="{{ bX }}" y2="{{ bY }}" stroke="var(--rosso)" stroke-width="3" marker-end="url(#ar)"/>
+        <circle cx="60" cy="200" r="3" fill="var(--ink)"/>
       </svg>
     </div>
   </div>
@@ -168,25 +168,25 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center">
       <div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 14px">
-          <div><label style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#2456B8">a = {{ ma }}</label><input type="range" min="-2" max="2" step="0.1" value="{{ ma }}" onChange="{{ setMa }}"></div>
-          <div><label style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#2456B8">b = {{ mb }}</label><input type="range" min="-2" max="2" step="0.1" value="{{ mb }}" onChange="{{ setMb }}"></div>
-          <div><label style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#2456B8">c = {{ mc }}</label><input type="range" min="-2" max="2" step="0.1" value="{{ mc }}" onChange="{{ setMc }}"></div>
-          <div><label style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#2456B8">d = {{ md }}</label><input type="range" min="-2" max="2" step="0.1" value="{{ md }}" onChange="{{ setMd }}"></div>
+          <div><label style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--blu)">a = {{ ma }}</label><input type="range" min="-2" max="2" step="0.1" value="{{ ma }}" onChange="{{ setMa }}"></div>
+          <div><label style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--blu)">b = {{ mb }}</label><input type="range" min="-2" max="2" step="0.1" value="{{ mb }}" onChange="{{ setMb }}"></div>
+          <div><label style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--blu)">c = {{ mc }}</label><input type="range" min="-2" max="2" step="0.1" value="{{ mc }}" onChange="{{ setMc }}"></div>
+          <div><label style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--blu)">d = {{ md }}</label><input type="range" min="-2" max="2" step="0.1" value="{{ md }}" onChange="{{ setMd }}"></div>
         </div>
-        <div style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:13px;background:#F3F0E6;border-radius:8px;padding:10px 12px">
+        <div style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:13px;background:var(--paper-sunken);border-radius:8px;padding:10px 12px">
           W = [[{{ ma }}, {{ mb }}], [{{ mc }}, {{ md }}]]<br>
-          det(W) = ad − bc = <span style="color:#D9741E;font-weight:600">{{ det }}</span> <span class="w-nav-here">(area)</span>
+          det(W) = ad − bc = <span style="color:var(--arancio);font-weight:600">{{ det }}</span> <span class="w-nav-here">(area)</span>
         </div>
-        <button onClick="{{ identity }}" style="margin-top:10px;font-family:'IBM Plex Mono',monospace;font-size:12px;border:1.5px solid #20242C;background:#fff;border-radius:8px;padding:6px 12px;cursor:pointer">↺ identità</button>
+        <button onClick="{{ identity }}" style="margin-top:10px;font-family:'IBM Plex Mono',monospace;font-size:12px;border:1.5px solid var(--ink);background:var(--paper-raised);border-radius:8px;padding:6px 12px;cursor:pointer">↺ identità</button>
       </div>
-      <svg viewBox="0 0 260 260" style="width:100%;height:auto;background:#FDFCF8;border-radius:8px">
-        <line x1="10" y1="130" x2="250" y2="130" stroke="#E0DAC6" stroke-width="1.5"/>
-        <line x1="130" y1="10" x2="130" y2="250" stroke="#E0DAC6" stroke-width="1.5"/>
-        <rect x="130" y="88" width="42" height="42" fill="rgba(36,86,184,.10)" stroke="#2456B8" stroke-width="1.5" stroke-dasharray="4 3"/>
-        <polygon points="{{ sqPts }}" fill="rgba(217,116,30,.22)" stroke="#D9741E" stroke-width="2.5"/>
-        <line x1="130" y1="130" x2="{{ iX }}" y2="{{ iY }}" stroke="#C0392B" stroke-width="2.5"/>
-        <line x1="130" y1="130" x2="{{ jX }}" y2="{{ jY }}" stroke="#2E7D4F" stroke-width="2.5"/>
-        <circle cx="130" cy="130" r="3" fill="#20242C"/>
+      <svg viewBox="0 0 260 260" style="width:100%;height:auto;background:var(--paper-raised);border-radius:8px">
+        <line x1="10" y1="130" x2="250" y2="130" stroke="var(--rule)" stroke-width="1.5"/>
+        <line x1="130" y1="10" x2="130" y2="250" stroke="var(--rule)" stroke-width="1.5"/>
+        <rect x="130" y="88" width="42" height="42" fill="rgba(36,86,184,.10)" stroke="var(--blu)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <polygon points="{{ sqPts }}" fill="rgba(217,116,30,.22)" stroke="var(--arancio)" stroke-width="2.5"/>
+        <line x1="130" y1="130" x2="{{ iX }}" y2="{{ iY }}" stroke="var(--rosso)" stroke-width="2.5"/>
+        <line x1="130" y1="130" x2="{{ jX }}" y2="{{ jY }}" stroke="var(--verde)" stroke-width="2.5"/>
+        <circle cx="130" cy="130" r="3" fill="var(--ink)"/>
       </svg>
     </div>
   </div>
@@ -221,16 +221,16 @@
 
   <figure class="w-figure">
     <svg viewBox="0 0 640 260" role="img" aria-label="uomo re donna regina come parallelogramma nello spazio">
-      <line x1="40" y1="230" x2="600" y2="230" stroke="#E0DAC6" stroke-width="1.5"/>
-      <line x1="90" y1="20" x2="90" y2="240" stroke="#E0DAC6" stroke-width="1.5"/>
-      <defs><marker id="ap" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#6B3FA0"/></marker></defs>
-      <circle cx="180" cy="190" r="6" fill="#2456B8"/><text x="150" y="212" font-family="IBM Plex Mono" font-size="14" fill="#20242C">uomo</text>
-      <circle cx="360" cy="120" r="6" fill="#2456B8"/><text x="345" y="108" font-family="IBM Plex Mono" font-size="14" fill="#20242C">re</text>
-      <circle cx="280" cy="150" r="6" fill="#C0392B"/><text x="250" y="172" font-family="IBM Plex Mono" font-size="14" fill="#20242C">donna</text>
-      <circle cx="460" cy="80" r="6" fill="#C0392B"/><text x="470" y="76" font-family="IBM Plex Mono" font-size="14" fill="#20242C">regina</text>
-      <line x1="180" y1="190" x2="360" y2="120" stroke="#6B3FA0" stroke-width="2.5" marker-end="url(#ap)"/>
-      <line x1="280" y1="150" x2="460" y2="80" stroke="#6B3FA0" stroke-width="2.5" stroke-dasharray="5 4" marker-end="url(#ap)"/>
-      <text x="250" y="150" font-family="Caveat" font-size="19" fill="#6B3FA0" transform="rotate(-21 250 150)">+ regalità →</text>
+      <line x1="40" y1="230" x2="600" y2="230" stroke="var(--rule)" stroke-width="1.5"/>
+      <line x1="90" y1="20" x2="90" y2="240" stroke="var(--rule)" stroke-width="1.5"/>
+      <defs><marker id="ap" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--viola)"/></marker></defs>
+      <circle cx="180" cy="190" r="6" fill="var(--blu)"/><text x="150" y="212" font-family="IBM Plex Mono" font-size="14" fill="var(--ink)">uomo</text>
+      <circle cx="360" cy="120" r="6" fill="var(--blu)"/><text x="345" y="108" font-family="IBM Plex Mono" font-size="14" fill="var(--ink)">re</text>
+      <circle cx="280" cy="150" r="6" fill="var(--rosso)"/><text x="250" y="172" font-family="IBM Plex Mono" font-size="14" fill="var(--ink)">donna</text>
+      <circle cx="460" cy="80" r="6" fill="var(--rosso)"/><text x="470" y="76" font-family="IBM Plex Mono" font-size="14" fill="var(--ink)">regina</text>
+      <line x1="180" y1="190" x2="360" y2="120" stroke="var(--viola)" stroke-width="2.5" marker-end="url(#ap)"/>
+      <line x1="280" y1="150" x2="460" y2="80" stroke="var(--viola)" stroke-width="2.5" stroke-dasharray="5 4" marker-end="url(#ap)"/>
+      <text x="250" y="150" font-family="Caveat" font-size="19" fill="var(--viola)" transform="rotate(-21 250 150)">+ regalità →</text>
     </svg>
     <figcaption>Fig. 3 — Le due frecce viola sono (quasi) parallele e uguali: la stessa "direzione di regalità" collega entrambe le coppie. Le relazioni sono geometria.</figcaption>
   </figure>
@@ -263,22 +263,22 @@
     <div style="display:flex;align-items:flex-end;gap:10px;height:170px;margin:0 0 6px">
       <sc-for list="{{ bars }}" as="b" hint-placeholder-count="5">
         <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%">
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6B6F7A;margin-bottom:3px">{{ b.pct }}%</div>
-          <div style="width:100%;background:#2456B8;border-radius:5px 5px 0 0;transition:height .2s;height:{{ b.h }}px"></div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);margin-bottom:3px">{{ b.pct }}%</div>
+          <div style="width:100%;background:var(--blu);border-radius:5px 5px 0 0;transition:height .2s;height:{{ b.h }}px"></div>
         </div>
       </sc-for>
     </div>
     <div style="display:flex;gap:10px;margin-bottom:14px">
       <sc-for list="{{ bars }}" as="b" hint-placeholder-count="5">
-        <div style="flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#20242C">"{{ b.label }}"</div>
+        <div style="flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink)">"{{ b.label }}"</div>
       </sc-for>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px 14px;padding-top:6px;border-top:1px dashed #E9E5D8">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px 14px;padding-top:6px;border-top:1px dashed var(--rule)">
       <sc-for list="{{ bars }}" as="b" hint-placeholder-count="5">
-        <div><label style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#2456B8">"{{ b.label }}" logit = {{ b.z }}</label><input type="range" min="-5" max="8" step="0.5" value="{{ b.z }}" onChange="{{ b.set }}"></div>
+        <div><label style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--blu)">"{{ b.label }}" logit = {{ b.z }}</label><input type="range" min="-5" max="8" step="0.5" value="{{ b.z }}" onChange="{{ b.set }}"></div>
       </sc-for>
     </div>
-    <div style="margin-top:12px;padding-top:10px;border-top:1px dashed #E9E5D8"><label class="w-label">temperatura T = {{ temp }}</label><input type="range" min="0.1" max="2.5" step="0.05" value="{{ temp }}" onChange="{{ setTemp }}"><span style="font-size:13px;color:#6B6F7A;font-style:italic">↓ verso 0.1: quasi sempre il migliore · ↑ verso 2.5: quasi sorteggio</span></div>
+    <div style="margin-top:12px;padding-top:10px;border-top:1px dashed var(--rule)"><label class="w-label">temperatura T = {{ temp }}</label><input type="range" min="0.1" max="2.5" step="0.05" value="{{ temp }}" onChange="{{ setTemp }}"><span style="font-size:13px;color:var(--ink-soft);font-style:italic">↓ verso 0.1: quasi sempre il migliore · ↑ verso 2.5: quasi sorteggio</span></div>
   </div>
 
   <div class="w-note w-note--expert">
@@ -307,25 +307,25 @@
     <h4 class="w-demo-title">Prova tu — discesa del gradiente</h4>
     <p class="w-demo-hint">La curva è l'errore \(f(x)=x^2\); il punto è il valore attuale del "peso". Premi <b>passo</b>: il peso si sposta contro il gradiente. Il <em>learning rate</em> \(\eta\) è la lunghezza del passo — troppo piccolo = lentissimo, troppo grande = rimbalza e diverge.</p>
     <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;align-items:center">
-      <svg viewBox="0 0 320 220" style="width:100%;height:auto;background:#FDFCF8;border-radius:8px">
-        <polyline points="{{ paraPts }}" fill="none" stroke="#2456B8" stroke-width="2.5"/>
-        <line x1="20" y1="200" x2="300" y2="200" stroke="#E0DAC6" stroke-width="1.5"/>
-        <line x1="160" y1="15" x2="160" y2="205" stroke="#E0DAC6" stroke-width="1"/>
-        <line x1="{{ gpx }}" y1="{{ gpy }}" x2="{{ gnpx }}" y2="{{ gnpy }}" stroke="#C0392B" stroke-width="1.5" stroke-dasharray="4 3"/>
-        <circle cx="{{ gnpx }}" cy="{{ gnpy }}" r="4" fill="none" stroke="#C0392B" stroke-width="1.5"/>
-        <circle cx="{{ gpx }}" cy="{{ gpy }}" r="6" fill="#D9741E" stroke="#20242C" stroke-width="1.5"/>
+      <svg viewBox="0 0 320 220" style="width:100%;height:auto;background:var(--paper-raised);border-radius:8px">
+        <polyline points="{{ paraPts }}" fill="none" stroke="var(--blu)" stroke-width="2.5"/>
+        <line x1="20" y1="200" x2="300" y2="200" stroke="var(--rule)" stroke-width="1.5"/>
+        <line x1="160" y1="15" x2="160" y2="205" stroke="var(--rule)" stroke-width="1"/>
+        <line x1="{{ gpx }}" y1="{{ gpy }}" x2="{{ gnpx }}" y2="{{ gnpy }}" stroke="var(--rosso)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <circle cx="{{ gnpx }}" cy="{{ gnpy }}" r="4" fill="none" stroke="var(--rosso)" stroke-width="1.5"/>
+        <circle cx="{{ gpx }}" cy="{{ gpy }}" r="6" fill="var(--arancio)" stroke="var(--ink)" stroke-width="1.5"/>
       </svg>
       <div>
         <div class="w-demo-out">
-          x = <span style="color:#D9741E;font-weight:600">{{ gx }}</span><br>
+          x = <span style="color:var(--arancio);font-weight:600">{{ gx }}</span><br>
           errore f(x) = {{ gfx }}<br>
           gradiente f'(x) = {{ gGrad }}
         </div>
-        <label style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#2456B8;display:block;margin-top:12px">learning rate η = {{ glr }}</label>
+        <label style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--blu);display:block;margin-top:12px">learning rate η = {{ glr }}</label>
         <input type="range" min="0.02" max="1.05" step="0.01" value="{{ glr }}" onChange="{{ setGlr }}">
         <div style="display:flex;gap:8px;margin-top:10px">
-          <button onClick="{{ stepGD }}" style="flex:1;font-family:'IBM Plex Mono',monospace;font-size:13px;border:none;background:#D9741E;color:#fff;border-radius:8px;padding:9px;cursor:pointer">▶ passo</button>
-          <button onClick="{{ resetGD }}" style="font-family:'IBM Plex Mono',monospace;font-size:13px;border:1.5px solid #20242C;background:#fff;border-radius:8px;padding:9px 12px;cursor:pointer">↺</button>
+          <button onClick="{{ stepGD }}" style="flex:1;font-family:'IBM Plex Mono',monospace;font-size:13px;border:none;background:var(--arancio);color:var(--paper-raised);border-radius:8px;padding:9px;cursor:pointer">▶ passo</button>
+          <button onClick="{{ resetGD }}" style="font-family:'IBM Plex Mono',monospace;font-size:13px;border:1.5px solid var(--ink);background:var(--paper-raised);border-radius:8px;padding:9px 12px;cursor:pointer">↺</button>
         </div>
         <p class="w-demo-foot">Prova η ≈ 1.0: il punto scavalca il fondo e oscilla. È l'instabilità che rovina l'addestramento.</p>
       </div>
@@ -358,10 +358,10 @@
   <h3 class="w-h3">La formula, smontata pezzo per pezzo</h3>
   <div class="w-formula">\[ \operatorname{Attention}(Q,K,V)=\operatorname{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d_k}}\right)V \]</div>
   <ul style="margin:0 0 1em;padding-left:20px">
-    <li><b style="color:#2456B8">\(QK^{\top}\)</b> — ogni Query fa il prodotto scalare con ogni Key: una matrice di <em>punteggi di rilevanza</em> (parola × parola). Cap. 1, all'opera.</li>
-    <li><b style="color:#C0392B">\(/\sqrt{d_k}\)</b> — si divide per la radice della dimensione. Senza, con \(d_k\) grande i prodotti scalari diventano enormi e la softmax si "satura" (un solo 1, tutti 0), uccidendo i gradienti. È un semplice riscalamento che tiene i numeri gestibili.</li>
-    <li><b style="color:#D9741E">\(\operatorname{softmax}(\cdot)\)</b> — cap. 4: trasforma i punteggi di ogni riga in <em>pesi</em> che sommano a 1. Ecco "quanta attenzione" dedicare a ciascuna parola.</li>
-    <li><b style="color:#2E7D4F">\(\cdots\,V\)</b> — si fa la media dei Value pesata da quei pesi. Il risultato è il nuovo vettore della parola, <em>arricchito dal contesto</em>.</li>
+    <li><b style="color:var(--blu)">\(QK^{\top}\)</b> — ogni Query fa il prodotto scalare con ogni Key: una matrice di <em>punteggi di rilevanza</em> (parola × parola). Cap. 1, all'opera.</li>
+    <li><b style="color:var(--rosso)">\(/\sqrt{d_k}\)</b> — si divide per la radice della dimensione. Senza, con \(d_k\) grande i prodotti scalari diventano enormi e la softmax si "satura" (un solo 1, tutti 0), uccidendo i gradienti. È un semplice riscalamento che tiene i numeri gestibili.</li>
+    <li><b style="color:var(--arancio)">\(\operatorname{softmax}(\cdot)\)</b> — cap. 4: trasforma i punteggi di ogni riga in <em>pesi</em> che sommano a 1. Ecco "quanta attenzione" dedicare a ciascuna parola.</li>
+    <li><b style="color:var(--verde)">\(\cdots\,V\)</b> — si fa la media dei Value pesata da quei pesi. Il risultato è il nuovo vettore della parola, <em>arricchito dal contesto</em>.</li>
   </ul>
 
   <div class="w-demo">
@@ -369,16 +369,16 @@
     <p class="w-demo-hint">Frase: <b>"Il gatto dorme stanco"</b>. Scegli la parola-Query: le barre mostrano quanta attenzione riceve ciascuna parola (i pesi dopo softmax(Q·Kᵀ/√d)). La parola stessa di solito prende molto — ma non solo lei.</p>
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
       <sc-for list="{{ attn }}" as="a" hint-placeholder-count="4">
-        <button onClick="{{ a.pick }}" style="font-family:'IBM Plex Mono',monospace;font-size:13px;border:1.5px solid #20242C;border-radius:20px;padding:6px 14px;cursor:pointer;background:{{ a.qbg }};color:{{ a.qfg }}">{{ a.tok }}</button>
+        <button onClick="{{ a.pick }}" style="font-family:'IBM Plex Mono',monospace;font-size:13px;border:1.5px solid var(--ink);border-radius:20px;padding:6px 14px;cursor:pointer;background:{{ a.qbg }};color:{{ a.qfg }}">{{ a.tok }}</button>
       </sc-for>
     </div>
-    <p style="margin:0 0 8px;font-size:13px;color:#6B6F7A;font-style:italic">Query = "{{ attnQtok }}" · attenzione distribuita su:</p>
+    <p style="margin:0 0 8px;font-size:13px;color:var(--ink-soft);font-style:italic">Query = "{{ attnQtok }}" · attenzione distribuita su:</p>
     <div style="display:flex;align-items:flex-end;gap:12px;height:150px">
       <sc-for list="{{ attn }}" as="a" hint-placeholder-count="4">
         <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%">
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6B6F7A;margin-bottom:3px">{{ a.pct }}%</div>
-          <div style="width:100%;background:#2E7D4F;border-radius:5px 5px 0 0;transition:height .2s;height:{{ a.h }}px"></div>
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#20242C;margin-top:6px">{{ a.tok }}</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);margin-bottom:3px">{{ a.pct }}%</div>
+          <div style="width:100%;background:var(--verde);border-radius:5px 5px 0 0;transition:height .2s;height:{{ a.h }}px"></div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink);margin-top:6px">{{ a.tok }}</div>
         </div>
       </sc-for>
     </div>
@@ -397,29 +397,29 @@
   <h2 class="w-tappa-title">Tutto insieme — dall'algebra al Transformer</h2>
   <p class="w-tappa-lead">Rimettiamo i pezzi in fila. Segui una parola che entra come testo ed esce come probabilità: ogni freccia di questo percorso è uno dei concetti che hai appena imparato.</p>
 
-  <figure style="margin:24px 0;background:#fff;border:2px solid #20242C;border-radius:14px;padding:16px;box-shadow:4px 4px 0 rgba(32,36,44,.12)">
+  <figure style="margin:24px 0;background:var(--paper-raised);border:2px solid var(--ink);border-radius:14px;padding:16px;box-shadow:4px 4px 0 rgba(32,36,44,.12)">
     <svg viewBox="0 0 700 250" role="img" aria-label="flusso dai token alle probabilita">
-      <defs><marker id="fl" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#C0392B" stroke-width="1.5"/></marker></defs>
+      <defs><marker id="fl" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="var(--rosso)" stroke-width="1.5"/></marker></defs>
       <g font-family="IBM Plex Mono" font-size="12.5">
-        <rect x="12" y="105" width="94" height="42" rx="8" fill="#fff" stroke="#20242C" stroke-width="2"/><text x="59" y="123" text-anchor="middle">token</text><text x="59" y="138" text-anchor="middle" fill="#6B6F7A" font-size="10">interi</text>
-        <rect x="140" y="105" width="104" height="42" rx="8" fill="#fff" stroke="#2456B8" stroke-width="2"/><text x="192" y="123" text-anchor="middle" fill="#2456B8">embedding</text><text x="192" y="138" text-anchor="middle" fill="#6B6F7A" font-size="10">vettori (c.1,3)</text>
-        <rect x="278" y="90" width="150" height="72" rx="8" fill="#FDF6EC" stroke="#D9741E" stroke-width="2"/><text x="353" y="112" text-anchor="middle" fill="#D9741E">attention</text><text x="353" y="128" text-anchor="middle" fill="#6B6F7A" font-size="10">Q·Kᵀ/√d · softmax</text><text x="353" y="142" text-anchor="middle" fill="#6B6F7A" font-size="10">(c.1,2,4,6)</text>
-        <rect x="462" y="105" width="104" height="42" rx="8" fill="#fff" stroke="#6B3FA0" stroke-width="2"/><text x="514" y="123" text-anchor="middle" fill="#6B3FA0">FFN</text><text x="514" y="138" text-anchor="middle" fill="#6B6F7A" font-size="10">matrici (c.2)</text>
-        <rect x="600" y="105" width="90" height="42" rx="8" fill="#fff" stroke="#20242C" stroke-width="2"/><text x="645" y="122" text-anchor="middle">softmax</text><text x="645" y="137" text-anchor="middle" fill="#6B6F7A" font-size="10">p (c.4)</text>
+        <rect x="12" y="105" width="94" height="42" rx="8" fill="var(--paper-raised)" stroke="var(--ink)" stroke-width="2"/><text x="59" y="123" text-anchor="middle">token</text><text x="59" y="138" text-anchor="middle" fill="var(--ink-soft)" font-size="10">interi</text>
+        <rect x="140" y="105" width="104" height="42" rx="8" fill="var(--paper-raised)" stroke="var(--blu)" stroke-width="2"/><text x="192" y="123" text-anchor="middle" fill="var(--blu)">embedding</text><text x="192" y="138" text-anchor="middle" fill="var(--ink-soft)" font-size="10">vettori (c.1,3)</text>
+        <rect x="278" y="90" width="150" height="72" rx="8" fill="color-mix(in srgb, var(--arancio) 12%, var(--paper-raised))" stroke="var(--arancio)" stroke-width="2"/><text x="353" y="112" text-anchor="middle" fill="var(--arancio)">attention</text><text x="353" y="128" text-anchor="middle" fill="var(--ink-soft)" font-size="10">Q·Kᵀ/√d · softmax</text><text x="353" y="142" text-anchor="middle" fill="var(--ink-soft)" font-size="10">(c.1,2,4,6)</text>
+        <rect x="462" y="105" width="104" height="42" rx="8" fill="var(--paper-raised)" stroke="var(--viola)" stroke-width="2"/><text x="514" y="123" text-anchor="middle" fill="var(--viola)">FFN</text><text x="514" y="138" text-anchor="middle" fill="var(--ink-soft)" font-size="10">matrici (c.2)</text>
+        <rect x="600" y="105" width="90" height="42" rx="8" fill="var(--paper-raised)" stroke="var(--ink)" stroke-width="2"/><text x="645" y="122" text-anchor="middle">softmax</text><text x="645" y="137" text-anchor="middle" fill="var(--ink-soft)" font-size="10">p (c.4)</text>
       </g>
-      <line x1="106" y1="126" x2="138" y2="126" stroke="#C0392B" stroke-width="1.5" marker-end="url(#fl)"/>
-      <line x1="244" y1="126" x2="276" y2="126" stroke="#C0392B" stroke-width="1.5" marker-end="url(#fl)"/>
-      <line x1="428" y1="126" x2="460" y2="126" stroke="#C0392B" stroke-width="1.5" marker-end="url(#fl)"/>
-      <line x1="566" y1="126" x2="598" y2="126" stroke="#C0392B" stroke-width="1.5" marker-end="url(#fl)"/>
-      <path d="M353 162 Q353 205 250 205 L250 175" fill="none" stroke="#2E7D4F" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#fl)"/>
-      <text x="300" y="222" font-family="Caveat" font-size="17" fill="#2E7D4F">×N strati (≈32–96)</text>
+      <line x1="106" y1="126" x2="138" y2="126" stroke="var(--rosso)" stroke-width="1.5" marker-end="url(#fl)"/>
+      <line x1="244" y1="126" x2="276" y2="126" stroke="var(--rosso)" stroke-width="1.5" marker-end="url(#fl)"/>
+      <line x1="428" y1="126" x2="460" y2="126" stroke="var(--rosso)" stroke-width="1.5" marker-end="url(#fl)"/>
+      <line x1="566" y1="126" x2="598" y2="126" stroke="var(--rosso)" stroke-width="1.5" marker-end="url(#fl)"/>
+      <path d="M353 162 Q353 205 250 205 L250 175" fill="none" stroke="var(--verde)" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#fl)"/>
+      <text x="300" y="222" font-family="Caveat" font-size="17" fill="var(--verde)">×N strati (≈32–96)</text>
     </svg>
     <figcaption>Fig. 7 — Il flusso completo. I blocchi arancione+viola (attention + FFN) si ripetono per decine di strati prima della softmax finale. Ogni parola di questa figura è un capitolo di questo libro.</figcaption>
   </figure>
 
   <h3 class="w-h3">Le dimensioni vere (Llama 3 8B)</h3>
   <table class="w-table">
-    <thead><tr><th style="border:1px solid #E9E5D8;padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F3F0E6">Grandezza</th><th style="border:1px solid #E9E5D8;padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F3F0E6">Valore</th><th style="border:1px solid #E9E5D8;padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F3F0E6">Concetto</th></tr></thead>
+    <thead><tr><th style="border:1px solid var(--rule);padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:var(--paper-sunken)">Grandezza</th><th style="border:1px solid var(--rule);padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:var(--paper-sunken)">Valore</th><th style="border:1px solid var(--rule);padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:var(--paper-sunken)">Concetto</th></tr></thead>
     <tbody>
       <tr><td>dimensione embedding \(d\)</td><td>4096</td><td>lunghezza di ogni vettore-parola (c.1,3)</td></tr>
       <tr><td>vocabolario</td><td>128.256</td><td>righe softmax finale (c.4)</td></tr>
@@ -429,7 +429,7 @@
     </tbody>
   </table>
 
-  <div class="w-note w-note--warn"><b style="color:#C0392B">Il ponte col Modulo 01.</b> Ora che padroneggi la matematica, rileggi <a href="Dentro-la-Macchina.dc.html">"Dentro la Macchina"</a>: quello che lì era descritto a parole — token, embedding, attention, KV-cache, softmax, sampling — qui ha una formula precisa. I due libri sono la stessa storia raccontata a due profondità.</div>
+  <div class="w-note w-note--warn"><b style="color:var(--rosso)">Il ponte col Modulo 01.</b> Ora che padroneggi la matematica, rileggi <a href="Dentro-la-Macchina.dc.html">"Dentro la Macchina"</a>: quello che lì era descritto a parole — token, embedding, attention, KV-cache, softmax, sampling — qui ha una formula precisa. I due libri sono la stessa storia raccontata a due profondità.</div>
 </section>
 
 <!-- ============ EPILOGO ============ -->
@@ -536,7 +536,7 @@ class Component extends DCLogic {
     var amx=Math.max.apply(null,asc);
     var aex=asc.map(function(v){return Math.exp(v-amx);});
     var asum=aex.reduce(function(a,b){return a+b;},0);
-    var attn=toks.map(function(tk,i){ var w=aex[i]/asum; var on=(i===s.attnQ); return {tok:tk, score:asc[i].toFixed(2), w:w, pct:(w*100).toFixed(0), h:Math.max(2,w*130).toFixed(1), active:on, qbg:(on?'#20242C':'#fff'), qfg:(on?'#fff':'#20242C'), pick:(function(idx){return function(){ self.setState({attnQ:idx}); };})(i) }; });
+    var attn=toks.map(function(tk,i){ var w=aex[i]/asum; var on=(i===s.attnQ); return {tok:tk, score:asc[i].toFixed(2), w:w, pct:(w*100).toFixed(0), h:Math.max(2,w*130).toFixed(1), active:on, qbg:(on?'var(--ink)':'var(--paper-raised)'), qfg:(on?'var(--paper-raised)':'var(--ink)'), pick:(function(idx){return function(){ self.setState({attnQ:idx}); };})(i) }; });
 
     return {
       vx:s.vx, vy:s.vy, vxSq:(s.vx*s.vx).toFixed(2), vySq:(s.vy*s.vy).toFixed(2),

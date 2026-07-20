@@ -28,7 +28,7 @@
     <a class="w-nav-home" href="Biblioteca.dc.html">← BIBLIOTECA</a>
     <span class="w-nav-sep">/</span>
     <span class="w-nav-here">Modulo 01 · Come genera testo</span>
-    <a href="Fondamenti-Matematici-LLM.dc.html" style="margin-left:auto;color:#2456B8;border-color:rgba(36,86,184,.3)">Modulo 02: la matematica →</a>
+    <a href="Fondamenti-Matematici-LLM.dc.html" style="margin-left:auto;color:var(--blu);border-color:rgba(36,86,184,.3)">Modulo 02: la matematica →</a>
   </nav>
 
   <header class="w-hero">
@@ -38,7 +38,7 @@
     <div class="w-hero-sign">— il tuo maestro di bottega, quaderno alla mano</div>
   </header>
 
-  <div style="border:2px solid #20242C;border-radius:14px;background:#fff;padding:18px 22px;margin:34px 0;box-shadow:4px 4px 0 rgba(32,36,44,.12)">
+  <div style="border:2px solid var(--ink);border-radius:14px;background:var(--paper-raised);padding:18px 22px;margin:34px 0;box-shadow:4px 4px 0 rgba(32,36,44,.12)">
     <h3 class="w-note-title" style="font-size:26px">La legenda delle penne ✒️</h3>
     <p>Ogni colore ha un significato, mantenuto per tutto il libro (e nel Modulo 02):</p>
     <ul class="w-legend">
@@ -66,7 +66,7 @@
     </ol>
   </nav>
 
-  <div class="w-note w-note--warn"><b style="color:#C0392B">Filo conduttore.</b> Seguiremo sempre la stessa domanda — <code>What is gravity?</code> — dal momento in cui la digiti fino a quando il modello risponde, un pezzetto alla volta, <em>"Gravity is a fundamental force that…"</em>. Ogni capitolo è una stazione di questo viaggio.</div>
+  <div class="w-note w-note--warn"><b style="color:var(--rosso)">Filo conduttore.</b> Seguiremo sempre la stessa domanda — <code>What is gravity?</code> — dal momento in cui la digiti fino a quando il modello risponde, un pezzetto alla volta, <em>"Gravity is a fundamental force that…"</em>. Ogni capitolo è una stazione di questo viaggio.</div>
 
   <!-- ============ CAP 01 ============ -->
   <section class="w-tappa" id="c1">
@@ -84,12 +84,12 @@
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px">
         <sc-for list="{{ tokens }}" as="tk" hint-placeholder-count="5">
           <div style="text-align:center">
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;background:#fff;border:2px solid #20242C;border-radius:6px;padding:5px 9px;white-space:pre">{{ tk.disp }}</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#2456B8;margin-top:3px">{{ tk.id }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;background:var(--paper-raised);border:2px solid var(--ink);border-radius:6px;padding:5px 9px;white-space:pre">{{ tk.disp }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--blu);margin-top:3px">{{ tk.id }}</div>
           </div>
         </sc-for>
       </div>
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6B6F7A;margin-top:8px">token: <span style="color:#D9741E;font-weight:600">{{ tokCount }}</span> · caratteri: {{ charCount }} · rapporto ≈ {{ tokRatio }} car/token</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-soft);margin-top:8px">token: <span style="color:var(--arancio);font-weight:600">{{ tokCount }}</span> · caratteri: {{ charCount }} · rapporto ≈ {{ tokRatio }} car/token</div>
     </div>
 
     <div class="w-note w-note--demo">
@@ -133,22 +133,22 @@
 
     <figure class="w-figure">
       <svg viewBox="0 0 700 240" role="img" aria-label="Spazio semantico degli embedding">
-        <line x1="60" y1="200" x2="660" y2="200" stroke="#20242C" stroke-width="2"/>
-        <line x1="60" y1="200" x2="60" y2="20" stroke="#20242C" stroke-width="2"/>
-        <text x="640" y="222" font-family="IBM Plex Mono" font-size="11" fill="#6B6F7A">dim. 1 (di 4096)</text>
-        <text x="18" y="30" font-family="IBM Plex Mono" font-size="11" fill="#6B6F7A">dim. 2</text>
+        <line x1="60" y1="200" x2="660" y2="200" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="60" y1="200" x2="60" y2="20" stroke="var(--ink)" stroke-width="2"/>
+        <text x="640" y="222" font-family="IBM Plex Mono" font-size="11" fill="var(--ink-soft)">dim. 1 (di 4096)</text>
+        <text x="18" y="30" font-family="IBM Plex Mono" font-size="11" fill="var(--ink-soft)">dim. 2</text>
         <g font-family="Caveat" font-size="20">
-          <circle cx="170" cy="80" r="5" fill="#2456B8"/><text x="182" y="76" fill="#2456B8">gravità</text>
-          <circle cx="210" cy="110" r="5" fill="#2456B8"/><text x="222" y="106" fill="#2456B8">forza</text>
-          <circle cx="150" cy="130" r="5" fill="#2456B8"/><text x="162" y="126" fill="#2456B8">massa</text>
-          <circle cx="520" cy="150" r="5" fill="#D9741E"/><text x="532" y="146" fill="#D9741E">torta</text>
-          <circle cx="560" cy="110" r="5" fill="#D9741E"/><text x="572" y="106" fill="#D9741E">ricetta</text>
+          <circle cx="170" cy="80" r="5" fill="var(--blu)"/><text x="182" y="76" fill="var(--blu)">gravità</text>
+          <circle cx="210" cy="110" r="5" fill="var(--blu)"/><text x="222" y="106" fill="var(--blu)">forza</text>
+          <circle cx="150" cy="130" r="5" fill="var(--blu)"/><text x="162" y="126" fill="var(--blu)">massa</text>
+          <circle cx="520" cy="150" r="5" fill="var(--arancio)"/><text x="532" y="146" fill="var(--arancio)">torta</text>
+          <circle cx="560" cy="110" r="5" fill="var(--arancio)"/><text x="572" y="106" fill="var(--arancio)">ricetta</text>
         </g>
-        <ellipse cx="180" cy="105" rx="80" ry="55" fill="none" stroke="#2E7D4F" stroke-dasharray="6 5" stroke-width="2"/>
-        <text x="120" y="185" font-family="Caveat" font-size="19" fill="#2E7D4F">quartiere "fisica"</text>
-        <path d="M300 60 C 360 30, 430 30, 480 55" stroke="#C0392B" stroke-width="2" fill="none" marker-end="url(#arrE)"/>
-        <defs><marker id="arrE" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#C0392B" stroke-width="1.5"/></marker></defs>
-        <text x="310" y="26" font-family="Caveat" font-size="18" fill="#C0392B">distanza = differenza di significato</text>
+        <ellipse cx="180" cy="105" rx="80" ry="55" fill="none" stroke="var(--verde)" stroke-dasharray="6 5" stroke-width="2"/>
+        <text x="120" y="185" font-family="Caveat" font-size="19" fill="var(--verde)">quartiere "fisica"</text>
+        <path d="M300 60 C 360 30, 430 30, 480 55" stroke="var(--rosso)" stroke-width="2" fill="none" marker-end="url(#arrE)"/>
+        <defs><marker id="arrE" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="var(--rosso)" stroke-width="1.5"/></marker></defs>
+        <text x="310" y="26" font-family="Caveat" font-size="18" fill="var(--rosso)">distanza = differenza di significato</text>
       </svg>
       <figcaption>Fig. 2 — Proiezione immaginaria in 2D di uno spazio a 4.096 dimensioni: la vicinanza geometrica codifica la parentela semantica.</figcaption>
     </figure>
@@ -180,9 +180,9 @@
     <h3 class="w-h3">L'idea: Query, Key, Value</h3>
     <p>Da ogni vettore-token vengono derivate tre proiezioni tramite tre matrici apprese (\(W_Q,W_K,W_V\), ciascuna \(d_{\text{model}}\times d_k\)):</p>
     <ul>
-      <li><strong style="color:#C0392B">Query (Q)</strong> — «che cosa sto cercando?»</li>
-      <li><strong style="color:#2E7D4F">Key (K)</strong> — «che cosa offro agli altri?»</li>
-      <li><strong style="color:#2456B8">Value (V)</strong> — «che contenuto porto, se qualcuno mi sceglie?»</li>
+      <li><strong style="color:var(--rosso)">Query (Q)</strong> — «che cosa sto cercando?»</li>
+      <li><strong style="color:var(--verde)">Key (K)</strong> — «che cosa offro agli altri?»</li>
+      <li><strong style="color:var(--blu)">Value (V)</strong> — «che contenuto porto, se qualcuno mi sceglie?»</li>
     </ul>
 
     <div class="w-note w-note--demo">
@@ -198,16 +198,16 @@
       <p class="w-demo-hint">Frase: <b>"What is grav ity ?"</b>. Scegli il token-Query: le barre mostrano quanta attenzione presta a ciascun token <em>precedente</em> (maschera causale: non può guardare il futuro). Nota come <b>"ity"</b> guardi fortissimo <b>"grav"</b>.</p>
       <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
         <sc-for list="{{ attnToks }}" as="a" hint-placeholder-count="5">
-          <button onClick="{{ a.pick }}" style="font-family:'IBM Plex Mono',monospace;font-size:13px;border:1.5px solid #20242C;border-radius:20px;padding:6px 14px;cursor:pointer;background:{{ a.bg }};color:{{ a.fg }}">{{ a.tok }}</button>
+          <button onClick="{{ a.pick }}" style="font-family:'IBM Plex Mono',monospace;font-size:13px;border:1.5px solid var(--ink);border-radius:20px;padding:6px 14px;cursor:pointer;background:{{ a.bg }};color:{{ a.fg }}">{{ a.tok }}</button>
         </sc-for>
       </div>
-      <p style="margin:0 0 8px;font-size:13px;color:#6B6F7A;font-style:italic">Query = "{{ attnQtok }}" · attenzione distribuita su:</p>
+      <p style="margin:0 0 8px;font-size:13px;color:var(--ink-soft);font-style:italic">Query = "{{ attnQtok }}" · attenzione distribuita su:</p>
       <div style="display:flex;align-items:flex-end;gap:12px;height:150px">
         <sc-for list="{{ attnBars }}" as="b" hint-placeholder-count="5">
           <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;opacity:{{ b.op }}">
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6B6F7A;margin-bottom:3px">{{ b.pct }}</div>
-            <div style="width:100%;background:#2456B8;border-radius:5px 5px 0 0;transition:height .2s;height:{{ b.h }}px"></div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#20242C;margin-top:6px">{{ b.tok }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);margin-bottom:3px">{{ b.pct }}</div>
+            <div style="width:100%;background:var(--blu);border-radius:5px 5px 0 0;transition:height .2s;height:{{ b.h }}px"></div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink);margin-top:6px">{{ b.tok }}</div>
           </div>
         </sc-for>
       </div>
@@ -247,7 +247,7 @@
 
     <h3 class="w-h3">Le due fasi dell'inferenza</h3>
     <table class="w-table">
-      <tr><th style="border:1px solid #E9E5D8;padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F3F0E6"></th><th style="border:1px solid #E9E5D8;padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F3F0E6;color:#2456B8">Prefill (leggere il prompt)</th><th style="border:1px solid #E9E5D8;padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F3F0E6;color:#2E7D4F">Decode (generare)</th></tr>
+      <tr><th style="border:1px solid var(--rule);padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:var(--paper-sunken)"></th><th style="border:1px solid var(--rule);padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:var(--paper-sunken);color:var(--blu)">Prefill (leggere il prompt)</th><th style="border:1px solid var(--rule);padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:var(--paper-sunken);color:var(--verde)">Decode (generare)</th></tr>
       <tr><td><b>Cosa fa</b></td><td>Processa <em>tutti</em> i token di input in parallelo</td><td>Genera <em>un token alla volta</em>, in sequenza</td></tr>
       <tr><td><b>Collo di bottiglia</b></td><td><b>Compute-bound</b>: la GPU macina matrici enormi</td><td><b>Memory-bound</b>: la GPU <em>legge</em> pesi e cache dalla memoria</td></tr>
       <tr><td><b>Metrica</b></td><td>TTFT — time to first token</td><td>TPOT — time per output token</td></tr>
@@ -266,11 +266,11 @@
       <p class="w-demo-hint">Modello di riferimento: Llama-3-8B in FP16 → <b>128 KB di cache per token</b>. Sposta il cursore sulla lunghezza del contesto e guarda crescere la memoria: è <em>lineare</em>, ma diventa enorme.</p>
       <label class="w-label">contesto = {{ kvTokens }} token</label>
       <input type="range" min="128" max="128000" step="128" value="{{ kvTokens }}" onChange="{{ setKv }}">
-      <div style="height:26px;background:#EAF3EE;border-radius:6px;overflow:hidden;margin:12px 0 8px;border:1px solid #CDE4D6">
-        <div style="height:100%;background:repeating-linear-gradient(90deg,#2E7D4F,#2E7D4F 8px,#3E9A63 8px,#3E9A63 16px);transition:width .15s;width:{{ kvBarPct }}%"></div>
+      <div style="height:26px;background:color-mix(in srgb, var(--verde) 12%, var(--paper-raised));border-radius:6px;overflow:hidden;margin:12px 0 8px;border:1px solid color-mix(in srgb, var(--verde) 32%, var(--paper-raised))">
+        <div style="height:100%;background:repeating-linear-gradient(90deg,var(--verde),var(--verde) 8px,color-mix(in srgb, var(--verde) 72%, white) 8px,color-mix(in srgb, var(--verde) 72%, white) 16px);transition:width .15s;width:{{ kvBarPct }}%"></div>
       </div>
       <div class="w-demo-out">
-        cache KV = <span style="color:#2E7D4F;font-weight:600">{{ kvSize }}</span> · pesi modello = 16 GB · totale da leggere/token = <span style="color:#C0392B;font-weight:600">{{ kvTotal }}</span>
+        cache KV = <span style="color:var(--verde);font-weight:600">{{ kvSize }}</span> · pesi modello = 16 GB · totale da leggere/token = <span style="color:var(--rosso);font-weight:600">{{ kvTotal }}</span>
       </div>
       <p class="w-demo-foot">A ~128K token la sola cache supera i pesi del modello: ecco perché il contesto lungo è così costoso.</p>
     </div>
@@ -310,20 +310,20 @@
     <figure class="w-figure">
       <svg viewBox="0 0 700 230" role="img" aria-label="Gerarchia di memoria GPU">
         <g font-family="IBM Plex Mono" font-size="12">
-          <rect x="60" y="150" width="580" height="50" rx="8" fill="#FBE9E7" stroke="#C0392B" stroke-width="2"/>
-          <text x="350" y="172" text-anchor="middle" fill="#C0392B" font-size="14">HBM · ~80 GB · ~3 TB/s</text>
-          <text x="350" y="190" text-anchor="middle" fill="#6B6F7A">grande ma lenta (relativamente)</text>
-          <rect x="180" y="80" width="340" height="46" rx="8" fill="#E3F2E9" stroke="#2E7D4F" stroke-width="2"/>
-          <text x="350" y="100" text-anchor="middle" fill="#2E7D4F" font-size="14">SRAM · ~20 MB · ~19 TB/s</text>
-          <text x="350" y="118" text-anchor="middle" fill="#6B6F7A">minuscola ma fulminea</text>
-          <rect x="270" y="24" width="160" height="36" rx="8" fill="#E8EDF9" stroke="#2456B8" stroke-width="2"/>
-          <text x="350" y="47" text-anchor="middle" fill="#2456B8" font-size="13">Compute (Tensor Core)</text>
+          <rect x="60" y="150" width="580" height="50" rx="8" fill="color-mix(in srgb, var(--rosso) 12%, var(--paper-raised))" stroke="var(--rosso)" stroke-width="2"/>
+          <text x="350" y="172" text-anchor="middle" fill="var(--rosso)" font-size="14">HBM · ~80 GB · ~3 TB/s</text>
+          <text x="350" y="190" text-anchor="middle" fill="var(--ink-soft)">grande ma lenta (relativamente)</text>
+          <rect x="180" y="80" width="340" height="46" rx="8" fill="color-mix(in srgb, var(--verde) 12%, var(--paper-raised))" stroke="var(--verde)" stroke-width="2"/>
+          <text x="350" y="100" text-anchor="middle" fill="var(--verde)" font-size="14">SRAM · ~20 MB · ~19 TB/s</text>
+          <text x="350" y="118" text-anchor="middle" fill="var(--ink-soft)">minuscola ma fulminea</text>
+          <rect x="270" y="24" width="160" height="36" rx="8" fill="color-mix(in srgb, var(--blu) 12%, var(--paper-raised))" stroke="var(--blu)" stroke-width="2"/>
+          <text x="350" y="47" text-anchor="middle" fill="var(--blu)" font-size="13">Compute (Tensor Core)</text>
         </g>
-        <path d="M120 150 Q 100 115 150 95" stroke="#D9741E" stroke-width="2.5" fill="none" marker-end="url(#arrF)"/>
-        <defs><marker id="arrF" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#D9741E" stroke-width="1.5"/></marker></defs>
-        <text x="30" y="118" font-family="Caveat" font-size="18" fill="#D9741E">porta su un blocco…</text>
-        <path d="M560 95 Q 610 115 590 150" stroke="#D9741E" stroke-width="2.5" fill="none" marker-end="url(#arrF)"/>
-        <text x="520" y="70" font-family="Caveat" font-size="18" fill="#D9741E">…scendi col risultato</text>
+        <path d="M120 150 Q 100 115 150 95" stroke="var(--arancio)" stroke-width="2.5" fill="none" marker-end="url(#arrF)"/>
+        <defs><marker id="arrF" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="var(--arancio)" stroke-width="1.5"/></marker></defs>
+        <text x="30" y="118" font-family="Caveat" font-size="18" fill="var(--arancio)">porta su un blocco…</text>
+        <path d="M560 95 Q 610 115 590 150" stroke="var(--arancio)" stroke-width="2.5" fill="none" marker-end="url(#arrF)"/>
+        <text x="520" y="70" font-family="Caveat" font-size="18" fill="var(--arancio)">…scendi col risultato</text>
       </svg>
       <figcaption>Fig. 5 — FlashAttention "fonde" (kernel fusion) tutte le operazioni dell'attention in un unico passaggio per blocchi in SRAM.</figcaption>
     </figure>
@@ -382,7 +382,7 @@
 
     <h3 class="w-h3">Le quattro manopole</h3>
     <table class="w-table">
-      <tr><th style="border:1px solid #E9E5D8;padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F3F0E6">Strategia</th><th style="border:1px solid #E9E5D8;padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F3F0E6">Come funziona</th><th style="border:1px solid #E9E5D8;padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:#F3F0E6">Analogia</th></tr>
+      <tr><th style="border:1px solid var(--rule);padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:var(--paper-sunken)">Strategia</th><th style="border:1px solid var(--rule);padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:var(--paper-sunken)">Come funziona</th><th style="border:1px solid var(--rule);padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:var(--paper-sunken)">Analogia</th></tr>
       <tr><td><b>Greedy</b></td><td>Prendi sempre l'argmax, il token più probabile</td><td>Ordinare sempre il piatto n.1: affidabile, ma ti ripeti</td></tr>
       <tr><td><b>Top-k</b></td><td>Tieni solo i k migliori (es. 50), rinormalizza, sorteggia</td><td>Rosa di candidati: solo i primi 50 al sorteggio</td></tr>
       <tr><td><b>Top-p</b></td><td>Tieni il set minimo con probabilità cumulata &gt; p (es. 0,9)</td><td>Rosa <em>adattiva</em>: 2 se uno domina, 100 se c'è incertezza</td></tr>
@@ -397,19 +397,19 @@
       <div style="display:flex;align-items:flex-end;gap:10px;height:150px;margin:0 0 6px">
         <sc-for list="{{ tbars }}" as="b" hint-placeholder-count="6">
           <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%">
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6B6F7A;margin-bottom:3px">{{ b.pct }}</div>
-            <div style="width:100%;background:#2456B8;border-radius:5px 5px 0 0;transition:height .2s;height:{{ b.h }}px"></div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);margin-bottom:3px">{{ b.pct }}</div>
+            <div style="width:100%;background:var(--blu);border-radius:5px 5px 0 0;transition:height .2s;height:{{ b.h }}px"></div>
           </div>
         </sc-for>
       </div>
       <div style="display:flex;gap:10px;margin-bottom:14px">
         <sc-for list="{{ tbars }}" as="b" hint-placeholder-count="6">
-          <div style="flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#20242C">{{ b.label }}</div>
+          <div style="flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink)">{{ b.label }}</div>
         </sc-for>
       </div>
       <label class="w-label">temperatura T = {{ temp }}</label>
       <input type="range" min="0.05" max="2" step="0.05" value="{{ temp }}" onChange="{{ setTemp }}">
-      <p style="font-size:12.5px;color:#6B6F7A;font-style:italic;margin:6px 0 0">A T=0,05 vince quasi sempre "force". A T=2 perfino "banana" comincia a sperare.</p>
+      <p style="font-size:12.5px;color:var(--ink-soft);font-style:italic;margin:6px 0 0">A T=0,05 vince quasi sempre "force". A T=2 perfino "banana" comincia a sperare.</p>
     </div>
 
     <h3 class="w-h3">Perché non usare sempre greedy?</h3>
@@ -454,12 +454,12 @@
             <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;border-radius:6px;padding:6px 12px;border:2px solid {{ d.bd }};background:{{ d.bg }};color:{{ d.fg }}">{{ d.mark }} {{ d.tok }}</div>
           </sc-for>
         </sc-if>
-        <sc-if value="{{ noSpec }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6B6F7A;font-style:italic">— premi "round" per iniziare —</span></sc-if>
+        <sc-if value="{{ noSpec }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-soft);font-style:italic">— premi "round" per iniziare —</span></sc-if>
       </div>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <button onClick="{{ specRun }}" style="font-family:'IBM Plex Mono',monospace;font-size:13px;border:none;background:#D9741E;color:#fff;border-radius:8px;padding:9px 16px;cursor:pointer">▶ round</button>
-        <button onClick="{{ specReset }}" style="font-family:'IBM Plex Mono',monospace;font-size:13px;border:1.5px solid #20242C;background:#fff;border-radius:8px;padding:9px 12px;cursor:pointer">↺</button>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;background:#F3F0E6;border-radius:8px;padding:8px 12px;margin-left:auto">round: {{ specRounds }} · token: {{ specTokens }} · media <span style="color:#D9741E;font-weight:600">{{ specAvg }}</span>/round → ~{{ specAvg }}× più veloce</div>
+        <button onClick="{{ specRun }}" style="font-family:'IBM Plex Mono',monospace;font-size:13px;border:none;background:var(--arancio);color:var(--paper-raised);border-radius:8px;padding:9px 16px;cursor:pointer">▶ round</button>
+        <button onClick="{{ specReset }}" style="font-family:'IBM Plex Mono',monospace;font-size:13px;border:1.5px solid var(--ink);background:var(--paper-raised);border-radius:8px;padding:9px 12px;cursor:pointer">↺</button>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;background:var(--paper-sunken);border-radius:8px;padding:8px 12px;margin-left:auto">round: {{ specRounds }} · token: {{ specTokens }} · media <span style="color:var(--arancio);font-weight:600">{{ specAvg }}</span>/round → ~{{ specAvg }}× più veloce</div>
       </div>
     </div>
 
@@ -496,7 +496,7 @@
       <p>Il modello è un radiocronista, non un romanziere: commenta l'azione <em>mentre accade</em>, senza conoscere il finale della partita. Ogni parola pronunciata diventa parte del contesto che condiziona la successiva. (Curiosità: alcuni byte multi-token, come certe emoji, non sono stampabili finché non arrivano tutti i pezzi — i detokenizer di produzione bufferizzano i byte UTF-8 incompleti.)</p>
     </div>
 
-    <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:#D9741E">Bonus: la quantizzazione, ovvero far entrare l'elefante nel frigo</h3>
+    <h3 style="font-family:'Caveat',cursive;line-height:1.15;font-size:27px;margin:26px 0 8px;color:var(--arancio)">Bonus: la quantizzazione, ovvero far entrare l'elefante nel frigo</h3>
     <p>L'annotazione rossa dello schema — «INT8/INT4 riduce la memoria 2–4×» — merita un capitolo suo. I pesi nascono come numeri a 16 bit; la quantizzazione li rappresenta con interi a 8 o 4 bit più fattori di scala per gruppo:</p>
     <div class="w-formula">\[ \text{peso}\;\approx\;\text{scala}\times\text{intero quantizzato} \]<span class="w-formula-note">8B parametri: FP16 = 16 GB → INT8 = 8 GB → INT4 ≈ 4,5 GB. E siccome il decode è memory-bound (cap. 4), dimezzare i byte da leggere quasi raddoppia la velocità: due piccioni con una fava.</span></div>
 
@@ -614,7 +614,7 @@ class Component extends DCLogic {
       [0.10,0.14,0.30,0.32,0.14]
     ];
     var q=s.attnQ;
-    var attnToks=aTok.map(function(t,i){ var on=(i===q); return {tok:t, bg:(on?'#20242C':'#fff'), fg:(on?'#fff':'#20242C'), pick:(function(idx){return function(){ self.setState({attnQ:idx}); };})(i)}; });
+    var attnToks=aTok.map(function(t,i){ var on=(i===q); return {tok:t, bg:(on?'var(--ink)':'var(--paper-raised)'), fg:(on?'var(--paper-raised)':'var(--ink)'), pick:(function(idx){return function(){ self.setState({attnQ:idx}); };})(i)}; });
     var attnBars=aTok.map(function(t,i){ var w=W[q][i]; var vis=(i<=q); return {tok:t, pct:(vis?(w*100).toFixed(0)+'%':'—'), h:(vis?Math.max(2,w*130):0).toFixed(1), op:(vis?'1':'0.28')}; });
 
     // KV cache (Llama-3-8B: 128 KB/token)
@@ -631,7 +631,7 @@ class Component extends DCLogic {
     var tbars=tl.map(function(z,i){ var p=tex[i]/tsum; return {label:tlab[i], pct:(p*100).toFixed(p<0.01?2:1)+'%', h:Math.max(2,p*130).toFixed(1)}; });
     // Speculative decoding
     var sp=s.spec;
-    var specLast=(sp.last||[]).map(function(d){ return {tok:d.tok, mark:(d.ok?'✓':'✎'), bd:(d.ok?'#2E7D4F':'#6B3FA0'), bg:(d.ok?'#E3F2E9':'#F0E8F8'), fg:(d.ok?'#2E7D4F':'#6B3FA0')}; });
+    var specLast=(sp.last||[]).map(function(d){ return {tok:d.tok, mark:(d.ok?'✓':'✎'), bd:(d.ok?'var(--verde)':'var(--viola)'), bg:(d.ok?'color-mix(in srgb, var(--verde) 12%, var(--paper-raised))':'color-mix(in srgb, var(--viola) 12%, var(--paper-raised))'), fg:(d.ok?'var(--verde)':'var(--viola)')}; });
 
     return {
       tokText:s.tokText, tokens:toks, tokCount:toks.length, charCount:s.tokText.length,
