@@ -5,6 +5,9 @@ persone e modelli linguistici. Se stai per scrivere una pagina nuova, leggi
 almeno la sezione **"Aggiungere una pagina in tre passi"** e apri
 `_TEMPLATE.dc.html`.
 
+Qui si parla solo di **forma**. Per il contenuto — come si costruisce un libro
+che insegna davvero — il documento gemello è [AgentAutore.md](AgentAutore.md).
+
 ---
 
 ## In una frase
@@ -152,7 +155,8 @@ Ognuno ha la sua icona e il suo colore, automatici.
 | `w-note--paper` | fonti e riferimenti | documento |
 
 Dentro ognuno: `<span class="w-note-title">` per il titolo. **Non mettere
-emoji nel titolo**: l'icona la mette il foglio di stile.
+emoji nel titolo**: l'icona la mette il foglio di stile. Le liste dentro un
+riquadro sono già impaginate: scrivi `<ul>` o `<ol>` senza toccare i rientri.
 
 ### Demo interattive
 

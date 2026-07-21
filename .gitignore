@@ -16,3 +16,8 @@ Icon?
 *.log
 *.tmp
 Thumbs.db
+
+# === Artefatti dello strumento di authoring esterno ===
+# Anteprime rigenerate automaticamente, non referenziate da nessuna pagina.
+.thumbnail
+screenshots/

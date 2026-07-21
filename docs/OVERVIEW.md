@@ -38,9 +38,6 @@ graph TD
     M2 --script src--> SJS
     M1 --script inline--> CDN3
     M2 --script inline--> CDN3
-
-    SS["screenshots/*.png + .thumbnail"]
-    SS -.non referenziati da nessun html.-> BIB
 ```
 
 ## I file
@@ -54,13 +51,16 @@ graph TD
 | `wiki/wiki.js` | **I comportamenti condivisi**, uno per tutte le pagine: tema chiaro/scuro, indice laterale generato dalle sezioni, barra di progresso, comparse allo scroll, card della homepage, configurazione MathJax. |
 | `wiki/wiki-index.js` | **Il manifest**: elenco dichiarativo di scaffali e moduli. La Biblioteca costruisce le sue card da qui. |
 | `_TEMPLATE.dc.html` | Scheletro da copiare per ogni pagina nuova. |
-| `AgentFE.md` | Lo standard front-end: regole, classi, icone, procedura di ingestion. Riferimento per sviluppatori e LLM. |
-| `INDEX.md` | Indice della documentazione del progetto. |
+| `AGENTS.md` | Il punto d'ingresso per qualsiasi assistente o modello linguistico: la regola d'oro (leggere `docs/AgentFE.md` e `docs/AgentAutore.md` prima di toccare un `.dc.html`), il ciclo di lavoro, i divieti. In radice perché è la convenzione che gli strumenti caricano da soli. |
+| `CLAUDE.md` | Tre righe che rimandano ad `AGENTS.md`. Esiste solo perché Claude Code cerca questo nome. |
+| `INDEX.md` | Indice della documentazione del progetto: sei documenti, sei domande. |
+| `docs/AgentFE.md` | Lo standard **della forma**: regole, classi, icone, il file dei parametri, la procedura in tre passi. |
+| `docs/AgentAutore.md` | Lo standard **del contenuto**: i sette principi didattici col perché di ognuno, il procedimento dalla richiesta al libro, la checklist di verifica. |
+| `docs/decisioni/` | Le decisioni di progettazione, una per file, con i problemi che risolvevano e le alternative scartate. |
 | `support.js` | Runtime condiviso (~1840 righe, minificato/bundlato). Gestisce: parsing del tag `<x-dc>`, montaggio dei componenti React, un mini-linguaggio di espressioni/binding per il markup dichiarativo, caricamento dinamico di React/ReactDOM/Babel da CDN (con integrità SRI), gestione di import esterni (`x-import`) con trasformazione JSX via Babel in-browser. |
-| `screenshots/` + `.thumbnail` | Immagini di anteprima (modalità notte, thumbnail webp) usate presumibilmente dallo strumento di authoring esterno che ha generato il progetto — **non sono linkate da nessuno dei file `.html`**. |
 | `README.md` | Front page pubblica della repo GitHub: cos'è, come si legge, tabella dei moduli, roadmap. Rimanda a questo `OVERVIEW.md` per la mappa tecnica di dettaglio. |
 | `index.html` | Redirect (`meta refresh`) verso `Biblioteca.dc.html`. Esiste solo per dare un URL pulito su GitHub Pages: `…/ProgettoSTUDIO/` apre direttamente la Biblioteca invece di mostrare un elenco di file. |
-| `.gitignore` | Esclude dal versionamento i file di sistema e di editor (`.DS_Store`, `.vscode/`, `.idea/`, file temporanei). |
+| `.gitignore` | Esclude dal versionamento i file di sistema e di editor (`.DS_Store`, `.vscode/`, `.idea/`, file temporanei) e gli artefatti dello strumento di authoring (`.thumbnail`, `screenshots/`). |
 
 ## Come si legge
 
@@ -69,7 +69,7 @@ graph TD
 ## Meccanica tecnica comune ai tre file
 
 - **Nessuna build necessaria per l'utente finale**: ogni `.dc.html` è apribile localmente col solo browser; React/ReactDOM/Babel vengono scaricati al volo da unpkg.com al primo caricamento.
-- **Modalità notte**: pulsante fisso in basso a destra, stato salvato in `localStorage` (chiave `llm-book-night`), applicata con un filtro CSS `invert(1) hue-rotate(180deg)`.
+- **Modalità notte**: pulsante fisso in basso a destra, stato salvato in `localStorage`, applicata con l'attributo `data-theme="dark"` sull'elemento `<html>` — un vero tema a variabili CSS, non più il filtro `invert` (vedi *Correzioni*, punto 2).
 - **Rendering formule**: MathJax 3 via CDN, presente solo nei due moduli (non serve in `Biblioteca.dc.html`).
 - **Componenti interattivi**: ogni file definisce una `class Component extends DCLogic` con uno `state` React-like e un metodo `renderVals()` che calcola i valori derivati (token, barre di probabilità, dimensione della KV cache, ecc.) usati dal template dichiarativo.
 
@@ -97,7 +97,7 @@ Il progetto è ora versionato con **git** e pubblicato su GitHub.
 1. ~~**Il Modulo 02 non ha il sommario laterale fisso né la barra di avanzamento lettura che ha il Modulo 01.**~~ **Risolto.** Nessuno dei due moduli li scrive più a mano: `wiki/wiki.js` li genera leggendo le sezioni `.w-tappa` della pagina, quindi ogni pagina presente e futura li ottiene senza codice dedicato e le pagine non possono più divergere.
 2. ~~**Script della modalità notte duplicato tre volte identico.**~~ **Risolto.** Vive una sola volta in `wiki/wiki.js`. Nell'occasione è stato anche riscritto: niente più filtro `invert`, ma un vero tema scuro a variabili CSS (vedi sotto).
 3. **`support.js` dichiara "GENERATED from dc-runtime/src/*.ts — do not edit. Rebuild with `cd dc-runtime && bun run build`"**, ma la cartella `dc-runtime/` con il sorgente TypeScript e la build non è presente in questo progetto. Se in futuro serve modificare il runtime (non solo i contenuti), oggi non è ricostruibile da questa cartella: bisognerebbe recuperare il sorgente dallo strumento/repo originale.
-4. **Asset orfani**: le tre immagini in `screenshots/` e il file `.thumbnail` (WebP senza estensione) non sono referenziati da nessun file `.html` del progetto. Sembrano artefatti dello strumento di authoring esterno (anteprime generate automaticamente) più che contenuti del "libro". Al momento sono stati **mantenuti** nel repository (pesano ~136 KB in tutto): si possono rimuovere in qualunque momento se il progetto va inteso come pacchetto autonomo da distribuire.
+4. ~~**Asset orfani**: le tre immagini in `screenshots/` e il file `.thumbnail` (WebP senza estensione) non sono referenziati da nessun file `.html` del progetto.~~ **Risolto.** Erano artefatti dello strumento di authoring esterno, ~136 KB mai usati: rimossi dal repository e aggiunti a `.gitignore` perché non rientrino. Restano nella storia git, recuperabili con `git show ae88f68:.thumbnail`.
 5. ~~**Piccola incoerenza cosmetica nella freccia di navigazione**~~ **Risolto** con la classe `w-nav-next`, che disegna la freccia da sola.
 
    (testo originale) **Piccola incoerenza cosmetica nella freccia di navigazione**: nel Modulo 02, il link verso il Modulo 01 è etichettato "Modulo 01: come genera testo →" con freccia verso destra, pur essendo di fatto un "torna indietro" nell'ordine di lettura consigliato (01 → 02). Nel Modulo 01 la freccia verso il Modulo 02 è invece coerente (in avanti). Dettaglio minore, ma vale un controllo se si cura la coerenza dell'esperienza.

@@ -17,10 +17,22 @@
     5. Non copiare script da altre pagine. Tutto ciò che serve è nel
        connettore.
 
+  Prima di scrivere, leggi AGENTS.md nella radice del progetto.
+
   Quando la pagina è pronta, aggiungi una voce in wiki/wiki-index.js:
   senza quella, la pagina esiste ma non compare nella Biblioteca.
 
-  Elenco completo delle classi e delle icone: AgentFE.md
+  COME SI SCRIVE (il metodo per esteso sta in docs/AgentAutore.md):
+    · Parti dal noto: ogni tappa si aggancia a qualcosa che il lettore ha già.
+    · Analogia prima, formula dopo.
+    · Poche frasi a effetto: colpiscono per contrasto, non per densità.
+    · Nessun dato non verificato. Cerca le fonti prima di scrivere.
+    · Dalla seconda tappa in poi, riapri un concetto già visto e approfondiscilo.
+    · Colori e riquadri seguono il significato, mai l'estetica.
+    · Chiudi con qualcosa da fare, non con un riassunto.
+
+  Elenco completo delle classi e delle icone: docs/AgentFE.md
+  Il metodo di scrittura e la checklist di verifica: docs/AgentAutore.md
   ===========================================================================
 -->
 <html>
@@ -87,12 +99,18 @@
       <!-- Il numero "Tappa 01 ·" lo mette il CSS: qui va solo il sottotitolo. -->
       <div class="w-tappa-kicker">[Sottotitolo tecnico della tappa]</div>
       <h2 class="w-tappa-title">[Titolo della tappa]</h2>
+      <!-- Dalla tappa 02 in poi, questa frase è il posto naturale per riaprire
+           un concetto già visto: "Adesso che hai i vettori, …". -->
       <p class="w-tappa-lead">[Una frase che spiega perché questa tappa esiste.]</p>
 
       <h3 class="w-h3">L'idea</h3>
+      <!-- Parti dal noto: aggancia, poi introduci. Mai aprire con la definizione. -->
       <p class="w-drop">[Paragrafo di apertura. La prima lettera diventa un capolettera scritto a mano.]</p>
 
-      <!-- Analogia o spiegazione per immagini -->
+      <!-- Analogia o spiegazione per immagini.
+           Viene PRIMA della formula e della demo: l'immagine crea l'intuizione,
+           la definizione la rende precisa. Una sola per concetto, e portata
+           fino in fondo. Se ha un limite, dichiaralo. -->
       <div class="w-note w-note--demo">
         <span class="w-note-title">Analogia: [nome dell'analogia]</span>
         <p>[L'idea difficile raccontata con qualcosa di familiare.]</p>
@@ -127,17 +145,21 @@
         <p class="w-demo-foot">[La cosa da notare nel risultato.]</p>
       </div>
 
-      <!-- Approfondimento per chi ne sa già -->
+      <!-- Approfondimento per chi ne sa già.
+           È un premio per chi legge fino in fondo: funziona finché resta raro.
+           Se ce ne sono due o tre per tappa, il libro ha cambiato pubblico. -->
       <div class="w-note w-note--expert">
         <span class="w-note-title">Livello esperto</span>
         <p>[I dettagli che interessano a chi lavora nel campo.]</p>
       </div>
 
-      <!-- Fonti -->
+      <!-- Fonti. Autore, titolo, anno, riferimento verificabile.
+           Regola senza eccezioni: ciò che non hai verificato non si scrive come
+           dato. Si riscrive al ribasso ("sensibilmente più veloce") o si toglie. -->
       <div class="w-note w-note--paper">
-        <span class="w-note-title">Le fonti</span>
+        <span class="w-note-title">I paper che lo dimostrano</span>
         <ul>
-          <li>[Autore], <em>[Titolo]</em> — <span class="w-ref">[riferimento]</span></li>
+          <li>[Autore], <em>[Titolo]</em> ([anno]) — <span class="w-ref">[riferimento]</span></li>
         </ul>
       </div>
 
@@ -153,11 +175,24 @@
     </section>
 
 
-    <!-- ===== EPILOGO — non viene numerato ===== -->
+    <!-- ===== EPILOGO — non viene numerato =====
+         Si chiude con un'azione, non con un riassunto. La sintesi ci sta, ma è
+         il penultimo gesto: l'ultimo è dare al lettore qualcosa da fare. -->
     <section class="w-tappa w-tappa--fine" id="fine">
       <div class="w-tappa-kicker">Tutto insieme</div>
       <h2 class="w-tappa-title">[Titolo della sintesi]</h2>
       <p class="w-tappa-lead">[Il filo che lega tutte le tappe.]</p>
+
+      <!-- L'azione: esercizi concreti e crescenti, dal più semplice al più
+           impegnativo. Vedi "la palestra" in Dentro-la-Macchina.dc.html. -->
+      <div class="w-note w-note--memory">
+        <span class="w-note-title">Dal livello medio all'esperto assoluto: la palestra</span>
+        <ol>
+          <li>[La cosa più semplice da provare subito, con le mani.]</li>
+          <li>[L'esercizio che costringe a costruire qualcosa.]</li>
+          <li>[Le letture, in un ordine preciso e motivato.]</li>
+        </ol>
+      </div>
 
       <div class="w-note w-note--bridge">
         <span class="w-note-title">Il ponte con [altro modulo]</span>

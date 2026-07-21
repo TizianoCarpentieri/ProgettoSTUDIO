@@ -406,6 +406,9 @@ html.w-anim .w-mark { animation: w-draw .9s var(--ease) .1s; }
   display: block; margin-bottom: 4px; color: var(--accent);
 }
 .w-note > :last-child { margin-bottom: 0; }
+/* Liste dentro un riquadro: rientro contenuto, così non serve nessuno style inline. */
+.w-note ul, .w-note ol { margin: 0; padding-left: 20px; }
+.w-note li { margin-bottom: 4px; }
 
 .w-note--info   { --accent: var(--blu); }
 .w-note--info::before   { -webkit-mask-image: var(--ico-orient);  mask-image: var(--ico-orient); }
@@ -425,8 +428,6 @@ html.w-anim .w-mark { animation: w-draw .9s var(--ease) .1s; }
 .w-note--expert::before { -webkit-mask-image: var(--ico-expert);  mask-image: var(--ico-expert); }
 .w-note--paper  { --accent: var(--ink-soft); background: var(--paper); font-size: 14.5px; }
 .w-note--paper::before  { -webkit-mask-image: var(--ico-paper);   mask-image: var(--ico-paper); }
-.w-note--paper ul { margin: 0; padding-left: 18px; }
-.w-note--paper li { margin-bottom: 4px; }
 .w-ref { font-family: var(--font-mono); font-size: 12px; color: var(--rosso); }
 
 /* --- Formula in evidenza ---------------------------------------------------- */

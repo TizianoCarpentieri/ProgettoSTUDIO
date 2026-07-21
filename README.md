@@ -35,7 +35,7 @@ connessione a internet.
 - **Nessuna build** necessaria per leggere: tutto gira nel browser.
 
 Per la mappa tecnica dettagliata — struttura, connessioni fra i file, note e
-migliorie previste — vedi **[OVERVIEW.md](OVERVIEW.md)**.
+migliorie previste — vedi **[OVERVIEW.md](docs/OVERVIEW.md)**.
 
 ## Roadmap
 
