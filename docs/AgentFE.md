@@ -56,11 +56,25 @@ tocca: copertina → cosa impari → sommario → tappe `#c1 … #cN` → epilog
   icona: "memory",
   accento: "verde",
   stato: "pronto",
-  tag: ["6 tappe", "4 demo interattive"]
+  tag: ["6 tappe", "4 demo interattive"],
+
+  // Campi del grafo: è ciò che accende la pagina nel cervello 3D.
+  nodo: "sub-1710",                       // dove si aggancia nello scheletro
+  concetti: [                             // uno per tappa, id "mNN-slug"
+    { id: "m03-retriever", label: "Il recupero" },
+    { id: "m03-agente",    label: "L'agente" }
+  ],
+  collegamenti: [                         // i "ponti" resi dati
+    { da: "m03-retriever", a: "m01-embedding", tipo: "approfondisce" }
+  ]
 }
 ```
 
-Senza il passo 3 la pagina esiste ma non compare nella Biblioteca.
+Senza il passo 3 la pagina esiste ma non compare nella Biblioteca. Senza i
+campi del grafo (`nodo`, `concetti`, `collegamenti`) compare come card ma resta
+**spenta** nel cervello 3D. La procedura completa — dove agganciare e quanto
+lunga fare la pagina — è in **[INGEST.md](INGEST.md)** (o la skill
+`/biblioteca-ingest`).
 
 Per **una materia nuova** (non un modulo, uno scaffale intero) aggiungi un
 blocco al livello superiore dello stesso file:
@@ -257,8 +271,12 @@ Se non stampa nulla, i binding sono a posto.
 
 | File | Contenuto |
 |---|---|
-| `wiki/wiki.css` | parametri, tema chiaro e scuro, icone, tutte le classi |
+| `wiki/wiki.css` | parametri, tema chiaro e scuro, icone, tutte le classi (incl. il cervello 3D) |
 | `wiki/wiki.js` | tema, indice, barra di progresso, animazioni, card, MathJax |
-| `wiki/wiki-index.js` | l'elenco di scaffali e moduli della biblioteca |
+| `wiki/wiki-index.js` | scaffali e moduli + i loro dati di grafo (`nodo`, `concetti`, `collegamenti`) |
+| `wiki/graph/skeleton.js` | lo scheletro del sapere: 282 nodi da OpenAlex (una delle due fonti del grafo) |
+| `wiki/graph/graph-model.js` | fonde scheletro e moduli nel grafo del cervello (logica pura, testabile) |
+| `wiki/graph/explorer.js` | il cervello 3D della homepage (3d-force-graph via CDN) |
+| `wiki/graph/valida.js` | controllo di coerenza del grafo: `node wiki/graph/valida.js` |
 | `_TEMPLATE.dc.html` | lo scheletro da copiare |
 | `support.js` | runtime `dc-runtime` (generato altrove, **non modificare**) |

@@ -568,3 +568,70 @@ html.w-anim .w-reveal.is-in { opacity: 1; transform: none; }
   html { scroll-behavior: auto; }
   .w-reveal { opacity: 1 !important; transform: none !important; }
 }
+
+
+/* ==========================================================================
+   7. CERVELLO 3D  (solo la homepage)
+   --------------------------------------------------------------------------
+   Il contenitore parte NASCOSTO: lo mostra wiki/graph/explorer.js solo se il
+   3D può partire (aggiunge .is-live). Così, senza WebGL o senza la libreria,
+   non resta un rettangolo nero: valgono le card della Biblioteca. Il fondo è
+   volutamente profondo in entrambi i temi, perché i nodi possano brillare.
+   ========================================================================== */
+
+.w-brain { display: none; position: relative; width: 100%; height: 92vh; min-height: 560px; overflow: hidden;
+  background:
+    radial-gradient(1200px 720px at 60% 40%, rgba(60, 84, 165, .30) 0%, rgba(60, 84, 165, 0) 60%),
+    radial-gradient(900px 620px at 28% 72%, rgba(120, 62, 150, .20) 0%, rgba(120, 62, 150, 0) 55%),
+    radial-gradient(150% 130% at 50% 28%, #10162a 0%, #0a0c15 55%, #06070e 100%); }
+.w-brain.is-live { display: block; }
+.w-brain canvas { display: block; outline: none; }
+
+/* Sovrapposizione: trasparente ai clic, così il canvas riceve trascinamenti;
+   solo i riquadri di testo catturano il puntatore. */
+.w-brain-ui { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.w-brain-ui > * { pointer-events: auto; }
+
+.w-brain-head { position: absolute; top: 22px; left: 24px; max-width: 460px; }
+.w-brain-kicker { font-family: var(--font-mono); font-size: 12px; letter-spacing: .25em; text-transform: uppercase; color: #8FA6D8; }
+.w-brain-title { font-family: var(--font-mano); font-weight: 700; font-size: clamp(34px, 5vw, 54px); line-height: 1; margin: 6px 0 8px; color: #FFFFFF; }
+.w-brain-title span { color: #7EA6F0; }
+.w-brain-hint { font-family: var(--font-testo); font-size: 14px; line-height: 1.5; color: #B9C0D4; max-width: 420px; margin: 0; }
+
+.w-brain-panel { position: absolute; left: 24px; bottom: 24px; width: min(340px, 74vw);
+  background: rgba(16, 19, 28, .86); backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
+  border: 1px solid rgba(126, 166, 240, .32); border-radius: 14px; padding: 15px 18px; box-shadow: 0 8px 30px rgba(0,0,0,.4); }
+.w-brain-path { font-family: var(--font-mono); font-size: 11px; letter-spacing: .04em; color: #8592AD; margin-bottom: 4px; }
+.w-brain-name { font-family: var(--font-mano); font-weight: 700; font-size: 27px; line-height: 1.05; color: #FFFFFF; }
+.w-brain-kind { font-family: var(--font-mono); font-size: 11px; color: #9FB0D6; margin-top: 2px; }
+.w-brain-open { display: inline-block; margin-top: 12px; font-family: var(--font-mono); font-size: 13px;
+  color: #0b0d12; background: #7EA6F0; padding: 8px 15px; border-radius: var(--radius-pill); border: none; }
+.w-brain-open:hover { color: #0b0d12; background: #A9C4F5; }
+.w-brain-more { margin-top: 9px; font-size: 12.5px; color: #9FB0D6; font-style: italic; }
+
+.w-brain-reset { position: absolute; top: 22px; right: 22px; font-family: var(--font-mono); font-size: 12px;
+  color: #EDECF5; background: rgba(16, 19, 28, .72); border: 1px solid rgba(150, 160, 180, .3);
+  border-radius: var(--radius-pill); padding: 7px 14px; cursor: pointer; transition: border-color var(--dur-fast); }
+.w-brain-reset:hover { border-color: #7EA6F0; }
+
+/* Etichetta al passaggio del mouse (3d-force-graph inietta questo HTML). */
+.w-brain-tip { font-family: var(--font-testo); font-size: 13px; color: #1c1f27; }
+.w-brain-tip b { font-family: var(--font-mano); font-size: 18px; }
+.w-brain-tip span { font-family: var(--font-mono); font-size: 11px; color: #5a6070; }
+
+/* Etichette proiettate sui nodi (posizionate da explorer.js via graph2ScreenCoords). */
+.w-brain-labels { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.w-brain-label { position: absolute; left: 0; top: 0; white-space: nowrap; opacity: 0; will-change: transform, opacity;
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .02em; color: #98a2bb;
+  text-shadow: 0 1px 4px rgba(0,0,0,.95), 0 0 3px rgba(0,0,0,.9); transition: opacity .25s; }
+.w-brain-label.is-dom { font-family: var(--font-mano); font-weight: 700; font-size: 24px; color: #FFFFFF;
+  letter-spacing: .01em; text-shadow: 0 2px 12px rgba(0,0,0,.95); }
+.w-brain-label.is-on  { color: #dbe2f2; font-size: 11px; }
+.w-brain-label.is-lit { font-family: var(--font-testo); font-weight: 700; font-size: 13.5px;
+  text-shadow: 0 1px 5px rgba(0,0,0,.98), 0 0 8px currentColor; }
+
+@media (max-width: 720px) {
+  .w-brain { height: 74vh; }
+  .w-brain-hint { display: none; }
+  .w-brain-head { max-width: 60vw; }
+}

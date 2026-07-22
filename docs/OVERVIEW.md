@@ -49,7 +49,13 @@ graph TD
 | `Fondamenti-Matematici-LLM.dc.html` | **Modulo 02**: le basi matematiche dietro il Modulo 01 — vettori, matrici, embedding come geometria, softmax, derivate/gradienti, la formula dell'attention `softmax(QKᵀ/√d)V`, e una sintesi finale. 7 tappe, con formule LaTeX vere via MathJax. |
 | `wiki/wiki.css` | **Il design system.** Blocco parametri (colori, caratteri, spaziature, icone), tema chiaro e scuro, set di icone SVG incorporate, tutte le classi `w-` usate dalle pagine. È il file da cui si cambia l'aspetto dell'intera wiki. |
 | `wiki/wiki.js` | **I comportamenti condivisi**, uno per tutte le pagine: tema chiaro/scuro, indice laterale generato dalle sezioni, barra di progresso, comparse allo scroll, card della homepage, configurazione MathJax. |
-| `wiki/wiki-index.js` | **Il manifest**: elenco dichiarativo di scaffali e moduli. La Biblioteca costruisce le sue card da qui. |
+| `wiki/wiki-index.js` | **Il manifest** e una delle due fonti del grafo: scaffali e moduli, ciascuno con i campi di grafo `nodo` / `concetti` / `collegamenti`. La Biblioteca costruisce le card da qui, e il cervello 3D vi legge cosa è "acceso". |
+| `wiki/graph/skeleton.js` | **Lo scheletro del sapere**: 282 nodi (4 domini → 26 campi → 252 sottocampi) derivati dalla gerarchia Topics di OpenAlex (CC0). È lo strato "sempre visibile ma per lo più spento" del cervello. |
+| `wiki/graph/graph-model.js` | Fonde scheletro e moduli in `{ nodes, links }`. Logica pura (niente three.js, niente DOM): gira nel browser **e** in Node per la validazione. |
+| `wiki/graph/explorer.js` | **Il cervello 3D** della homepage: grafo navigabile su `3d-force-graph` (via CDN). Si espande ramo per ramo, i nodi accesi aprono la pagina. Potenziamento progressivo: senza WebGL restano le card. |
+| `wiki/graph/valida.js` | Controllo di coerenza del grafo da riga di comando: `node wiki/graph/valida.js`. |
+| `INGEST.md` | La pipeline in sei passi per creare una pagina nuova, dall'idea/fonti fino all'aggancio al grafo. |
+| `.claude/skills/biblioteca-ingest/` | La skill di Claude Code che esegue la pipeline di `INGEST.md`. |
 | `_TEMPLATE.dc.html` | Scheletro da copiare per ogni pagina nuova. |
 | `AGENTS.md` | Il punto d'ingresso per qualsiasi assistente o modello linguistico: la regola d'oro (leggere `docs/AgentFE.md` e `docs/AgentAutore.md` prima di toccare un `.dc.html`), il ciclo di lavoro, i divieti. In radice perché è la convenzione che gli strumenti caricano da soli. |
 | `CLAUDE.md` | Tre righe che rimandano ad `AGENTS.md`. Esiste solo perché Claude Code cerca questo nome. |
@@ -69,9 +75,41 @@ graph TD
 ## Meccanica tecnica comune ai tre file
 
 - **Nessuna build necessaria per l'utente finale**: ogni `.dc.html` è apribile localmente col solo browser; React/ReactDOM/Babel vengono scaricati al volo da unpkg.com al primo caricamento.
-- **Modalità notte**: pulsante fisso in basso a destra, stato salvato in `localStorage`, applicata con l'attributo `data-theme="dark"` sull'elemento `<html>` — un vero tema a variabili CSS, non più il filtro `invert` (vedi *Correzioni*, punto 2).
+- **Tema chiaro/scuro**: pulsante fisso in basso a destra, stato in `localStorage` (chiave `wiki-theme`), applicato con l'attributo `data-theme` sull'`<html>` e i token CSS di `wiki/wiki.css` — **nessun filtro `invert`** (vedi correzione 2). La prima visita segue la preferenza di sistema e si sincronizza fra le schede.
 - **Rendering formule**: MathJax 3 via CDN, presente solo nei due moduli (non serve in `Biblioteca.dc.html`).
 - **Componenti interattivi**: ogni file definisce una `class Component extends DCLogic` con uno `state` React-like e un metodo `renderVals()` che calcola i valori derivati (token, barre di probabilità, dimensione della KV cache, ecc.) usati dal template dichiarativo.
+
+## Il grafo del sapere e il cervello 3D
+
+La homepage non è più solo un elenco di card: è un **cervello** — un grafo 3D di
+tutto il sapere, in cui i rami che abbiamo scritto sono illuminati e gli altri
+restano visibili ma spenti, pronti a riempirsi.
+
+Il grafo ha **due sole fonti di verità**, entrambe caricate via `<script>` (mai
+`fetch`, che si romperebbe aprendo da `file://`):
+
+1. **Lo scheletro** (`wiki/graph/skeleton.js`) — la mappa universale del sapere,
+   derivata da OpenAlex: dominio → campo → sottocampo. Statica, quasi tutta
+   spenta.
+2. **Ciò che abbiamo scritto** (`wiki/wiki-index.js`) — ogni modulo dichiara a
+   quale nodo si **aggancia** (`nodo`), i suoi concetti interni (`concetti`,
+   uno per tappa) e i **collegamenti** verso altri moduli (i "ponti" resi dati).
+
+`wiki/graph/graph-model.js` le fonde in un unico grafo con gerarchia
+**dominio → campo → sottocampo → modulo → concetto**, marca ogni nodo acceso o
+spento (l'accensione risale dai moduli fino al dominio) e assegna il colore per
+dominio. `wiki/graph/explorer.js` lo disegna in 3D con `3d-force-graph`.
+
+**Integrazione col runtime.** Il canvas del cervello sta in un `<div>` fratello
+di `<x-dc>`, non dentro: il runtime `dc` sostituisce **solo** `<x-dc>`
+(`support.js:168`, `dc.replaceWith(hostEl)`), quindi il `<div>` sopravvive e
+React non lo tocca. È un **potenziamento progressivo**: senza WebGL, senza la
+libreria (offline) o con `prefers-reduced-motion`, il cervello non parte e
+restano le card della Biblioteca — un'animazione non può mai nascondere
+contenuto.
+
+Per aggiungere una pagina e agganciarla al grafo: **[INGEST.md](INGEST.md)**.
+Per controllarne la coerenza: `node wiki/graph/valida.js`.
 
 ## Pubblicazione su GitHub e versionamento
 

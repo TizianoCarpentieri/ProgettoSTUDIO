@@ -30,8 +30,16 @@ connessione a internet.
 ## Come è fatto (in breve)
 
 - I file `.dc.html` non sono HTML standard: usano un runtime proprietario
-  **dc-runtime**, compilato in `support.js` (l'unico file JavaScript del progetto).
-- **Modalità notte** integrata (pulsante fisso in basso a destra; stato salvato in `localStorage`).
+  **dc-runtime**, compilato in `support.js`.
+- **Un design system condiviso** (`wiki/`): tutte le pagine hanno lo stesso
+  vestito, cambiabile da un solo file. Tema chiaro/scuro a token (pulsante in
+  basso a destra), indice laterale e barra di avanzamento generati da soli.
+- **Un cervello 3D** nella homepage: un grafo di tutto il sapere in cui i temi
+  scritti sono illuminati e gli altri restano visibili ma spenti. Si esplora
+  ramo per ramo; dove c'è contenuto, apre la pagina. Se manca WebGL, restano le
+  card — niente si perde.
+- **Una pipeline** per creare pagine nuove (`INGEST.md`): dall'idea o dalle
+  fonti fino alla pagina conforme e agganciata al grafo.
 - **Nessuna build** necessaria per leggere: tutto gira nel browser.
 
 Per la mappa tecnica dettagliata — struttura, connessioni fra i file, note e
@@ -39,9 +47,11 @@ migliorie previste — vedi **[OVERVIEW.md](docs/OVERVIEW.md)**.
 
 ## Roadmap
 
-- [ ] **Modulo 03** — fine-tuning, RAG, agenti, valutazione.
-- [ ] Allineare il layout del Modulo 02 al Modulo 01 (indice laterale fisso + barra di avanzamento lettura).
-- [ ] Spostare lo script "modalità notte" dentro `support.js` (oggi duplicato nei tre file HTML).
+- [x] Design system condiviso: tema a token, indice laterale e barra di lettura generati.
+- [x] Grafo del sapere + cervello 3D nella home + pipeline di ingest (`INGEST.md`).
+- [ ] **Modulo 03** — fine-tuning, RAG, agenti, valutazione (primo banco di prova della pipeline).
+- [ ] Tradurre in italiano i sottocampi dello scheletro man mano che si accendono.
+- [ ] Etichette sempre visibili sui nodi del cervello (oggi compaiono al passaggio del mouse).
 
 ---
 

@@ -11,10 +11,27 @@
 <link rel="stylesheet" href="./wiki/wiki.css">
 <script src="./support.js"></script>
 <script src="./wiki/wiki-index.js"></script>
+
+<!-- ===== IL CERVELLO 3D — solo la homepage. Le due fonti del grafo si
+     caricano via <script> (sicure anche da file://); la libreria 3D è un
+     potenziamento: se non c'è, restano le card qui sotto. ===== -->
+<script src="./wiki/graph/skeleton.js"></script>
+<script src="./wiki/graph/graph-model.js"></script>
+<script defer src="https://unpkg.com/3d-force-graph@1"></script>
+<script defer src="./wiki/graph/explorer.js"></script>
+
 <script defer src="./wiki/wiki.js"></script>
 <!-- ======================================================================== -->
 </head>
 <body>
+
+<!-- Il cervello del sapere. Fratello di <x-dc>, NON dentro: il runtime dc
+     sostituisce solo <x-dc> (support.js:168), quindi questo <div> sopravvive e
+     React non lo tocca. Vuoto: lo popola wiki/graph/explorer.js. Se il 3D non
+     parte, resta nascosto e valgono le card della Biblioteca qui sotto. -->
+<div id="wiki-brain" class="w-brain" role="img"
+     aria-label="Il cervello del sapere: grafo 3D interattivo degli argomenti della biblioteca"></div>
+
 <x-dc>
 <div class="w-page">
 
@@ -30,7 +47,7 @@
 
   <div class="w-note w-note--info" style="margin-top:56px">
     <span class="w-note-title">Come è pensata questa biblioteca</span>
-    <p>Ogni modulo è un file autonomo nello stesso stile: si legge da solo ma rimanda agli altri. Così la base cresce senza diventare un unico blocco ingestibile — si aggiungono scaffali e libri, non capitoli infiniti. Consigliato leggere il <a href="Dentro-la-Macchina.dc.html">Modulo 01</a> per la visione d'insieme, poi il <a href="Fondamenti-Matematici-LLM.dc.html">Modulo 02</a> per le fondamenta matematiche.</p>
+    <p>In cima trovi la stessa biblioteca come <strong>cervello 3D</strong>: un grafo di tutto il sapere in cui i temi già scritti sono accesi e gli altri restano visibili ma spenti, pronti a riempirsi. Qui sotto, gli stessi moduli come card. Ogni modulo è un file autonomo nello stesso stile: si legge da solo ma rimanda agli altri. Così la base cresce senza diventare un unico blocco ingestibile — si aggiungono scaffali e libri, non capitoli infiniti. Consigliato leggere il <a href="Dentro-la-Macchina.dc.html">Modulo 01</a> per la visione d'insieme, poi il <a href="Fondamenti-Matematici-LLM.dc.html">Modulo 02</a> per le fondamenta matematiche.</p>
   </div>
 
   <footer class="w-footer">
