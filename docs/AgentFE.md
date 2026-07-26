@@ -80,8 +80,20 @@ Per **una materia nuova** (non un modulo, uno scaffale intero) aggiungi un
 blocco al livello superiore dello stesso file:
 
 ```js
-{ scaffale: "Statistica", moduli: [ … ] }
+{
+  scaffale: "Statistica",
+  descrizione: "Facoltativa: di che parla lo scaffale e in che ordine si legge.",
+  moduli: [ … ]
+}
 ```
+
+### Il cervello 3D non è la porta d'ingresso
+
+Nella homepage l'indice (scaffali e card) viene **prima**; il grafo 3D sta in
+fondo, dentro `.w-brainwrap`, incorniciato, e si accende quando entra in vista.
+Qualunque visualizzazione futura segue la stessa regola: si aggiunge in fondo,
+non in cima. Il perché è in
+[decisioni/2026-07-26-cervello-secondario-design.md](decisioni/2026-07-26-cervello-secondario-design.md).
 
 ---
 
@@ -177,6 +189,28 @@ riquadro sono già impaginate: scrivi `<ul>` o `<ol>` senza toccare i rientri.
 `w-demo`, `w-demo-title`, `w-demo-hint`, `w-demo-out`, `w-demo-foot`,
 `w-label`, `w-btn`. I valori dinamici usano i binding `{{ }}` collegati alla
 classe `Component` in fondo al file.
+
+### Codice
+
+| Classe | Uso |
+|---|---|
+| `code` | codice **dentro** una frase — non serve nessuna classe |
+| `w-codice` | listato su più righe: si scrive su `<pre>`, mai a capo automatico |
+| `w-codice-nota` | la riga in corsivo che commenta il listato, subito sotto |
+| `w-com` | un commento dentro il listato |
+| `w-ev` | la riga (o il pezzo) del listato da guardare |
+
+La lingua del listato si dichiara con `data-lang` e la scrive il foglio di
+stile: `<pre class="w-codice" data-lang="scheme">`. Non aggiungere markup per
+l'etichetta.
+
+### Mattoncini per le demo
+
+Servono a non scrivere `style="..."` dentro una demo: `w-row` (una riga di
+elementi) · `w-cell` + `is-on` `is-off` `is-ok` `is-ko` (celle di memoria,
+token, valori) · `w-stack` + `w-frame` + `is-top` `is-done` (una pila che
+cresce verso l'alto) · `w-prog` + `w-riga` + `is-now` (un programma di cui si
+illumina la riga corrente).
 
 ### Altro
 
