@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Il Primo Soffio — l'autoreferenzialità, lo stato, il tempo</title>
+
+<!-- ===== CONNETTORE DELLA WIKI - righe fisse, non modificarle ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./wiki/wiki.css">
+<script src="./support.js"></script>
+<script defer src="./wiki/wiki.js"></script>
+<!-- =============================================================== -->
+</head>
+<body>
+<x-dc>
+
+<div class="w-page--toc">
+
+  <aside class="w-toc"
+         data-titolo="Libro 01 · Indice"
+         data-pie='<a href="Biblioteca.dc.html">Biblioteca</a><a href="La-Cristallizzazione.dc.html">Libro 02: le funzioni</a>'></aside>
+
+  <main class="w-main">
+
+    <!-- ===== BRICIOLE DI PANE ===== -->
+    <nav class="w-nav">
+      <a class="w-nav-home" href="Biblioteca.dc.html">← BIBLIOTECA</a>
+      <span class="w-nav-sep">/</span>
+      <span class="w-nav-here">Libro 01 · Il primo soffio</span>
+      <a class="w-nav-next" href="La-Cristallizzazione.dc.html">Libro 02: le funzioni →</a>
+    </nav>
+
+    <!-- ===== COPERTINA ===== -->
+    <header class="w-hero a-arancio">
+      <div class="w-hero-kicker">Il pensiero computazionale · libro 1 di 6</div>
+      <h1 class="w-hero-title">Il primo <span class="w-mark">soffio</span> di vita</h1>
+      <p class="w-hero-sub">Come tre caratteri — <code>x = x + 1</code> — spezzano la matematica e ci mettono dentro il tempo. Lo stato, il salto condizionale, il ciclo: le poche righe da cui nasce ogni movimento che una macchina abbia mai fatto.</p>
+      <div class="w-hero-sign">— il tuo maestro di bottega, quaderno alla mano</div>
+    </header>
+
+    <!-- ===== COSA SI IMPARA QUI ===== -->
+    <div class="w-note w-note--info">
+      <span class="w-note-title">Cosa impari in questa pagina</span>
+      <p>Alla fine saprai dire con precisione perché <code>x = x + 1</code> non è un'equazione; saprai leggere un ciclo dicendo ad alta voce che cosa resta vero a ogni giro; saprai riconoscere a colpo d'occhio le tre cause per cui un ciclo non finisce; e saprai spiegare perché due nomi che indicano la stessa cosa sono l'origine della metà dei bug della tua vita.</p>
+    </div>
+
+    <div class="w-note w-note--demo">
+      <span class="w-note-title">Il filo di tutta la serie</span>
+      <p>Sei libri, un solo movimento: si parte da una variabile che si modifica da sola e si arriva a un programma che riscrive se stesso, per poi scendere sotto la staccionata dell'astrazione e guardare la memoria in faccia. Ogni libro riapre qualcosa del precedente. Questo è il primo: qui nasce il <strong>tempo</strong>.</p>
+    </div>
+
+    <!-- ===== SOMMARIO ===== -->
+    <h2 class="w-h2">Il viaggio in sei tappe</h2>
+    <ol class="w-summary">
+      <li><a href="#c1"><span class="w-summary-n">01</span><span>L'equazione che nessun matematico firmerebbe</span><span class="w-summary-tag">assegnazione</span></a></li>
+      <li><a href="#c2"><span class="w-summary-n">02</span><span>La cella, il nome e l'istante</span><span class="w-summary-tag">stato, memoria</span></a></li>
+      <li><a href="#c3"><span class="w-summary-n">03</span><span>Il salto: il momento in cui il programma sceglie</span><span class="w-summary-tag">if, goto, PC</span></a></li>
+      <li><a href="#c4"><span class="w-summary-n">04</span><span>Il ciclo: ritmo dal nulla</span><span class="w-summary-tag">while, invariante</span></a></li>
+      <li><a href="#c5"><span class="w-summary-n">05</span><span>Il ciclo che non finisce mai</span><span class="w-summary-tag">terminazione</span></a></li>
+      <li><a href="#c6"><span class="w-summary-n">06</span><span>Lo stato: la casa e il nemico</span><span class="w-summary-tag">alias, mutazione</span></a></li>
+    </ol>
+
+
+    <!-- ======================= TAPPA 01 ======================= -->
+    <section class="w-tappa" id="c1">
+
+      <div class="w-tappa-kicker">Assegnazione, non uguaglianza</div>
+      <h2 class="w-tappa-title">L'equazione che nessun matematico firmerebbe</h2>
+      <p class="w-tappa-lead">Hai passato tredici anni di scuola a imparare che il segno di uguale è una bilancia in equilibrio. Il tuo primo giorno di programmazione qualcuno ti chiede di scrivere una bilancia falsa — e di crederci.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Prendi la riga più innocua del mondo: <code>x = x + 1</code>. In matematica, sottrai <em>x</em> da entrambi i lati e ottieni <code>0 = 1</code>. È una contraddizione: quella riga, come equazione, non ha soluzioni. Non è "difficile", non è "strana": è <strong>falsa</strong>, in ogni universo in cui il segno di uguale significhi ciò che ti hanno insegnato. Eppure quella riga è la più eseguita nella storia del calcolo.</p>
+
+      <p>La soluzione dell'enigma è che il segno di uguale, lì, non è una bilancia: è una <strong>freccia</strong>. Non afferma niente, <em>ordina</em> qualcosa. Si legge da destra a sinistra e in due tempi: <em>prendi il valore che sta in x adesso, sommagli 1, e rimetti il risultato dentro x</em>. Il nome <code>x</code> a destra e il nome <code>x</code> a sinistra sono due cose diverse — a destra c'è il contenuto, a sinistra c'è il contenitore.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: il conto in banca</span>
+        <p>Il tuo saldo è 100 €. Ti accreditano 50. Nessuno dice mai <em>«100 uguale 150»</em>: si dice <em>«il saldo <strong>diventa</strong> 150»</em>. La riga <code>saldo = saldo + 50</code> è esattamente questo, e nel dirlo hai già usato la parola chiave: <strong>diventa</strong>. Un'equazione descrive una verità fuori dal tempo; un'assegnazione descrive un <em>evento</em> — e un evento ha un prima e un dopo.</p>
+        <p>Dove l'analogia si rompe, e va detto subito: nel tuo conto in banca ogni movimento resta scritto nell'estratto conto. In memoria no. Dopo <code>x = x + 1</code>, il vecchio valore di <code>x</code> <strong>non esiste più</strong>: è stato sovrascritto, e nessuno lo ricorda. Un programma non ha un estratto conto — a meno che tu non glielo scriva a mano.</p>
+      </div>
+
+      <div class="w-demo">
+        <h4 class="w-demo-title">Prova tu — esegui la riga, una volta alla volta</h4>
+        <p class="w-demo-hint">C'è una sola cella di memoria, chiamata <code>x</code>. Premi <b>esegui</b> e guarda i due tempi: prima si legge il vecchio valore, poi si scrive il nuovo. La colonna a destra è la storia — quella che la macchina, da sola, non terrebbe.</p>
+
+        <div class="w-row">
+          <div class="w-cell is-on">{{ xVal }}<b>x adesso</b></div>
+          <div class="w-cell is-off">{{ xLetto }}<b>letto a destra</b></div>
+          <div class="w-cell is-off">{{ xCalc }}<b>x + 1</b></div>
+          <div class="w-cell is-off">{{ xScritto }}<b>scritto in x</b></div>
+        </div>
+
+        <div class="w-demo-out">x = x + 1 &nbsp;→&nbsp; eseguita {{ xVolte }} volte &nbsp;·&nbsp; storia: {{ xStoria }}</div>
+
+        <div class="w-row">
+          <button class="w-btn" onClick="{{ xEsegui }}">▶ esegui la riga</button>
+          <button class="w-btn" onClick="{{ xDieci }}">▶▶ eseguila 10 volte</button>
+          <button class="w-btn" onClick="{{ xReset }}">↺ azzera</button>
+        </div>
+        <p class="w-demo-foot">Nota che il risultato dipende da <em>quante volte</em> hai premuto. Nessuna equazione si comporta così: questa è la firma inconfondibile del tempo.</p>
+      </div>
+
+      <h3 class="w-h3">Chi ha scelto quel simbolo, e perché ci pentiamo ancora</h3>
+      <p>Il pasticcio ha una data. Il Fortran, il primo linguaggio di alto livello diffuso — progettato dal 1954 e consegnato nel 1957 — prese in prestito il segno <code>=</code> della matematica e lo usò per l'assegnazione. Pochi anni dopo la famiglia ALGOL fece la scelta opposta e più pulita: <code>:=</code> per assegnare (una freccia stilizzata verso sinistra), <code>=</code> lasciato al confronto, come a scuola. Pascal, Ada e Go hanno tenuto quella strada. Il C ha tenuto l'altra, ed è dal C che discende quasi tutto ciò che scrivi oggi — Java, JavaScript, Python, C#, Rust — con la toppa dell'<code>==</code> per il confronto e del <code>=</code> per l'assegnazione.</p>
+
+      <pre class="w-codice" data-lang="tre dialetti, una sola idea">
+<span class="w-com">-- ALGOL / Pascal / Go: due simboli diversi per due cose diverse</span>
+x := x + 1;        <span class="w-com">assegna</span>
+if x = 5 then ...  <span class="w-com">confronta</span>
+
+<span class="w-com">-- C / Java / JavaScript: lo stesso simbolo, un significato nuovo</span>
+x = x + 1;         <span class="w-com">assegna</span>
+if (x == 5) ...    <span class="w-com">confronta (e guai a dimenticare un =)</span>
+
+<span class="w-com">-- Python: assegna, ma non è un'espressione: non puoi sbagliarlo in un if</span>
+x = x + 1
+if x == 5: ...</pre>
+      <p class="w-codice-nota">Tre modi di scrivere lo stesso evento. La sintassi cambia, i due tempi — leggi, poi scrivi — no.</p>
+
+      <div class="w-note w-note--warn">
+        <span class="w-note-title">Attenzione</span>
+        <p>In C, <code>if (x = 5)</code> compila benissimo: assegna 5 a <code>x</code> e poi considera il risultato "vero". È il più famoso errore di battitura della storia del software, ed è nato quel giorno del 1957 in cui si decise che un solo simbolo poteva fare due mestieri. Quando un linguaggio ti sembra pedante, spesso sta solo pagando il debito di qualcun altro.</p>
+      </div>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p><code>x = x + 1</code> non è un'affermazione sul mondo: è un <strong>ordine impartito al tempo</strong>. Si legge sempre in due tempi — <em>valuta a destra, scrivi a sinistra</em> — e i due <code>x</code> non sono la stessa cosa: a destra c'è un valore, a sinistra un posto.</p>
+      </div>
+
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">I paper che lo dimostrano</span>
+        <ul>
+          <li>Naur (a cura di), <em>Report on the Algorithmic Language ALGOL 60</em> (1960) — introduce e formalizza <code>:=</code> come simbolo di assegnazione, distinto da <code>=</code> — <span class="w-ref">CACM 3(5), 299–314</span></li>
+          <li>Backus et al., <em>The FORTRAN Automatic Coding System</em> (1957) — il linguaggio che consegnò <code>=</code> all'assegnazione — <span class="w-ref">Proc. Western Joint Computer Conference</span></li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 02 ======================= -->
+    <section class="w-tappa" id="c2">
+
+      <div class="w-tappa-kicker">Nome, contenitore, contenuto</div>
+      <h2 class="w-tappa-title">La cella, il nome e l'istante</h2>
+      <p class="w-tappa-lead">Hai appena visto che a sinistra dell'uguale c'è un posto e a destra un valore. Adesso guardiamo quel posto: è lì che vive tutto ciò che un programma sa di sé.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Una variabile non è un numero: è un <strong>indirizzo con un'etichetta sopra</strong>. Da qualche parte, nella memoria della macchina, c'è una casella; il nome <code>x</code> è il post-it appiccicato sopra, che serve a te, non a lei. La macchina il post-it non lo legge nemmeno: il compilatore lo ha già tradotto in un numero, e di quel nome così faticosamente scelto non resta niente nel programma in esecuzione.</p>
+
+      <p>Questa distinzione fra il posto e il contenuto ha perfino due nomi tecnici, che i compilatori usano ancora: <strong>l-value</strong> (ciò che può stare a sinistra: un posto) e <strong>r-value</strong> (ciò che può stare a destra: un valore). Ecco perché <code>x = 5</code> si può scrivere e <code>5 = x</code> no. Non è pignoleria di sintassi: 5 non è un posto, non ha un indirizzo dove metterci qualcosa.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: la casella della posta</span>
+        <p>Il tuo nome sulla cassetta delle lettere non è la tua corrispondenza. La cassetta è sempre la stessa, il contenuto cambia ogni giorno, e se qualcuno cambia la targhetta la posta continua ad arrivare nella stessa cassetta. Nel codice: la <em>cella</em> è la cassetta, il <em>nome</em> è la targhetta, il <em>valore</em> è la posta di oggi. Le tre cose si confondono di continuo quando si impara, e quasi tutta la confusione dei primi mesi nasce da lì.</p>
+      </div>
+
+      <p>Il punto vero, però, non è lo spazio: è il tempo. Una variabile ha un <em>contenuto adesso</em>, e la parola "adesso" in matematica non esiste. L'insieme di tutti gli "adesso" di tutte le celle si chiama <strong>stato</strong>, ed è la cosa che distingue un programma da una formula. Una formula la puoi leggere in qualsiasi ordine e dice sempre la stessa cosa. Un programma cambia significato se sposti due righe.</p>
+
+      <pre class="w-codice" data-lang="python">
+a = 2
+b = a * 3      <span class="w-com">b diventa 6 — perché "adesso" a vale 2</span>
+a = 10         <span class="w-com">a diventa 10 …ma b resta 6: aveva copiato il valore, non il legame</span>
+print(b)       <span class="w-com">6</span></pre>
+      <p class="w-codice-nota">Se <code>b = a * 3</code> fosse un'equazione, cambiare <code>a</code> cambierebbe <code>b</code>. Non succede: l'assegnazione fotografa il valore in quell'istante e poi se ne dimentica.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Un'assegnazione è una <strong>fotografia</strong>, non un vincolo. Registra il valore che c'era in quel momento; da lì in poi le due cose vivono vite separate. I fogli di calcolo, invece, fanno l'opposto — in una cella scrivi <code>=A1*3</code> e il legame resta vivo — ed è per questo che Excel non è un linguaggio imperativo ma un piccolo linguaggio dichiarativo travestito.</p>
+      </div>
+
+      <div class="w-note w-note--warn">
+        <span class="w-note-title">Attenzione</span>
+        <p>La fotografia vale per i valori semplici. Quando la cella contiene un <em>riferimento</em> a un oggetto — una lista, un dizionario, un array — copi la fotografia dell'indirizzo, non della cosa. Due nomi finiscono per indicare lo stesso oggetto, e modificarlo tramite uno lo modifica anche per l'altro. È la trappola numero uno del linguaggio moderno, e ci torniamo nella tappa 06 con una demo apposta: non è un dettaglio, è metà dei bug della tua carriera.</p>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 03 ======================= -->
+    <section class="w-tappa" id="c3">
+
+      <div class="w-tappa-kicker">Il program counter e il salto</div>
+      <h2 class="w-tappa-title">Il salto: il momento in cui il programma sceglie</h2>
+      <p class="w-tappa-lead">Una cella che cambia valore, da sola, non va da nessuna parte. Serve qualcosa che <em>guardi</em> quel valore e, in base a quello, decida quale riga eseguire dopo.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Dentro il processore c'è una cella speciale, diversa da tutte le altre: il <strong>program counter</strong>. Non contiene i tuoi dati: contiene l'indirizzo della prossima istruzione da eseguire. Il funzionamento normale della macchina è banale fino alla noia: esegui l'istruzione, aumenta il program counter di uno, ricomincia. Una riga dopo l'altra, per sempre, come un dito che scorre l'elenco della spesa.</p>
+
+      <p>Poi arriva un'istruzione che fa una cosa sola, e cambia tutto: <strong>scrive nel program counter</strong>. Non "più uno": un numero qualsiasi. Il dito, invece di scendere alla riga dopo, salta. Se la scrittura è incondizionata si chiama <code>jmp</code>, salto; se avviene solo quando un certo confronto è andato in un certo modo si chiama <strong>salto condizionale</strong>, ed è l'istruzione da cui discende ogni <code>if</code>, ogni <code>while</code>, ogni <code>for</code>, ogni <code>switch</code>, ogni gestione di eccezione che tu abbia mai scritto.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: il libro-game</span>
+        <p>I libri in cui a fondo pagina c'è scritto <em>«se hai la spada, vai al paragrafo 114; altrimenti vai al 27»</em>. Il libro è la memoria, il tuo dito è il program counter, la spada è lo stato. Non c'è nient'altro. Con questi tre ingredienti — celle, un dito che le percorre, e la possibilità di spostare il dito guardando una cella — hai una macchina universale: qualunque cosa un computer possa calcolare, la può calcolare così.</p>
+      </div>
+
+      <pre class="w-codice" data-lang="assembly x86-64, semplificato">
+        mov  eax, [x]     <span class="w-com">porta nel registro il contenuto della cella x</span>
+        cmp  eax, 10      <span class="w-com">confronta con 10 (accende i flag del processore)</span>
+        jl   .minore      <span class="w-com">SALTO CONDIZIONALE: se "minore", scrivi .minore nel PC</span>
+        <span class="w-com">…qui ci arrivi solo se x >= 10…</span>
+        jmp  .fine
+.minore:
+        <span class="w-com">…qui ci arrivi solo se x &lt; 10…</span>
+.fine:</pre>
+      <p class="w-codice-nota">Le tre righe evidenziate sono, per intero, la macchineria di un <code>if</code>. Tutto ciò che il tuo linguaggio ti offre sopra a questo è comodità — preziosa, ma comodità.</p>
+
+      <h3 class="w-h3">La grande scoperta: bastano tre forme</h3>
+      <p>Se il salto può andare ovunque, un programma può diventare un groviglio in cui nessuno sa più da dove si arriva a una certa riga. Negli anni Sessanta si scriveva davvero così, e ci si perdeva davvero. Poi arrivarono due risultati che cambiarono il mestiere.</p>
+      <p>Nel 1966 Corrado Böhm e Giuseppe Jacopini dimostrarono che qualunque diagramma di flusso, per intricato che sia, si può riscrivere usando solo tre forme: <strong>sequenza</strong> (una riga dopo l'altra), <strong>selezione</strong> (l'<code>if</code>) e <strong>iterazione</strong> (il <code>while</code>). Non "quasi tutti": tutti. Due anni dopo Edsger Dijkstra scrisse una lettera alle <em>Communications of the ACM</em> per dire che, se bastano tre forme, tanto vale rinunciare al salto libero — perché il codice si legge molto meglio. Aveva intitolato la lettera <em>A Case Against the Goto Statement</em>; fu il direttore della rivista, Niklaus Wirth, a ribattezzarla <em>Go To Statement Considered Harmful</em>, dando al mondo insieme una battaglia e un modello di titolo polemico che dura da sessant'anni.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Il salto condizionale è l'unico atomo di controllo che esista davvero. <code>if</code>, <code>while</code>, <code>for</code>, <code>switch</code>, <code>try/catch</code> e le stesse chiamate di funzione sono <strong>impacchettamenti disciplinati dello stesso gesto</strong>: scrivere un numero nel program counter. Ricordarlo è ciò che, più avanti, ti permetterà di capire senza sforzo cose che sembrano magiche — le continuazioni del libro 4 fra tutte.</p>
+      </div>
+
+      <div class="w-note w-note--expert">
+        <span class="w-note-title">Livello esperto</span>
+        <p>Il teorema di Böhm–Jacopini dice che si <em>può</em>, non che convenga sempre: la riscrittura può richiedere variabili di controllo aggiuntive e rendere il codice meno leggibile, non più. È il punto che Donald Knuth argomentò nel 1974 in <em>Structured Programming with go to Statements</em>, difendendo i pochi casi in cui un salto in avanti — uscire da due cicli annidati, gestire un errore — è la forma più chiara. Sul processore, intanto, il salto condizionale è diventato la cosa più costosa che c'è: la pipeline deve <em>indovinare</em> in anticipo dove salterai, e quando il branch predictor sbaglia butta via decine di cicli di lavoro già fatto. È il motivo per cui certo codice ad alte prestazioni si scrive apposta senza rami.</p>
+      </div>
+
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">I paper che lo dimostrano</span>
+        <ul>
+          <li>Böhm &amp; Jacopini, <em>Flow Diagrams, Turing Machines and Languages with Only Two Formation Rules</em> (1966) — <span class="w-ref">CACM 9(5), 366–371</span></li>
+          <li>Dijkstra, <em>Letters to the editor: go to statement considered harmful</em> (1968) — <span class="w-ref">CACM 11(3), 147–148</span></li>
+          <li>Knuth, <em>Structured Programming with go to Statements</em> (1974) — <span class="w-ref">ACM Computing Surveys 6(4), 261–301</span></li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 04 ======================= -->
+    <section class="w-tappa" id="c4">
+
+      <div class="w-tappa-kicker">Iterazione e invariante</div>
+      <h2 class="w-tappa-title">Il ciclo: ritmo dal nulla</h2>
+      <p class="w-tappa-lead">Metti insieme le due cose che hai appena visto — una cella che si modifica da sé e un salto che guarda quella cella — e ottieni la prima cosa davvero magica del mestiere: quattro righe che fanno un milione di cose.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Un ciclo è un salto che va <em>all'indietro</em>. Nient'altro. Il program counter, arrivato in fondo al blocco, invece di proseguire torna su; e ogni volta che ripassa trova lo stato leggermente cambiato dal giro precedente, perché dentro il blocco c'era un <code>i = i + 1</code>. Il salto all'indietro dà la ripetizione; l'autoreferenzialità della tappa 01 dà il <em>progresso</em>. Senza il salto non ci sarebbe ripetizione; senza <code>x = x + 1</code> ci sarebbe una ripetizione identica e sterile, per sempre.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: il giradischi e il solco</span>
+        <p>La puntina gira sempre nello stesso modo — quello è il salto all'indietro, il ritmo. Ma il solco si sposta di un pelo verso il centro a ogni giro, e per questo esce musica invece di un rumore fisso. Il contatore del ciclo è quello spostamento: la ripetizione è il motore, il contatore è la direzione. Tolto il contatore, la puntina salta per sempre nello stesso solco — e nella tappa 05 vedremo che è esattamente ciò che succede.</p>
+      </div>
+
+      <div class="w-demo">
+        <h4 class="w-demo-title">Prova tu — esegui un ciclo con il dito</h4>
+        <p class="w-demo-hint">Sei tu il program counter. Premi <b>un passo</b> e guarda la riga che si accende, poi le due celle. Cambia il confronto da <code>&lt;</code> a <code>&lt;=</code> e ripeti: la stessa identica logica dà un risultato diverso, ed è l'errore più antico del mestiere.</p>
+
+        <div class="w-prog">
+          <sc-for list="{{ righe }}" as="r" hint-placeholder-count="6"><span class="{{ r.cls }}">{{ r.txt }}</span></sc-for>
+        </div>
+
+        <div class="w-row">
+          <div class="w-cell is-on">{{ ciI }}<b>i</b></div>
+          <div class="w-cell is-on">{{ ciSomma }}<b>somma</b></div>
+          <div class="w-cell is-off">{{ ciGiri }}<b>giri fatti</b></div>
+          <div class="{{ ciTestCls }}">{{ ciTest }}<b>i {{ ciOp }} 4</b></div>
+        </div>
+
+        <div class="w-demo-out">{{ ciStato }}</div>
+
+        <div class="w-row">
+          <button class="w-btn" onClick="{{ ciPasso }}">▶ un passo</button>
+          <button class="w-btn" onClick="{{ ciTutto }}">▶▶ fino alla fine</button>
+          <button class="w-btn" onClick="{{ ciOpSwap }}">⇄ usa {{ ciOpAltro }}</button>
+          <button class="w-btn" onClick="{{ ciReset }}">↺ azzera</button>
+        </div>
+        <p class="w-demo-foot">Con <code>&lt;</code> somma 1+2+3 = 6. Con <code>&lt;=</code> somma 1+2+3+4 = 10. Un carattere, quattro unità di differenza: benvenuto nell'errore <em>off-by-one</em>.</p>
+      </div>
+
+      <h3 class="w-h3">La frase che rende un ciclo leggibile</h3>
+      <p>C'è un modo per smettere di "seguire i giri con la testa", ed è il salto di qualità che separa chi scrive cicli a tentativi da chi li scrive giusti al primo colpo. Consiste nel dire ad alta voce una frase che sia <strong>vera all'inizio di ogni giro</strong>, sempre, indipendentemente da quanti giri siano passati. Si chiama <strong>invariante di ciclo</strong>.</p>
+
+      <pre class="w-codice" data-lang="python">
+i = 1
+somma = 0
+<span class="w-com"># INVARIANTE: somma contiene 1 + 2 + … + (i-1)</span>
+while i &lt; 4:
+    somma = somma + i
+    i = i + 1
+<span class="w-com"># all'uscita i vale 4, quindi somma contiene 1+2+3. Dimostrato, non sperato.</span></pre>
+      <p class="w-codice-nota">L'invariante è vera prima del primo giro (somma = 0 = somma vuota), resta vera dopo ogni giro, e all'uscita — combinata con la condizione diventata falsa — ti <em>dà</em> il risultato. Non serve simulare niente con la testa.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Un ciclo si capisce con tre domande, nell'ordine: <strong>1)</strong> che cosa è vero a ogni giro (l'invariante)? <strong>2)</strong> che cosa avvicina la fine a ogni giro (la variante: qui <code>i</code> che cresce)? <strong>3)</strong> che cosa è vero all'uscita? Se sai rispondere a tutte e tre, il ciclo è corretto. Se non sai rispondere alla prima, non hai scritto un ciclo: hai scritto una speranza.</p>
+      </div>
+
+      <div class="w-note w-note--warn">
+        <span class="w-note-title">Attenzione</span>
+        <p>L'errore <em>off-by-one</em> non nasce dalla distrazione, nasce dall'ambiguità dell'italiano: <em>«dal 1 al 4»</em> comprende il 4 o no? Il rimedio non è concentrarsi di più — è scegliere una convenzione e non tradirla mai. Quasi tutto il software moderno usa gli <strong>intervalli semiaperti</strong>: estremo sinistro incluso, destro escluso. È il motivo per cui <code>range(0, 4)</code> in Python dà 0,1,2,3 e per cui le liste partono da zero: con questa convenzione la lunghezza di un intervallo è sempre <code>fine - inizio</code>, e due intervalli adiacenti si incastrano senza buchi né sovrapposizioni.</p>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 05 ======================= -->
+    <section class="w-tappa" id="c5">
+
+      <div class="w-tappa-kicker">Terminazione</div>
+      <h2 class="w-tappa-title">Il ciclo che non finisce mai</h2>
+      <p class="w-tappa-lead">Hai imparato a chiedere a un ciclo che cosa resta vero a ogni giro. Adesso la domanda scomoda, quella che nessun compilatore può rispondere al posto tuo: sei sicuro che finisca?</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Un ciclo termina se esiste una quantità che <em>diminuisce a ogni giro</em> e che non può scendere sotto un limite. Si chiama <strong>variante</strong>, ed è la gemella della invariante della tappa precedente: quella dice che cosa resta vero, questa dice che cosa si consuma. Nel ciclo di prima la variante era <code>4 - i</code>: parte da 3 e cala di uno ogni giro. Non può calare per sempre, quindi il ciclo finisce. Fine della dimostrazione.</p>
+
+      <p>I cicli infiniti nascono quindi in tre modi, e sono sempre gli stessi tre:</p>
+
+      <pre class="w-codice" data-lang="i tre modi di non finire mai">
+<span class="w-com">1. La variante non si muove — hai dimenticato di far crescere il contatore</span>
+i = 0
+while i &lt; 10:
+    print(i)          <span class="w-com">i resta 0 per sempre: il solco del giradischi</span>
+
+<span class="w-com">2. La variante si muove nella direzione sbagliata</span>
+i = 10
+while i &gt; 0:
+    i = i + 1         <span class="w-com">si allontana dalla condizione di uscita</span>
+
+<span class="w-com">3. La variante si muove, ma "salta sopra" il bersaglio</span>
+x = 0.0
+while x != 1.0:
+    x = x + 0.1       <span class="w-com">in virgola mobile 0.1 non è 0.1: non colpirai mai 1.0 esatto</span></pre>
+      <p class="w-codice-nota">Il terzo è il più crudele, perché il codice sembra giusto. Con i numeri in virgola mobile non si usa mai <code>!=</code> né <code>==</code>: si usa <code>&lt;</code>, oppure si confronta a meno di una tolleranza.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: le scale mobili al contrario</span>
+        <p>Sali una scala mobile che scende. Se i tuoi gradini al secondo superano i suoi, arrivi in cima: la variante — i gradini che ti mancano — cala. Se vanno pari, resti sospeso a metà per sempre, con l'aria di fare un enorme lavoro. Un ciclo infinito non è un programma fermo: è un programma indaffaratissimo che non va da nessuna parte. È anche il motivo per cui, quando qualcosa si "impianta", la ventola parte a mille.</p>
+      </div>
+
+      <h3 class="w-h3">Perché nessuno può controllarlo per te</h3>
+      <p>La domanda naturale è: perché il compilatore non mi avvisa? La risposta è che <strong>non può</strong>, e non per pigrizia di chi lo scrive. Nel 1936 Alan Turing dimostrò che non può esistere un programma capace di stabilire, per ogni programma e ogni input, se quell'esecuzione terminerà. È il <em>problema della fermata</em>, ed è indecidibile: non è che sia difficile, è che è dimostrabilmente impossibile.</p>
+
+      <p>L'idea della dimostrazione sta in tre righe e usa esattamente l'autoreferenzialità con cui abbiamo aperto il libro. Supponi che esista <code>termina(P, i)</code>, che risponde sempre e correttamente sì/no. Costruisci allora questo dispetto:</p>
+
+      <pre class="w-codice" data-lang="pseudocodice">
+def dispetto(P):
+    if termina(P, P):     <span class="w-com">se P, dato se stesso in pasto, finisce…</span>
+        while True: pass  <span class="w-com">…allora io non finisco mai</span>
+    else:
+        return            <span class="w-com">…altrimenti finisco subito</span>
+
+dispetto(dispetto)        <span class="w-ev">← e adesso? finisce se e solo se non finisce.</span></pre>
+      <p class="w-codice-nota">La contraddizione non riguarda <code>dispetto</code>: riguarda <code>termina</code>, che quindi non può esistere. La stessa mossa — dare una cosa in pasto a se stessa — che nella tappa 01 ha creato il tempo, qui traccia il confine di ciò che il calcolo può sapere di sé.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Non esiste e non esisterà mai uno strumento che ti dica se il tuo ciclo finisce. Nemmeno un modello linguistico: può accorgersi dei casi tipici — e lo fa bene — ma il caso generale è chiuso da un teorema, non da un limite tecnologico. La responsabilità della terminazione è tua, e l'unico strumento che hai è saper indicare la variante ad alta voce.</p>
+      </div>
+
+      <div class="w-note w-note--expert">
+        <span class="w-note-title">Livello esperto</span>
+        <p>Quanto è vicino il confine dell'indecidibile? Prendi la congettura di Collatz: parti da un numero, se è pari dimezzalo, se è dispari fai <code>3n+1</code>, ripeti finché non arrivi a 1. Il ciclo è di quattro righe. Nessuno sa dimostrare che termini per ogni numero di partenza — è un problema aperto dagli anni Trenta, verificato al calcolatore per quantità enormi di casi e mai dimostrato in generale. Quattro righe che chiunque scrive al primo mese di corso, e la matematica non sa dire se si fermano.</p>
+      </div>
+
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">I paper che lo dimostrano</span>
+        <ul>
+          <li>Turing, <em>On Computable Numbers, with an Application to the Entscheidungsproblem</em> (1936) — il problema della fermata — <span class="w-ref">Proc. London Math. Soc., s2-42, 230–265</span></li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 06 ======================= -->
+    <section class="w-tappa" id="c6">
+
+      <div class="w-tappa-kicker">Mutazione e riferimenti</div>
+      <h2 class="w-tappa-title">Lo stato: la casa e il nemico</h2>
+      <p class="w-tappa-lead">Lo stato ti ha regalato il tempo, e con il tempo tutto il resto. Adesso ti presenta il conto — e il conto ha il nome che avevi promesso di ricordare dalla tappa 02: due targhette sulla stessa cassetta.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Finché nelle celle metti numeri, l'assegnazione è la fotografia innocua che hai visto. Ma appena una cella contiene un <em>oggetto</em> — una lista, un dizionario, un array, un'istanza — quello che ci sta dentro non è l'oggetto: è il suo <strong>indirizzo</strong>. Scrivere <code>b = a</code> copia l'indirizzo, non la cosa. Da quel momento hai due nomi, un solo oggetto, e ogni modifica fatta con un nome è visibile anche all'altro. Si chiama <strong>aliasing</strong>, e non è un difetto di Python o di Java: è la conseguenza inevitabile di avere insieme la memoria e i nomi.</p>
+
+      <div class="w-demo">
+        <h4 class="w-demo-title">Prova tu — un oggetto, due nomi</h4>
+        <p class="w-demo-hint">Scegli come costruire <code>b</code>: puntando allo stesso oggetto di <code>a</code>, oppure copiandolo. Poi aggiungi elementi ad <code>a</code> e guarda che cosa succede a <code>b</code>. Il codice che aggiunge è identico nei due casi.</p>
+
+        <div class="w-prog">
+          <span class="w-riga">a = [1, 2]</span>
+          <span class="w-riga is-now">{{ alRigaB }}</span>
+          <span class="w-riga">a.append(…)   <span class="w-com"># premuto {{ alMosse }} volte</span></span>
+        </div>
+
+        <div class="w-row">
+          <div class="w-cell is-on">{{ alA }}<b>a</b></div>
+          <div class="{{ alBcls }}">{{ alB }}<b>b</b></div>
+          <div class="w-cell is-off">{{ alStessi }}<b>a è b</b></div>
+        </div>
+
+        <div class="w-demo-out">{{ alSpiega }}</div>
+
+        <div class="w-row">
+          <button class="w-btn" onClick="{{ alModo }}">⇄ {{ alModoLbl }}</button>
+          <button class="w-btn" onClick="{{ alAppend }}">▶ a.append({{ alProx }})</button>
+          <button class="w-btn" onClick="{{ alReset }}">↺ azzera</button>
+        </div>
+        <p class="w-demo-foot">Nel caso condiviso <code>b</code> cambia senza che una sola riga lo nomini. Immagina la stessa scena con <code>a</code> passata a una funzione scritta da qualcun altro sei mesi fa.</p>
+      </div>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: la lavagna condivisa dell'ufficio</span>
+        <p>Una lavagna sola, appesa in corridoio, su cui tutti possono scrivere. Finché siete in due funziona benissimo ed è comodissima. A quindici, nessuno sa più chi ha cancellato quel numero, quando, e se il valore che stai leggendo adesso è ancora quello che serviva a te. Lo stato condiviso non diventa un problema perché è sbagliato: diventa un problema perché <strong>cresce il numero di persone che possono scriverci</strong>. Il libro 2 di questa serie è, per intero, la risposta a questa scena.</p>
+      </div>
+
+      <p>C'è poi il caso in cui la lavagna la usano in due <em>nello stesso istante</em>. Torna qui il primo insight del libro, e stavolta morde: <code>x = x + 1</code> non è un'operazione sola, sono tre — leggi, somma, scrivi. Se due esecuzioni si intrecciano nel mezzo, il risultato non è quello che nessuno dei due voleva:</p>
+
+      <pre class="w-codice" data-lang="due thread, un solo contatore">
+<span class="w-com">stato iniziale: x = 5.  Entrambi eseguono x = x + 1.  Ti aspetti 7.</span>
+
+thread A            thread B            x in memoria
+---------           ---------           ------------
+legge x → 5                             5
+                    legge x → 5         5
+somma   → 6                             5
+                    somma   → 6         5
+scrive  6                               6
+                    scrive  6           <span class="w-ev">6  ← un incremento è svanito</span></pre>
+      <p class="w-codice-nota">Si chiama <em>race condition</em>. Non è un bug del linguaggio: è il fatto che l'assegnazione ha un dentro. Le soluzioni — lock, operazioni atomiche, o togliere di mezzo la mutabilità — sono tutte modi di rendere indivisibili quei tre tempi.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Lo stato mutabile è potentissimo e va tenuto <strong>piccolo e visibile</strong>. Le due domande da farsi davanti a qualunque variabile che cambia sono sempre le stesse: <em>chi può scriverci?</em> e <em>fino a dove è visibile?</em> Tutte le grandi idee dei prossimi libri — le funzioni pure, la ricorsione, i linguaggi senza variabili — sono tentativi diversi di rispondere "il meno possibile" a entrambe.</p>
+      </div>
+    </section>
+
+
+    <!-- ===== EPILOGO — non viene numerato ===== -->
+    <section class="w-tappa w-tappa--fine" id="fine">
+      <div class="w-tappa-kicker">Tutto insieme</div>
+      <h2 class="w-tappa-title">Il tempo, costruito a mano</h2>
+      <p class="w-tappa-lead">Sei partito da una riga che la matematica rifiuta e sei arrivato a una macchina che si muove. Guarda che cosa è servito davvero.</p>
+
+      <p>Una cella che può cambiare valore: nasce il <strong>prima e il dopo</strong>. Un'istruzione che scrive nel program counter: nasce la <strong>scelta</strong>. Un salto che va all'indietro: nasce la <strong>ripetizione</strong>. E l'autoreferenzialità dentro il ciclo — quel <code>i = i + 1</code> che sembrava un dettaglio — trasforma la ripetizione in <strong>progresso</strong>. Quattro ingredienti. Da qui in poi non si aggiunge più niente di essenziale al motore: si aggiungono solo modi di non impazzire mentre lo si usa, ed è di questo che parlano gli altri cinque libri.</p>
+
+      <p>Vale la pena fermarsi un momento sul fatto che ti è passato sotto gli occhi due volte. La riga <code>x = x + 1</code> è autoreferenziale: definisce il nuovo x in termini del vecchio x. Il <code>dispetto(dispetto)</code> di Turing è autoreferenziale allo stesso modo. La prima genera il tempo, il secondo genera un limite invalicabile alla conoscenza. <strong>Sono la stessa mossa</strong>, e la incontrerai di nuovo — molto più in grande — quando nel libro 3 una funzione chiamerà se stessa e nel libro 5 un programma leggerà il proprio codice come se fosse un dato.</p>
+
+      <div class="w-note w-note--memory">
+        <span class="w-note-title">Dal livello medio all'esperto assoluto: la palestra</span>
+        <ol>
+          <li><strong>Cinque minuti, subito.</strong> Apri una console Python. Scrivi <code>a = [1,2,3]</code>, poi <code>b = a</code>, poi <code>a.append(4)</code>, poi <code>print(b)</code>. Guarda il 4 che non hai messo. Rifallo con <code>b = a.copy()</code>. Ora non lo dimenticherai più.</li>
+          <li><strong>Scrivi l'invariante, non il ciclo.</strong> Prendi tre cicli già scritti nel tuo codice e aggiungi sopra ognuno un commento che dica che cosa è vero a ogni giro. Almeno uno dei tre ti sembrerà improvvisamente sbagliato: lo era.</li>
+          <li><strong>Costruisci il ciclo senza il ciclo.</strong> Riscrivi un <code>while</code> usando solo <code>if</code> e <code>goto</code> — in C, o in assembly, o in un simulatore online. Serve a sentire sulla mano che il <code>while</code> non esiste: è una convenzione tipografica sopra un salto.</li>
+          <li><strong>Fai svanire un incremento.</strong> Scrivi due thread che incrementano lo stesso contatore un milione di volte ciascuno (in Python usa <code>threading</code> con una lista condivisa, in Java due <code>Thread</code> su un <code>int</code>). Il totale non farà due milioni. Poi mettici un lock e guardalo tornare esatto: è il modo più veloce per capire perché esiste metà della programmazione concorrente.</li>
+          <li><strong>Le letture, in quest'ordine.</strong> La lettera di Dijkstra del 1968 (due pagine, si legge in dieci minuti). Poi il capitolo sugli invarianti in <em>The Science of Programming</em> di David Gries, o le prime venti pagine di <em>A Discipline of Programming</em>. Poi, quando ti senti pronto a essere contraddetto, <em>Structured Programming with go to Statements</em> di Knuth: è la migliore lezione di equilibrio che il mestiere abbia prodotto.</li>
+        </ol>
+      </div>
+
+      <div class="w-note w-note--bridge">
+        <span class="w-note-title">Il ponte con il libro 02</span>
+        <p>Lo stato ti ha dato il movimento e ti ha lasciato una lavagna che chiunque può sporcare. La prossima mossa è recintare: prendere un frammento di logica, chiuderlo dietro un nome, e stabilire per contratto che cosa entra e che cosa esce. Vai a <a href="La-Cristallizzazione.dc.html">La Cristallizzazione</a>.</p>
+      </div>
+    </section>
+
+    <footer class="w-footer">
+      ~ · fine del quaderno · ~<br>
+      <a href="Biblioteca.dc.html">torna alla Biblioteca</a>
+    </footer>
+
+  </main>
+</div>
+
+</x-dc>
+
+<!-- Logica delle demo interattive. -->
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    /* demo 1 — x = x + 1 */
+    x: 0, letto: null, calc: null, scritto: null, volte: 0, storia: [],
+    /* demo 2 — il ciclo */
+    ci: 1, cs: 0, riga: 0, giri: 0, incl: false, fine: false,
+    /* demo 3 — alias */
+    a: [1, 2], bcopia: [1, 2], cond: true, mosse: 0
+  }
+
+  /* --- demo 2: un passo del program counter ------------------------------ */
+  _passo(st) {
+    var lim = st.incl ? 4 : 3;              /* i <= 4  oppure  i < 4 */
+    if (st.fine) return st;
+    if (st.riga === 0) return { ci: 1, riga: 1 };
+    if (st.riga === 1) return { cs: 0, riga: 2 };
+    if (st.riga === 2) return (st.ci <= lim) ? { riga: 3 } : { riga: 5, fine: true };
+    if (st.riga === 3) return { cs: st.cs + st.ci, riga: 4 };
+    if (st.riga === 4) return { ci: st.ci + 1, riga: 2, giri: st.giri + 1 };
+    return { fine: true };
+  }
+
+  renderVals() {
+    var self = this, s = this.state;
+
+    /* ============ demo 1 ============ */
+    var esegui = function () {
+      self.setState(function (st) {
+        var l = st.x, c = st.x + 1;
+        var h = st.storia.concat([c]);
+        if (h.length > 12) h = h.slice(h.length - 12);
+        return { x: c, letto: l, calc: c, scritto: c, volte: st.volte + 1, storia: h };
+      });
+    };
+
+    /* ============ demo 2 ============ */
+    var lim = s.incl ? 4 : 3;
+    var op = s.incl ? '<=' : '<';
+    var testOk = s.ci <= lim;
+    var testi = [
+      'i = 1',
+      'somma = 0',
+      'while i ' + op + ' 4:',
+      '    somma = somma + i',
+      '    i = i + 1',
+      'print(somma)   # ' + (s.fine ? s.cs : '…')
+    ];
+    var righe = testi.map(function (t, k) {
+      return { txt: t, cls: 'w-riga' + (k === s.riga ? ' is-now' : '') };
+    });
+    var stato = s.fine
+      ? 'ciclo terminato dopo ' + s.giri + ' giri · somma = ' + s.cs
+      : (s.riga === 2
+          ? 'sto valutando la condizione: ' + s.ci + ' ' + op + ' 4 → ' + (testOk ? 'vero, entro' : 'falso, esco')
+          : 'prossima riga da eseguire: ' + (s.riga + 1));
+
+    /* ============ demo 3 ============ */
+    var mostraB = s.cond ? s.a : s.bcopia;
+    var prossimo = 3 + s.mosse;
+    var spiega = s.cond
+      ? 'b punta allo stesso oggetto di a: ogni append è visibile da entrambi i nomi.'
+      : 'b è una copia fatta prima degli append: da quel momento le due liste hanno vite separate.';
+
+    return {
+      /* demo 1 */
+      xVal: s.x,
+      xLetto: (s.letto === null ? '—' : s.letto),
+      xCalc: (s.calc === null ? '—' : s.calc),
+      xScritto: (s.scritto === null ? '—' : s.scritto),
+      xVolte: s.volte,
+      xStoria: (s.storia.length ? s.storia.join(' → ') : '(nessuna: la macchina non la tiene)'),
+      xEsegui: esegui,
+      xDieci: function () { for (var k = 0; k < 10; k++) esegui(); },
+      xReset: function () { self.setState({ x: 0, letto: null, calc: null, scritto: null, volte: 0, storia: [] }); },
+
+      /* demo 2 */
+      righe: righe,
+      ciI: s.ci, ciSomma: s.cs, ciGiri: s.giri, ciOp: op,
+      ciOpAltro: (s.incl ? '<' : '<='),
+      ciTest: (s.fine ? 'falso' : (testOk ? 'vero' : 'falso')),
+      ciTestCls: 'w-cell ' + ((!s.fine && testOk) ? 'is-ok' : 'is-ko'),
+      ciStato: stato,
+      ciPasso: function () { self.setState(function (st) { return self._passo(st); }); },
+      ciTutto: function () {
+        self.setState(function (st) {
+          var cur = { ci: st.ci, cs: st.cs, riga: st.riga, giri: st.giri, incl: st.incl, fine: st.fine };
+          for (var k = 0; k < 60 && !cur.fine; k++) {
+            var d = self._passo(cur);
+            for (var key in d) cur[key] = d[key];
+          }
+          return cur;
+        });
+      },
+      ciOpSwap: function () { self.setState(function (st) { return { incl: !st.incl, ci: 1, cs: 0, riga: 0, giri: 0, fine: false }; }); },
+      ciReset: function () { self.setState({ ci: 1, cs: 0, riga: 0, giri: 0, fine: false }); },
+
+      /* demo 3 */
+      alA: '[' + s.a.join(', ') + ']',
+      alB: '[' + mostraB.join(', ') + ']',
+      alBcls: 'w-cell ' + (s.cond ? 'is-ko' : 'is-ok'),
+      alStessi: s.cond ? 'sì' : 'no',
+      alRigaB: s.cond ? 'b = a          # stesso oggetto' : 'b = a.copy()   # oggetto nuovo',
+      alModoLbl: s.cond ? 'passa a b = a.copy()' : 'passa a b = a',
+      alMosse: s.mosse,
+      alProx: prossimo,
+      alSpiega: spiega,
+      alModo: function () { self.setState(function (st) { return { cond: !st.cond, a: [1, 2], bcopia: [1, 2], mosse: 0 }; }); },
+      alAppend: function () {
+        self.setState(function (st) {
+          return { a: st.a.concat([3 + st.mosse]), mosse: st.mosse + 1 };
+        });
+      },
+      alReset: function () { self.setState({ a: [1, 2], bcopia: [1, 2], mosse: 0 }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

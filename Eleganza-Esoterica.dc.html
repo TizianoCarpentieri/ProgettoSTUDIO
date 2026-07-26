@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eleganza Esoterica — linguaggi a pila e continuazioni</title>
+
+<!-- ===== CONNETTORE DELLA WIKI - righe fisse, non modificarle ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./wiki/wiki.css">
+<script src="./support.js"></script>
+<script defer src="./wiki/wiki.js"></script>
+<!-- =============================================================== -->
+</head>
+<body>
+<x-dc>
+
+<div class="w-page--toc">
+
+  <aside class="w-toc"
+         data-titolo="Libro 04 · Indice"
+         data-pie='<a href="Biblioteca.dc.html">Biblioteca</a><a href="La-Vertigine.dc.html">Libro 03: la ricorsione</a><a href="Il-Fantasma-nella-Macchina.dc.html">Libro 05: sotto l&apos;astrazione</a>'></aside>
+
+  <main class="w-main">
+
+    <!-- ===== BRICIOLE DI PANE ===== -->
+    <nav class="w-nav">
+      <a class="w-nav-home" href="Biblioteca.dc.html">← BIBLIOTECA</a>
+      <span class="w-nav-sep">/</span>
+      <span class="w-nav-here">Libro 04 · Eleganza esoterica</span>
+      <a class="w-nav-next" href="Il-Fantasma-nella-Macchina.dc.html">Libro 05: sotto l'astrazione →</a>
+    </nav>
+
+    <!-- ===== COPERTINA ===== -->
+    <header class="w-hero a-rosso">
+      <div class="w-hero-kicker">Il pensiero computazionale · libro 4 di 6</div>
+      <h1 class="w-hero-title">Eleganza <span class="w-mark">esoterica</span></h1>
+      <p class="w-hero-sub">Linguaggi senza variabili, dove i programmi si compongono attaccandoli uno all'altro. E poi il Santo Graal dell'astrazione: catturare l'istante presente di un programma, congelarlo come un valore qualsiasi, e risvegliarlo quando ti pare.</p>
+      <div class="w-hero-sign">— il tuo maestro di bottega, quaderno alla mano</div>
+    </header>
+
+    <!-- ===== COSA SI IMPARA QUI ===== -->
+    <div class="w-note w-note--info">
+      <span class="w-note-title">Cosa impari in questa pagina</span>
+      <p>Saprai leggere ed eseguire a mano un programma a pila; capirai perché in un linguaggio concatenativo "comporre due programmi" significa letteralmente scriverli uno dopo l'altro; saprai dire che cos'è una continuazione senza usare la parola "continuazione"; e riconoscerai <code>return</code>, <code>throw</code>, i generatori e <code>async/await</code> per quello che sono: cinque addomesticamenti dello stesso animale selvatico.</p>
+    </div>
+
+    <div class="w-note w-note--bridge">
+      <span class="w-note-title">Da dove veniamo</span>
+      <p>Il <a href="La-Vertigine.dc.html">libro 3</a> ha tolto la sintassi e ha lasciato solo liste, scoprendo che un programma può leggere e riscrivere se stesso. Questo libro toglie un'altra cosa che sembrava irrinunciabile — <strong>i nomi degli argomenti</strong> — e poi si spinge dove nessun linguaggio d'uso comune arriva: rendere un valore quello che finora era invisibile, cioè <em>il resto del programma</em>.</p>
+    </div>
+
+    <!-- ===== SOMMARIO ===== -->
+    <h2 class="w-h2">Il viaggio in sei tappe</h2>
+    <ol class="w-summary">
+      <li><a href="#c1"><span class="w-summary-n">01</span><span>Togliere i nomi: la notazione postfissa</span><span class="w-summary-tag">pila, RPN</span></a></li>
+      <li><a href="#c2"><span class="w-summary-n">02</span><span>Forth: parole che definiscono parole</span><span class="w-summary-tag">dizionario</span></a></li>
+      <li><a href="#c3"><span class="w-summary-n">03</span><span>Joy: comporre è concatenare</span><span class="w-summary-tag">quotation</span></a></li>
+      <li><a href="#c4"><span class="w-summary-n">04</span><span>Il resto del programma ha un nome</span><span class="w-summary-tag">continuazione</span></a></li>
+      <li><a href="#c5"><span class="w-summary-n">05</span><span>call/cc: congelare il presente</span><span class="w-summary-tag">viaggio nel tempo</span></a></li>
+      <li><a href="#c6"><span class="w-summary-n">06</span><span>Il prezzo del biglietto</span><span class="w-summary-tag">shift/reset, async</span></a></li>
+    </ol>
+
+
+    <!-- ======================= TAPPA 01 ======================= -->
+    <section class="w-tappa" id="c1">
+
+      <div class="w-tappa-kicker">Notazione postfissa</div>
+      <h2 class="w-tappa-title">Togliere i nomi: la notazione postfissa</h2>
+      <p class="w-tappa-lead">Una variabile è un nome dato a un posto. Nel libro 1 ne è nato il tempo; nel libro 2 i nomi sono diventati parametri. Adesso proviamo l'esperimento opposto: e se non ce ne fosse nessuno?</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Scrivi <code>3 4 +</code>. Non è un errore di battitura: è la stessa somma di prima, con l'operatore alla fine. Si chiama <strong>notazione postfissa</strong>, o polacca inversa, e la sua regola di lettura si spiega in una riga: <em>quando incontri un numero, mettilo su una pila; quando incontri un'operazione, togli dalla pila quanti valori le servono, applicala, rimetti il risultato</em>. Non serve altro. Non servono le parentesi, non servono le regole di precedenza, non serve sapere che la moltiplicazione viene prima della somma.</p>
+
+      <p>La cosa notevole è ciò che sparisce. In <code>f(g(x))</code> i nomi <code>x</code>, <code>g</code>, <code>f</code> tengono insieme il discorso: dicono chi riceve cosa. Nella forma <code>x g f</code> non c'è nessun nome, e il "chi riceve cosa" lo dice <strong>la posizione sulla pila</strong>. Il contesto, che negli altri linguaggi è esplicito e ha dei nomi, qui è implicito e ha un ordine.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: la catena di montaggio</span>
+        <p>Ogni operaio ha davanti un nastro. Prende i pezzi che trova, fa la sua unica operazione, rimette il risultato sul nastro. Nessuno dà nomi ai pezzi, nessuno dice "prendi il bullone che ti ha dato Mario": si prende quello che c'è, nell'ordine in cui è arrivato. Il vantaggio è che si può <em>inserire un operaio in qualunque punto della catena</em> senza cambiare una riga di quello che fanno gli altri. Il costo, e va detto perché è reale, è che per capire un punto della catena devi sapere che cosa c'è sul nastro in quel momento — e quello, a differenza di un nome, non è scritto da nessuna parte.</p>
+      </div>
+
+      <div class="w-demo">
+        <h4 class="w-demo-title">Prova tu — sei tu la macchina a pila</h4>
+        <p class="w-demo-hint">Premi <b>un passo</b> ed esegui un simbolo alla volta. I numeri salgono sulla pila, gli operatori ne consumano due e ne rimettono uno. Tieni d'occhio l'altezza della pila: è tutto ciò che questa macchina ha come memoria.</p>
+
+        <div class="w-prog">
+          <sc-for list="{{ rpnSimboli }}" as="t" hint-placeholder-count="5"><span class="{{ t.cls }}">{{ t.txt }}</span></sc-for>
+        </div>
+
+        <div class="w-row">
+          <sc-for list="{{ rpnPila }}" as="c" hint-placeholder-count="3">
+            <div class="{{ c.cls }}">{{ c.v }}<b>{{ c.eti }}</b></div>
+          </sc-for>
+        </div>
+
+        <div class="w-demo-out">{{ rpnStato }}</div>
+
+        <div class="w-row">
+          <button class="w-btn" onClick="{{ rpnPasso }}">▶ un passo</button>
+          <button class="w-btn" onClick="{{ rpnTutto }}">▶▶ fino alla fine</button>
+          <button class="w-btn" onClick="{{ rpnCambia }}">⇄ altro programma</button>
+          <button class="w-btn" onClick="{{ rpnReset }}">↺ azzera</button>
+        </div>
+        <p class="w-demo-foot">In notazione infissa quel programma richiede parentesi per essere non ambiguo. In postfissa l'ambiguità non esiste proprio: l'ordine <em>è</em> il significato.</p>
+      </div>
+
+      <p>Questa non è una curiosità accademica: l'hai usata senza saperlo. Le calcolatrici scientifiche HP degli anni Settanta funzionavano così, e i loro affezionati ancora oggi giurano che si digiti più in fretta. <strong>PostScript</strong>, il linguaggio con cui il tuo computer descrive una pagina alla stampante, è un linguaggio a pila. E il <a href="Il-Fantasma-nella-Macchina.dc.html#c5">bytecode della Java Virtual Machine</a>, che vedremo nel prossimo libro, è anch'esso una macchina a pila: quando scrivi <code>a + b</code> in Java, ciò che finisce nel file <code>.class</code> è, letteralmente, <em>«carica a, carica b, somma»</em>.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>La notazione postfissa non è un modo strano di scrivere le stesse cose: è ciò che resta quando togli i nomi e lasci che sia <strong>l'ordine a portare l'informazione</strong>. Ed è per questo che è la forma preferita dalle macchine — un interprete di postfisso sta in venti righe, un parser di infisso con le precedenze no.</p>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 02 ======================= -->
+    <section class="w-tappa" id="c2">
+
+      <div class="w-tappa-kicker">Forth, 1968–1970</div>
+      <h2 class="w-tappa-title">Forth: parole che definiscono parole</h2>
+      <p class="w-tappa-lead">La pila da sola è una calcolatrice. Diventa un linguaggio quando qualcuno aggiunge la sola cosa che manca — la possibilità di dare un nome a una sequenza di simboli — e scopre che, fatta bene, è anche l'unica cosa che serve.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Nel 1968, all'osservatorio radioastronomico americano, Charles «Chuck» Moore aveva bisogno di controllare i radiotelescopi con macchine minuscole. Costruì un linguaggio che chiamò Forth, usato da altri programmatori dal 1970 e diffuso dal 1971 con la società che fondò insieme a Elizabeth Rather. Il suo principio è tanto semplice da sembrare povero: un programma Forth è una sequenza di <strong>parole</strong> separate da spazi; ogni parola prende ciò che le serve dalla pila e ci lascia il risultato; e tu puoi definire parole nuove usando quelle esistenti.</p>
+
+      <pre class="w-codice" data-lang="forth">
+: quadrato  dup * ;              <span class="w-com">dup duplica la cima della pila, * moltiplica</span>
+5 quadrato .                     <span class="w-com">stampa 25</span>
+
+: cubo      dup quadrato * ;     <span class="w-com">una parola nuova usa quella appena definita</span>
+: media     + 2/ ;               <span class="w-com">somma i due in cima e dimezza</span>
+
+: fahrenheit  9 5 */ 32 + ;      <span class="w-ev">← un intero convertitore di temperature, in sei simboli</span>
+100 fahrenheit .                 <span class="w-com">stampa 212</span></pre>
+      <p class="w-codice-nota">I due punti aprono una definizione, il punto e virgola la chiude. Non c'è altra sintassi: <code>:</code> e <code>;</code> sono <em>parole anche loro</em>, e potresti ridefinirle.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: il vocabolario che cresce mentre parli</span>
+        <p>Immagina una lingua che parte da cinquanta parole e in cui, ogni volta che ti serve un concetto, lo <em>definisci</em> in termini di quelle che hai già — e da quel momento è una parola come tutte le altre, anche per chi ti ascolta. Dopo un'ora di conversazione non stai più parlando la lingua di partenza: stai parlando un dialetto costruito per l'argomento di cui state discutendo. Questo è il modo di lavorare di Forth, ed è per questo che i programmi Forth veri sono così difficili da leggere per un estraneo: metà del programma è il vocabolario che l'ha reso possibile.</p>
+      </div>
+
+      <p>Se ti sembra di aver già sentito questa storia, è perché è la stessa del libro 3. Anche il Lisp cresce definendo il proprio dialetto — con le macro. La differenza è che in Forth il meccanismo non ha bisogno di nulla di speciale: <strong>siccome un programma è solo una sequenza di parole, dare un nome a una sequenza è già estendere il linguaggio</strong>. Non c'è distinzione fra "usare il linguaggio" e "costruirlo", e non c'è nemmeno un momento di espansione: c'è solo il dizionario.</p>
+
+      <p>Il risultato è che un sistema Forth completo — compilatore, interprete, editor — stava in poche migliaia di byte, e per decenni è stato la scelta per i posti in cui non c'è spazio per nient'altro: strumentazione scientifica, sistemi embedded, e l'<em>Open Firmware</em> che avviava le macchine Sun e i Mac PowerPC. Quando la memoria è un lusso, un linguaggio che è un dizionario e una pila vince.</p>
+
+      <div class="w-note w-note--warn">
+        <span class="w-note-title">Attenzione</span>
+        <p>Il costo di togliere i nomi è reale e onesto: in <code>: media + 2/ ;</code> non si vede da nessuna parte <em>quali</em> due numeri stai facendo la media. La comunità Forth ha risposto con una disciplina di commenti — <code>( n1 n2 -- media )</code>, che dichiara che cosa la parola si aspetta e cosa lascia — ma resta una convenzione, non un controllo. È il caso puro di un'astrazione che compra potenza pagando in leggibilità, ed è sano riconoscerlo invece di innamorarsene.</p>
+      </div>
+
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">I paper che lo dimostrano</span>
+        <ul>
+          <li>Moore, <em>FORTH: A Language for Interactive Computing</em> (1970) — il primo scritto sul linguaggio</li>
+          <li>Moore, <em>Forth — The Early Years</em> (1991) — il racconto in prima persona dell'invenzione, dai radiotelescopi in poi</li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 03 ======================= -->
+    <section class="w-tappa" id="c3">
+
+      <div class="w-tappa-kicker">Linguaggi concatenativi</div>
+      <h2 class="w-tappa-title">Joy: comporre è concatenare</h2>
+      <p class="w-tappa-lead">Forth è nato per far funzionare i telescopi con pochi kilobyte. Trent'anni dopo, qualcuno ha preso la stessa forma e si è chiesto che <em>algebra</em> ci fosse sotto — e la risposta è più bella dell'ingegneria che l'aveva prodotta.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Nel <a href="La-Cristallizzazione.dc.html#c6">libro 2</a>, comporre due funzioni voleva dire scrivere <code>f(g(x))</code>, o inventarsi un operatore apposta. In un linguaggio dove tutto passa per la pila accade una cosa che sembra un gioco di parole e non lo è: <strong>la composizione di due programmi è la loro concatenazione testuale</strong>. Se <code>A</code> è un programma e <code>B</code> è un programma, allora <code>A B</code> — scritti uno dopo l'altro, con uno spazio in mezzo — è il programma che fa prima l'uno e poi l'altro. Per questo la famiglia si chiama <strong>concatenativa</strong>.</p>
+
+      <p>Il linguaggio che ha reso esplicita questa proprietà è <strong>Joy</strong>, creato da Manfred von Thun e comparso nel 2001. Joy aggiunge a Forth un'idea sola, e cambia tutto: un programma può essere messo fra parentesi quadre, e allora non viene eseguito — diventa un <strong>dato</strong> che sta sulla pila, esattamente come un numero. Si chiama <em>quotation</em>, ed è il cugino a pila del <code>quote</code> di Lisp che hai incontrato nel libro 3.</p>
+
+      <pre class="w-codice" data-lang="joy">
+[2 *]                    <span class="w-com">questo NON raddoppia niente: mette un programma sulla pila</span>
+[2 *] i                  <span class="w-com">i lo esegue: adesso sì che raddoppia</span>
+
+[1 2 3 4] [2 *] map      <span class="w-ev">← map prende una lista e un PROGRAMMA e li combina</span>
+                         <span class="w-com">→ [2 4 6 8]</span>
+
+[1 2 3 4] [dup *] map    <span class="w-com">→ [1 4 9 16]  la stessa impalcatura, altra intenzione</span>
+
+<span class="w-com">E i "combinatori" sono parole che manipolano programmi:</span>
+5 [dup *] [1 +] cleave   <span class="w-com">applica entrambi allo stesso valore → 25 e 6</span></pre>
+      <p class="w-codice-nota">Le funzioni di ordine superiore del libro 2 ricompaiono qui senza aver dovuto inventare niente: se un programma è un dato, passarlo a un altro programma è la cosa più naturale del mondo.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: i tubi dell'idraulico</span>
+        <p>Ogni programma è un pezzo di tubo con una bocca d'entrata e una d'uscita. Comporli significa infilarli uno nell'altro: nessuna colla, nessun adattatore, nessun nome scritto sui tubi. E siccome due tubi infilati <em>sono</em> un tubo, puoi prendere qualunque tratto della tubatura, dargli un nome e riusarlo altrove. Il limite dell'immagine — dichiariamolo — è che i tubi veri hanno una bocca sola, mentre qui possono passare più valori: per questo esistono parole come <code>dup</code> e <code>swap</code>, che nell'idraulica sarebbero raccordi a Y.</p>
+      </div>
+
+      <p>Qui torna, e si chiude, il discorso di John Backus del <a href="La-Cristallizzazione.dc.html#c6">libro 2</a>. Backus chiedeva un modo di programmare fatto di <em>funzioni combinate</em> invece che di assegnazioni a celle, e ne voleva soprattutto una cosa: un'<strong>algebra dei programmi</strong>, cioè la possibilità di dimostrare che due programmi sono equivalenti manipolandoli come si manipolano le espressioni. In un linguaggio concatenativo quella richiesta è quasi gratis: siccome comporre è concatenare, le leggi di riscrittura sono leggi su stringhe di parole. <code>dup drop</code> è il programma che non fa niente, e lo si può cancellare ovunque compaia — come si semplifica un fattore in una frazione.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>In un linguaggio concatenativo la giustapposizione — <em>mettere una cosa accanto a un'altra</em> — è l'unica operazione, e coincide con la composizione di funzioni. Non è una notazione più corta: è che <strong>la struttura del testo e la struttura del calcolo diventano la stessa cosa</strong>. Nel libro 3 il codice era un dato perché aveva la forma di una lista; qui lo è perché ha la forma di una sequenza.</p>
+      </div>
+
+      <div class="w-note w-note--expert">
+        <span class="w-note-title">Livello esperto</span>
+        <p>Se questa forma ti attira, il posto dove è viva oggi è <strong>Factor</strong> — un concatenativo moderno con oggetti, un ambiente grafico interattivo e una libreria vasta, nato dall'esperienza di Joy e Forth — e in parte <strong>Uiua</strong> e i dialetti recenti che uniscono pila e array. Ma il posto dove la incontri <em>davvero</em>, che tu lo voglia o no, è la riga di comando: <code>cat file | grep errore | sort | uniq -c</code> è concatenativo puro. Ogni comando prende dal flusso, lavora, rimette nel flusso; la pipe è la giustapposizione; e nessuno dà un nome ai dati che passano.</p>
+      </div>
+
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">I paper che lo dimostrano</span>
+        <ul>
+          <li>von Thun, <em>Joy: Forth's Functional Cousin</em> e i saggi sull'algebra di Joy (dal 2001) — la formulazione della composizione come concatenazione</li>
+          <li>Backus, <em>Can Programming Be Liberated from the von Neumann Style?</em> (1977) — <span class="w-ref">CACM 21(8), 1978</span> — la richiesta di un'algebra dei programmi</li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 04 ======================= -->
+    <section class="w-tappa" id="c4">
+
+      <div class="w-tappa-kicker">Continuazioni</div>
+      <h2 class="w-tappa-title">Il resto del programma ha un nome</h2>
+      <p class="w-tappa-lead">Nella pila di Forth il contesto è esplicito: è lì, lo vedi, ci sono i valori. Adesso la domanda che apre l'ultimo terzo di questo libro: e il contesto <em>del calcolo</em> — cioè quello che il programma farà dopo — dove sta scritto?</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Prendi l'espressione <code>1 + (2 * 3)</code>. Mentre la macchina sta calcolando <code>2 * 3</code>, esiste da qualche parte l'informazione «quando avrai il risultato, sommagli 1 e poi consegna il tutto». Quell'informazione è reale — senza di essa il programma non saprebbe che fare del 6 — ma è invisibile: vive nella pila delle chiamate, nel program counter, nei registri. Si chiama <strong>continuazione</strong>: il resto del calcolo, visto dal punto in cui sei adesso.</p>
+
+      <p>Il modo più utile di raffigurarsela è come un <strong>buco</strong>. Ferma il programma mentre valuta <code>2 * 3</code> e guarda ciò che rimane in attesa: <code>1 + ▢</code>. Quel <code>▢</code> è il posto dove il valore andrà a finire, e tutto ciò che gli sta attorno è la continuazione. Una funzione con un buco, che aspetta un valore — cioè, guarda un po', <strong>una funzione</strong>.</p>
+
+      <pre class="w-codice" data-lang="scheme">
+<span class="w-com">Espressione:                    la continuazione di (* 2 3) è:</span>
+(+ 1 (* 2 3))                   (lambda (▢) (+ 1 ▢))
+
+<span class="w-com">Più in profondità:              la continuazione di (- 5 1) è:</span>
+(display (+ 1 (* 2 (- 5 1))))   (lambda (▢) (display (+ 1 (* 2 ▢))))</pre>
+      <p class="w-codice-nota">Ogni sotto-espressione di un programma ha la sua continuazione, e la continuazione contiene <em>tutto</em> ciò che verrà dopo — fino alla fine del programma, stampa compresa.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: il segnalibro che contiene il resto della storia</span>
+        <p>Un segnalibro normale dice a che pagina sei. Questo è un segnalibro che, oltre alla pagina, contiene <em>tutte le pagine che devi ancora leggere</em>, nell'ordine in cui le leggerai, comprese le decisioni che prenderai. Consegnare quel segnalibro a qualcuno significa consegnargli il tuo futuro di lettore, che potrà riprendere lui, o rifare due volte, o dare a un altro. Dove l'immagine si rompe — ed è il punto della prossima tappa — è che nel libro il futuro è già stampato, mentre in un programma dipende dai valori: la stessa continuazione, richiamata con valori diversi, produce finali diversi.</p>
+      </div>
+
+      <h3 class="w-h3">Renderla visibile: lo stile CPS</h3>
+      <p>C'è un modo di scrivere programmi in cui la continuazione smette di essere implicita: la si <strong>passa come argomento</strong>. Nessuna funzione restituisce niente; ognuna riceve, oltre ai suoi dati, una funzione «e-poi» a cui consegnare il risultato. Si chiama <em>continuation-passing style</em>, ed è la forma in cui molti compilatori traducono internamente il tuo codice.</p>
+
+      <pre class="w-codice" data-lang="javascript">
+<span class="w-com">Stile normale: la funzione restituisce, e chi ha chiamato riprende il controllo.</span>
+function somma(a, b) { return a + b; }
+console.log(somma(1, 2) * 10);
+
+<span class="w-com">Stile CPS: nessun return. Il "cosa fare dopo" è un argomento come gli altri.</span>
+function somma(a, b, poi) { poi(a + b); }
+somma(1, 2, function (r) { console.log(r * 10); });   <span class="w-ev">← questa è la continuazione, scritta a mano</span></pre>
+      <p class="w-codice-nota">Se l'ultima riga ti ricorda le callback di JavaScript, non è un caso: le callback <em>sono</em> continuazioni scritte a mano, e la "callback hell" degli anni Duemila era il prezzo di doverle scrivere tutte, sempre, a mano.</p>
+
+      <p>Il concetto ha una storia precisa e un momento di nascita insolito: è stato scoperto e riscoperto almeno quattro volte in ambiti diversi prima che qualcuno gli desse il nome. Christopher Strachey e Christopher Wadsworth lo formalizzarono a Oxford nel 1974 in un rapporto tecnico dal titolo eloquente — <em>Continuations: A Mathematical Semantics for Handling Full Jumps</em>, cioè un modo per dare significato matematico ai salti selvaggi della tappa 03 del libro 1. Nel 1993 John Reynolds scrisse un articolo che ricostruisce tutte quelle scoperte indipendenti, e si intitola, appunto, <em>The Discoveries of Continuations</em> — al plurale.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Una continuazione non è un concetto esotico che qualcuno ha inventato: <strong>c'è sempre stata</strong>, in ogni programma che tu abbia mai scritto, ed è ciò che rende possibile il <code>return</code>. La domanda esotica non è "che cos'è una continuazione", è: <em>e se potessi prenderla in mano?</em></p>
+      </div>
+
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">I paper che lo dimostrano</span>
+        <ul>
+          <li>Strachey &amp; Wadsworth, <em>Continuations: A Mathematical Semantics for Handling Full Jumps</em> (1974) — <span class="w-ref">Oxford PRG Technical Monograph PRG-11</span></li>
+          <li>Reynolds, <em>The Discoveries of Continuations</em> (1993) — <span class="w-ref">Lisp and Symbolic Computation 6(3–4), 233–247</span></li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 05 ======================= -->
+    <section class="w-tappa" id="c5">
+
+      <div class="w-tappa-kicker">call-with-current-continuation</div>
+      <h2 class="w-tappa-title">call/cc: congelare il presente</h2>
+      <p class="w-tappa-lead">Hai visto che il resto del programma è una funzione con un buco. Adesso il costrutto che te la mette in mano come un valore qualsiasi — e con essa la possibilità di tornare in un istante che era già passato.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Scheme ha una procedura dal nome più lungo dell'informatica: <code>call-with-current-continuation</code>, per gli amici <strong>call/cc</strong>. Si usa così: le passi una funzione, e lei la chiama passandole <em>la continuazione corrente</em> — cioè quel <code>▢</code> di cui parlavamo, impacchettato come una normalissima funzione di un argomento. Da quel momento hai in mano un valore che, se lo invochi, <strong>abbandona il calcolo in corso e riprende il programma dal punto in cui la continuazione era stata catturata</strong>, con il valore che gli passi tu.</p>
+
+      <pre class="w-codice" data-lang="scheme">
+(+ 1 (call/cc (lambda (k) 10)))
+<span class="w-com">→ 11.  Se non invochi k, call/cc restituisce semplicemente 10 e tutto è normale.</span>
+
+(+ 1 (call/cc (lambda (k) (k 41) 10)))
+<span class="w-ev">→ 42.  Invocando k salti fuori: il 10 non viene mai raggiunto, e il 41 finisce nel buco.</span>
+
+<span class="w-com">E questa è la mossa che fa girare la testa: k si può conservare.</span>
+(define salvata #f)
+(+ 1 (call/cc (lambda (k) (set! salvata k) 10)))   <span class="w-com">→ 11</span>
+(salvata 100)                                       <span class="w-com">→ 101, DOPO che quell'espressione era finita</span></pre>
+      <p class="w-codice-nota">L'ultima riga non ricalcola: <em>ritorna</em> in un istante del passato del programma, con un valore diverso nel buco. Il calcolo era finito, e adesso finisce di nuovo, diversamente.</p>
+
+      <div class="w-demo">
+        <h4 class="w-demo-title">Prova tu — cattura, esci, richiama</h4>
+        <p class="w-demo-hint">Esegui l'espressione: <code>call/cc</code> cattura il resto del calcolo e lo mette in <code>k</code>. Poi invoca <code>k</code> con i valori che vuoi e guarda il programma <b>finire di nuovo</b>, ogni volta con un risultato diverso, senza aver ricalcolato nulla di ciò che stava prima.</p>
+
+        <div class="w-prog">
+          <span class="w-riga">(define salvata #f)</span>
+          <span class="{{ ccRigaCls }}">(+ 1 (call/cc (lambda (k) (set! salvata k) 10)))</span>
+          <span class="w-riga">(salvata {{ ccValore }})</span>
+        </div>
+
+        <div class="w-row">
+          <div class="{{ ccKcls }}">{{ ccK }}<b>la continuazione k</b></div>
+          <div class="w-cell is-on">{{ ccValore }}<b>valore che passi a k</b></div>
+          <div class="w-cell is-ok">{{ ccRis }}<b>risultato</b></div>
+        </div>
+
+        <div class="w-demo-out">{{ ccLog }}</div>
+
+        <div class="w-row">
+          <button class="w-btn" onClick="{{ ccEsegui }}">▶ esegui l'espressione</button>
+          <button class="w-btn" onClick="{{ ccInvoca }}">↩ invoca k con {{ ccValore }}</button>
+          <button class="w-btn" onClick="{{ ccCambia }}">⇄ cambia il valore</button>
+          <button class="w-btn" onClick="{{ ccReset }}">↺ azzera</button>
+        </div>
+        <p class="w-demo-foot">Nota bene: il <code>+ 1</code> viene rifatto ogni volta, il <code>(set! salvata k)</code> no. Non stai rieseguendo il programma: stai rientrando in un suo momento.</p>
+      </div>
+
+      <h3 class="w-h3">A che serve, davvero</h3>
+      <p>Il fascino di <code>call/cc</code> è che non è <em>un</em> costrutto di controllo: è quello da cui si possono <strong>costruire tutti gli altri</strong>, in poche righe di libreria e senza toccare il compilatore.</p>
+
+      <table class="w-table">
+        <tr><th>Con call/cc ottieni…</th><th>Come</th></tr>
+        <tr><td><strong>return anticipato</strong></td><td>cattura la continuazione all'inizio della funzione; invocarla è uscire subito</td></tr>
+        <tr><td><strong>eccezioni</strong></td><td><code>try</code> cattura, <code>throw</code> invoca la continuazione catturata con l'errore</td></tr>
+        <tr><td><strong>generatori</strong></td><td>salva la continuazione del produttore, restituisci un valore, riprendi da lì al prossimo giro</td></tr>
+        <tr><td><strong>backtracking</strong></td><td>salva la continuazione a ogni bivio; se un ramo fallisce, torna indietro nel tempo e prendi l'altro</td></tr>
+        <tr><td><strong>multitasking cooperativo</strong></td><td>ogni "thread" è una continuazione conservata; lo scheduler decide quale risvegliare</td></tr>
+      </table>
+
+      <p>Il caso del backtracking merita una frase in più, perché è quello in cui il "viaggio nel tempo" si vede meglio. Stai cercando una soluzione, arrivi a un bivio, salvi la continuazione, prendi la strada A. Duecento chiamate più in là scopri che è un vicolo cieco. Invochi la continuazione salvata: <strong>il programma è di nuovo al bivio</strong>, con tutto lo stato di allora, e stavolta prende la B. Nessun ciclo, nessuna struttura di supporto, nessuna riscrittura ricorsiva. È così che funziona, sotto, la ricerca di Prolog.</p>
+
+      <h3 class="w-h3">La storia, che è più bella della leggenda</h3>
+      <p>Il costrutto compare nel 1975, nel rapporto con cui Gerald Sussman e Guy Steele presentano Scheme al MIT — <em>Scheme: An Interpreter for Extended Lambda Calculus</em>, AI Memo 349 — dove si chiama <code>catch</code> ed è una forma speciale. Il nome che conosciamo arriva sette anni dopo: nel 1982 alcuni implementatori si accorgono che quella potenza non richiede una forma speciale, che <strong>basta una procedura ordinaria</strong>, e la battezzano <code>call-with-current-continuation</code>. Vale la pena assaporare l'ironia: il costrutto più esotico dell'informatica non è un'estensione del linguaggio, è una funzione di libreria.</p>
+
+      <div class="w-note w-note--warn">
+        <span class="w-note-title">Attenzione</span>
+        <p>Le continuazioni di Scheme sono <em>illimitate</em> e <em>riutilizzabili</em>: puoi invocare la stessa <code>k</code> quante volte vuoi, anche molto dopo. Questo è ciò che le rende potentissime e, per gli implementatori, un incubo: se una continuazione può essere risvegliata in futuro, la sua parte di stack <strong>non si può più buttare</strong>. Ed è la ragione principale per cui quasi nessun linguaggio di uso comune ha <code>call/cc</code> pieno: costa troppo a chi implementa, e in mano a chi lo usa produce codice che nessun debugger sa raccontare.</p>
+      </div>
+
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">I paper che lo dimostrano</span>
+        <ul>
+          <li>Sussman &amp; Steele, <em>Scheme: An Interpreter for Extended Lambda Calculus</em> (1975) — <span class="w-ref">MIT AI Memo 349</span> — il costrutto compare come <code>catch</code></li>
+          <li>Il nome <code>call-with-current-continuation</code> è coniato nel 1982, quando si scopre che basta una procedura anziché una forma speciale — <span class="w-ref">cfr. le note storiche dei Revised Report on Scheme</span></li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 06 ======================= -->
+    <section class="w-tappa" id="c6">
+
+      <div class="w-tappa-kicker">Continuazioni delimitate e discendenti</div>
+      <h2 class="w-tappa-title">Il prezzo del biglietto</h2>
+      <p class="w-tappa-lead">Un costrutto che cattura "tutto il resto del programma" è troppo potente per essere comodo. La storia degli ultimi quarant'anni è il tentativo — riuscito — di tenerne la sostanza buttando via l'eccesso.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Il problema di <code>call/cc</code> è nella parola <em>tutto</em>. La continuazione catturata comprende il resto del programma fino alla fine dei tempi: se la usi dentro una libreria, ti porti dietro anche il <code>main</code> di chi ti ha chiamato. È un'astrazione che non compone bene, perché non ha confini — e un'astrazione senza confini è difficile da mettere dentro un'altra.</p>
+
+      <p>La risposta si chiama <strong>continuazione delimitata</strong>: metti un paletto (<code>reset</code>) e cattura solo il pezzo di programma fra il paletto e il punto di cattura (<code>shift</code>). La continuazione diventa allora una funzione onesta — prende un valore, restituisce un valore, finisce — invece di un buco nero che si mangia il futuro. Il costrutto <code>shift/reset</code> è stato introdotto da Olivier Danvy e Andrzej Filinski nel 1990, dopo che Matthias Felleisen aveva proposto l'idea del delimitatore un paio d'anni prima.</p>
+
+      <pre class="w-codice" data-lang="scheme">
+<span class="w-com">call/cc: k contiene TUTTO il resto del programma, fino alla fine.</span>
+(+ 1 (call/cc (lambda (k) …)))          k = (lambda (▢) (+ 1 ▢) … e poi tutto il resto)
+
+<span class="w-com">shift/reset: reset pianta il paletto, k contiene solo il pezzo fino a lì.</span>
+(reset (+ 1 (shift k …)))               k = (lambda (▢) (+ 1 ▢))     <span class="w-ev">← e basta</span></pre>
+      <p class="w-codice-nota">Una continuazione con un confine è un valore come gli altri: si può restituire, mettere in una lista, passare a una funzione. Senza confine, no.</p>
+
+      <h3 class="w-h3">Dove è finito tutto questo (spoiler: nel codice che scrivi ogni giorno)</h3>
+      <p>La grande maggioranza dei linguaggi non ha adottato <code>call/cc</code>. Ha fatto di meglio, dal punto di vista dell'ingegneria: ne ha preso <strong>i casi d'uso, uno alla volta, chiusi dentro costrutti sicuri</strong>. Ogni riga di questa tabella è una continuazione addomesticata, e adesso hai gli occhi per vederla.</p>
+
+      <table class="w-table">
+        <tr><th>Il costrutto che usi</th><th>Che continuazione è</th></tr>
+        <tr><td><code>return</code></td><td>invocare la continuazione della chiamata, saltando il resto del corpo</td></tr>
+        <tr><td><code>throw</code> / <code>catch</code></td><td>invocare una continuazione catturata più in alto nello stack</td></tr>
+        <tr><td><code>yield</code> (generatori)</td><td>la continuazione della funzione viene <em>conservata</em> e ripresa alla prossima richiesta</td></tr>
+        <tr><td><code>await</code></td><td>«sospendi qui e riprendi da questo punto quando il risultato arriva»: il compilatore spezza la funzione in due e conserva il punto</td></tr>
+        <tr><td>le callback</td><td>la continuazione scritta a mano, come nello stile CPS della tappa 04</td></tr>
+        <tr><td>goroutine, fibre, thread virtuali</td><td>continuazioni conservate e risvegliate da uno scheduler</td></tr>
+      </table>
+
+      <p>Ecco perché questa tappa non è folklore per collezionisti di linguaggi morti. Quando in Python scrivi <code>yield</code> e la funzione riprende esattamente dov'era, con le sue variabili intatte; quando in JavaScript un <code>await</code> restituisce il controllo e mezzo secondo dopo la funzione riparte dalla riga giusta — <strong>stai usando la stessa idea di questo capitolo</strong>, confezionata in modo che tu non possa farti male. Chi ha capito <code>call/cc</code> non impara <code>async/await</code>: lo riconosce.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Il percorso di ogni grande astrazione è sempre questo: <strong>qualcuno scopre la forma generale, qualcun altro la rende sicura restringendola.</strong> <code>goto</code> → cicli e funzioni. Puntatori → riferimenti e garbage collector. <code>call/cc</code> → eccezioni, generatori, <code>async</code>. Studiare la forma generale non serve a usarla: serve a capire in un pomeriggio, invece che in un anno, ogni versione ristretta che incontrerai da qui in avanti.</p>
+      </div>
+
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">I paper che lo dimostrano</span>
+        <ul>
+          <li>Danvy &amp; Filinski, <em>Abstracting Control</em> (1990) — introduce <code>shift</code> e <code>reset</code> — <span class="w-ref">ACM Conf. on LISP and Functional Programming</span></li>
+          <li>Felleisen, <em>The Theory and Practice of First-Class Prompts</em> (1988) — l'idea del delimitatore — <span class="w-ref">POPL '88</span></li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- ===== EPILOGO — non viene numerato ===== -->
+    <section class="w-tappa w-tappa--fine" id="fine">
+      <div class="w-tappa-kicker">Tutto insieme</div>
+      <h2 class="w-tappa-title">Due modi di rendere visibile l'invisibile</h2>
+      <p class="w-tappa-lead">Questo libro ha fatto due volte lo stesso gesto, su due cose diverse — ed è il gesto che, ripetuto, costituisce quasi tutta la storia dei linguaggi.</p>
+
+      <p>Nei linguaggi concatenativi è diventato visibile il <strong>contesto dei dati</strong>: dove negli altri linguaggi ci sono nomi e ambienti nascosti, lì c'è una pila che vedi. Con <code>call/cc</code> è diventato visibile il <strong>contesto del controllo</strong>: dove negli altri linguaggi c'è uno stack di ritorni che nessuno ti fa toccare, lì c'è un valore che puoi mettere in una variabile. Due volte la stessa mossa: <em>prendere qualcosa che il linguaggio teneva per sé e consegnarlo al programmatore come un dato di prima classe</em>.</p>
+
+      <p>Ed è anche il momento di dire una cosa sull'eleganza, visto che dà il titolo al libro. Nessuno di questi linguaggi ha vinto. Forth è nelle nicchie, Joy è un esperimento, <code>call/cc</code> è quasi ovunque assente. Ma le idee sono passate <em>tutte</em>: nella pila della JVM, nelle pipe della shell, nei generatori, in <code>async/await</code>. <strong>I linguaggi esoterici non servono a essere usati: servono a essere capiti, e poi a rendere ovvio ciò che negli altri linguaggi è arrivato travestito.</strong></p>
+
+      <div class="w-note w-note--memory">
+        <span class="w-note-title">Dal livello medio all'esperto assoluto: la palestra</span>
+        <ol>
+          <li><strong>Dieci minuti, subito.</strong> Traduci in postfissa tre espressioni che hai sotto mano — una con le parentesi, una con una divisione, una con un confronto — ed eseguile a mano su un foglio, disegnando la pila. Poi verificale con <code>dc</code>, che è installato su ogni Mac e ogni Linux: <code>echo "3 4 + 2 * p" | dc</code>.</li>
+          <li><strong>Scrivi la macchina.</strong> Un valutatore di espressioni postfisse: venti righe, un array come pila, uno <code>switch</code>. Poi aggiungi <code>dup</code>, <code>swap</code>, <code>drop</code> e la possibilità di definire parole nuove — e a quel punto avrai scritto un Forth minimo, che è un rito di passaggio.</li>
+          <li><strong>Prova un Forth vero.</strong> Installa <code>gforth</code> (un comando) e definisci cinque parole tue. Quindici minuti di gioco valgono tre articoli letti.</li>
+          <li><strong>CPS a mano.</strong> Prendi una funzione ricorsiva che hai scritto per il libro 3 e riscrivila in continuation-passing style: nessun <code>return</code>, tutto passa da un argomento <code>poi</code>. È fastidioso, ed è esattamente il punto: quando avrai finito, saprai che cos'è una continuazione perché ne avrai scritte a mano una dozzina.</li>
+          <li><strong>call/cc davvero.</strong> Installa Racket o Guile, ed esegui i tre esempi della tappa 05. Poi implementa un <code>return</code> anticipato e un generatore usando solo <code>call/cc</code>. Quando il generatore funzionerà, guarda il codice di <code>yield</code> nel tuo linguaggio preferito con occhi nuovi.</li>
+          <li><strong>Le letture, in quest'ordine.</strong> <em>Thinking Forth</em> di Leo Brodie, che è un libro di progettazione travestito da manuale. Poi <em>The Discoveries of Continuations</em> di Reynolds (1993), per la storia. Poi, se vuoi la vetta, i capitoli sulle continuazioni di <em>Programming Languages: Application and Interpretation</em> di Shriram Krishnamurthi — gratuito e con il codice che gira.</li>
+        </ol>
+      </div>
+
+      <div class="w-note w-note--bridge">
+        <span class="w-note-title">Il ponte con il libro 05</span>
+        <p>Abbiamo parlato di pile per un intero libro, e di uno stack di chiamate che si può catturare e conservare. È il momento di andare a vedere <strong>dove sta fisicamente quella roba</strong>: gli indirizzi, i registri, lo stack che cresce all'ingiù e lo heap che cresce all'insù. Sotto la staccionata dell'astrazione. Vai a <a href="Il-Fantasma-nella-Macchina.dc.html">Il Fantasma nella Macchina</a>.</p>
+      </div>
+    </section>
+
+    <footer class="w-footer">
+      ~ · fine del quaderno · ~<br>
+      <a href="Biblioteca.dc.html">torna alla Biblioteca</a>
+    </footer>
+
+  </main>
+</div>
+
+</x-dc>
+
+<!-- Logica delle demo interattive. -->
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    /* demo 1 — macchina a pila */
+    prog: 0, pc: 0, pila: [],
+    /* demo 2 — call/cc */
+    catturata: false, valore: 41, ris: null, log: [], invocazioni: 0
+  }
+
+  _programmi() {
+    return [
+      { simboli: ['3', '4', '+', '2', '*'], infissa: '(3 + 4) × 2' },
+      { simboli: ['5', '1', '2', '+', '4', '*', '+', '3', '-'], infissa: '5 + ((1 + 2) × 4) − 3' }
+    ];
+  }
+
+  _esegui(pila, simbolo) {
+    var p = pila.slice();
+    if (simbolo === '+' || simbolo === '*' || simbolo === '-') {
+      var b = p.pop(), a = p.pop();
+      var r = (simbolo === '+') ? a + b : (simbolo === '*' ? a * b : a - b);
+      p.push(r);
+    } else {
+      p.push(parseInt(simbolo, 10));
+    }
+    return p;
+  }
+
+  renderVals() {
+    var self = this, s = this.state;
+
+    /* ============ demo 1 ============ */
+    var prg = self._programmi()[s.prog];
+    var simboli = prg.simboli.map(function (t, k) {
+      var stato = (k < s.pc) ? ' is-done' : (k === s.pc ? ' is-now' : '');
+      return { txt: '  ' + t + '  ', cls: 'w-riga' + (k === s.pc ? ' is-now' : '') };
+    });
+    var celle = s.pila.map(function (v, k) {
+      return { v: v, eti: (k === s.pila.length - 1 ? 'cima' : 'pos. ' + k), cls: 'w-cell' + (k === s.pila.length - 1 ? ' is-on' : '') };
+    });
+    if (!celle.length) celle = [{ v: '—', eti: 'pila vuota', cls: 'w-cell is-off' }];
+    var finito = s.pc >= prg.simboli.length;
+    var stato = finito
+      ? 'finito · la pila contiene un solo valore: ' + s.pila[s.pila.length - 1] + '   (in notazione infissa: ' + prg.infissa + ')'
+      : 'prossimo simbolo: ' + prg.simboli[s.pc] + ' — ' +
+        (['+', '*', '-'].indexOf(prg.simboli[s.pc]) >= 0
+          ? 'toglie due valori dalla pila e ne rimette uno'
+          : 'sale sulla pila');
+
+    /* ============ demo 2 ============ */
+    var ccLog = s.log.length ? s.log.join('   ·   ') : 'niente è ancora successo: premi «esegui l\'espressione».';
+
+    return {
+      /* demo 1 */
+      rpnSimboli: simboli,
+      rpnPila: celle,
+      rpnStato: stato,
+      rpnPasso: function () {
+        self.setState(function (st) {
+          var pr = self._programmi()[st.prog];
+          if (st.pc >= pr.simboli.length) return {};
+          return { pila: self._esegui(st.pila, pr.simboli[st.pc]), pc: st.pc + 1 };
+        });
+      },
+      rpnTutto: function () {
+        self.setState(function (st) {
+          var pr = self._programmi()[st.prog];
+          var p = st.pila, i = st.pc;
+          while (i < pr.simboli.length) { p = self._esegui(p, pr.simboli[i]); i++; }
+          return { pila: p, pc: i };
+        });
+      },
+      rpnCambia: function () { self.setState(function (st) { return { prog: (st.prog + 1) % 2, pc: 0, pila: [] }; }); },
+      rpnReset: function () { self.setState({ pc: 0, pila: [] }); },
+
+      /* demo 2 */
+      ccK: s.catturata ? '(lambda (▢) (+ 1 ▢))' : 'non ancora catturata',
+      ccKcls: 'w-cell ' + (s.catturata ? 'is-ok' : 'is-off'),
+      ccValore: s.valore,
+      ccRis: (s.ris === null ? '—' : s.ris),
+      ccRigaCls: 'w-riga' + (s.catturata ? '' : ' is-now'),
+      ccLog: ccLog,
+      ccEsegui: function () {
+        self.setState(function (st) {
+          var l = st.log.concat(['eseguita: call/cc cattura il resto del calcolo in k, restituisce 10 → risultato 11']);
+          if (l.length > 3) l = l.slice(l.length - 3);
+          return { catturata: true, ris: 11, log: l };
+        });
+      },
+      ccInvoca: function () {
+        self.setState(function (st) {
+          if (!st.catturata) {
+            var l0 = st.log.concat(['k non esiste ancora: prima esegui l\'espressione']);
+            if (l0.length > 3) l0 = l0.slice(l0.length - 3);
+            return { log: l0 };
+          }
+          var r = 1 + st.valore;
+          var l = st.log.concat(['(salvata ' + st.valore + ') → rientro nel buco, il + 1 si rifà → ' + r]);
+          if (l.length > 3) l = l.slice(l.length - 3);
+          return { ris: r, log: l, invocazioni: st.invocazioni + 1 };
+        });
+      },
+      ccCambia: function () { self.setState(function (st) { var v = [41, 100, 7, 0]; return { valore: v[(v.indexOf(st.valore) + 1) % v.length] }; }); },
+      ccReset: function () { self.setState({ catturata: false, valore: 41, ris: null, log: [], invocazioni: 0 }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

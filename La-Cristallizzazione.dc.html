@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Cristallizzazione — funzioni, purezza e side-effect</title>
+
+<!-- ===== CONNETTORE DELLA WIKI - righe fisse, non modificarle ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./wiki/wiki.css">
+<script src="./support.js"></script>
+<script defer src="./wiki/wiki.js"></script>
+<!-- =============================================================== -->
+</head>
+<body>
+<x-dc>
+
+<div class="w-page--toc">
+
+  <aside class="w-toc"
+         data-titolo="Libro 02 · Indice"
+         data-pie='<a href="Biblioteca.dc.html">Biblioteca</a><a href="Il-Primo-Soffio.dc.html">Libro 01: il primo soffio</a><a href="La-Vertigine.dc.html">Libro 03: la ricorsione</a>'></aside>
+
+  <main class="w-main">
+
+    <!-- ===== BRICIOLE DI PANE ===== -->
+    <nav class="w-nav">
+      <a class="w-nav-home" href="Biblioteca.dc.html">← BIBLIOTECA</a>
+      <span class="w-nav-sep">/</span>
+      <span class="w-nav-here">Libro 02 · La cristallizzazione</span>
+      <a class="w-nav-next" href="La-Vertigine.dc.html">Libro 03: la ricorsione →</a>
+    </nav>
+
+    <!-- ===== COPERTINA ===== -->
+    <header class="w-hero a-blu">
+      <div class="w-hero-kicker">Il pensiero computazionale · libro 2 di 6</div>
+      <h1 class="w-hero-title">La <span class="w-mark">cristallizzazione</span></h1>
+      <p class="w-hero-sub">Prendere un frammento di logica, chiuderlo dietro un nome e aspettarsi un valore di ritorno. Poi la scoperta che divide in due la tua vita da programmatore: esiste una matematica senza macchia, e poi esiste il mondo — dove toccare lo stato cambia la realtà.</p>
+      <div class="w-hero-sign">— il tuo maestro di bottega, quaderno alla mano</div>
+    </header>
+
+    <!-- ===== COSA SI IMPARA QUI ===== -->
+    <div class="w-note w-note--info">
+      <span class="w-note-title">Cosa impari in questa pagina</span>
+      <p>Saprai perché una funzione non è "codice raggruppato" ma un <em>contratto</em>; saprai dire in dieci secondi se una funzione è pura e che cosa ci guadagni; saprai riconoscere dove il side-effect è indispensabile e come confinarlo invece di combatterlo; e saprai perché passare una funzione a un'altra funzione è la forma di riuso che ha reso possibile tutto il resto.</p>
+    </div>
+
+    <div class="w-note w-note--bridge">
+      <span class="w-note-title">Da dove veniamo</span>
+      <p>Il <a href="Il-Primo-Soffio.dc.html">libro 1</a> ha costruito il movimento — celle che cambiano, salti, cicli — e ti ha lasciato con una lavagna su cui chiunque può scrivere. Questo libro è la prima grande risposta a quel problema: <strong>recintare</strong>.</p>
+    </div>
+
+    <!-- ===== SOMMARIO ===== -->
+    <h2 class="w-h2">Il viaggio in sei tappe</h2>
+    <ol class="w-summary">
+      <li><a href="#c1"><span class="w-summary-n">01</span><span>Il gesto ripetuto e il primo nome</span><span class="w-summary-tag">subroutine</span></a></li>
+      <li><a href="#c2"><span class="w-summary-n">02</span><span>Il contratto: che cosa entra, che cosa esce</span><span class="w-summary-tag">parametri, ritorno</span></a></li>
+      <li><a href="#c3"><span class="w-summary-n">03</span><span>Il foglietto della chiamata</span><span class="w-summary-tag">stack, scope</span></a></li>
+      <li><a href="#c4"><span class="w-summary-n">04</span><span>Le funzioni pure: matematica senza macchia</span><span class="w-summary-tag">trasparenza</span></a></li>
+      <li><a href="#c5"><span class="w-summary-n">05</span><span>Il side-effect: dove il mondo entra dalla porta</span><span class="w-summary-tag">I/O, confine</span></a></li>
+      <li><a href="#c6"><span class="w-summary-n">06</span><span>Funzioni che prendono funzioni</span><span class="w-summary-tag">ordine superiore</span></a></li>
+    </ol>
+
+
+    <!-- ======================= TAPPA 01 ======================= -->
+    <section class="w-tappa" id="c1">
+
+      <div class="w-tappa-kicker">Dalla copia al richiamo</div>
+      <h2 class="w-tappa-title">Il gesto ripetuto e il primo nome</h2>
+      <p class="w-tappa-lead">Il ciclo del libro 1 ripete la stessa azione su dati diversi. Ma esiste un secondo tipo di ripetizione, che il ciclo non sa curare: la stessa azione in punti diversi del programma.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Hai scritto sei righe che calcolano una radice quadrata con il metodo di Newton. Ti servono di nuovo trenta righe più in basso. Le copi. Poi ancora, in un altro file. Le copi. Un mese dopo scopri che c'era un errore nella condizione di uscita, e adesso lo stesso errore è in tre posti — anzi in quattro, ma il quarto lo scoprirà un utente. Il ciclo non ti salva: il ciclo ripete <em>nel tempo</em>, tu hai bisogno di ripetere <em>nello spazio</em> del codice.</p>
+
+      <p>La soluzione è di una semplicità che oggi non fa nemmeno notizia: scrivi quelle sei righe <strong>una volta sola</strong>, in un posto, dai a quel posto un nome, e negli altri punti scrivi solo il nome. Ma per farlo davvero serve una cosa tutt'altro che ovvia, ed è il vero cuore dell'invenzione: quando le sei righe hanno finito, la macchina deve sapere <strong>dove tornare</strong> — e il posto da cui l'hai chiamata è diverso ogni volta.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: la ricetta appesa in cucina</span>
+        <p>In un ristorante nessuno riscrive la ricetta della besciamella su ogni comanda: la ricetta sta appesa, con un nome, e le comande dicono "besciamella". Cambiare la ricetta significa cambiare un foglio, non cinquecento comande. Ma il foglio da solo non basta: chi lo va a leggere deve ricordarsi <em>a quale piatto stava lavorando</em> per tornarci. Quel "ricordarsi dove ero" è la parte difficile, ed è ciò che il cuoco fa senza pensarci e la macchina no.</p>
+      </div>
+
+      <h3 class="w-h3">Come è successo davvero</h3>
+      <p>Siamo a Cambridge, fra il 1949 e il 1951, attorno all'EDSAC. Maurice Wilkes chiede al giovane David Wheeler di costruire una libreria di programmi riutilizzabili. L'EDSAC non era stato progettato per questo: non aveva né un registro né una pila hardware in cui depositare l'indirizzo di ritorno. Wheeler inventò allora una tecnica — passata alla storia come <em>Wheeler jump</em> — in cui il chiamante deposita il proprio indirizzo di ritorno in una cella, e l'ultima istruzione della subroutine è un salto che usa quella cella. Nel 1951 Wilkes, Wheeler e Gill pubblicano <em>The Preparation of Programs for an Electronic Digital Computer</em>: il primo libro di programmazione della storia, costruito attorno all'idea di una libreria di subroutine. L'anno dopo Wheeler presenta all'ACM un articolo che si chiama, semplicemente, <em>The use of sub-routines in programmes</em>.</p>
+
+      <p>Vale la pena fermarsi un secondo su cosa significhi. Nel 1951, quando i computer al mondo si contavano sulle dita, qualcuno aveva già capito che <strong>il pezzo di codice riutilizzabile è l'unità economica del software</strong>. Ogni <code>import</code>, ogni pacchetto, ogni chiamata a una API remota discende da quella cella dove si scriveva l'indirizzo di ritorno.</p>
+
+      <pre class="w-codice" data-lang="lo stesso gesto, tre epoche">
+<span class="w-com">EDSAC, 1951 — il ritorno è un dato che il chiamante deposita a mano</span>
+      A  17F        <span class="w-com">metti nell'accumulatore l'indirizzo di ritorno…</span>
+      T  ret        <span class="w-com">…e scrivilo dentro la subroutine, prima di saltarci</span>
+      E  sqrt
+
+<span class="w-com">C, 1972 — il ritorno lo gestisce il linguaggio, tu non lo vedi più</span>
+double r = radice(2.0);
+
+<span class="w-com">Python, oggi — non sai nemmeno più che ci sia un indirizzo di ritorno</span>
+r = radice(2.0)</pre>
+      <p class="w-codice-nota">Settant'anni di astrazioni sopra la stessa domanda: «dove torno quando ho finito?». Nel <a href="Il-Fantasma-nella-Macchina.dc.html">libro 5</a> andremo a guardare quella cella: esiste ancora, si chiama <em>return address</em> e vive sullo stack.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Una funzione non nasce per "organizzare meglio" il codice: nasce per avere <strong>un solo posto da correggere</strong>. Ogni volta che duplichi della logica non stai risparmiando tempo, stai comprando a rate la certezza di dimenticarti una delle copie.</p>
+      </div>
+
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">I paper che lo dimostrano</span>
+        <ul>
+          <li>Wilkes, Wheeler &amp; Gill, <em>The Preparation of Programs for an Electronic Digital Computer</em> (1951) — il primo libro di programmazione, fondato su una libreria di subroutine</li>
+          <li>Wheeler, <em>The use of sub-routines in programmes</em> (1952) — <span class="w-ref">Proc. 1952 ACM National Meeting (Pittsburgh), 235–236</span></li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 02 ======================= -->
+    <section class="w-tappa" id="c2">
+
+      <div class="w-tappa-kicker">Parametri e valore di ritorno</div>
+      <h2 class="w-tappa-title">Il contratto: che cosa entra, che cosa esce</h2>
+      <p class="w-tappa-lead">Dare un nome a sei righe è solo metà dell'invenzione. L'altra metà è decidere <em>di che cosa quelle righe hanno bisogno</em> — e giurare che non toccheranno nient'altro.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Una subroutine che lavora sempre sulle stesse celle globali è poco più di un'abbreviazione tipografica. Diventa uno strumento nel momento in cui dichiara i suoi <strong>parametri</strong>: "dammi un numero, io ti restituisco la sua radice". Da quel momento non stai più leggendo codice, stai leggendo un <em>contratto</em>: c'è un ingresso, c'è un'uscita, e in mezzo c'è qualcosa che non sei obbligato a guardare.</p>
+
+      <p>La parola giusta è quella del titolo di questo libro: <strong>cristallizzazione</strong>. Una logica sparsa e liquida diventa un solido con delle facce nette. E come ogni cristallo, da quel momento la puoi prendere in mano senza sapere com'è fatta dentro.</p>
+
+      <pre class="w-codice" data-lang="python">
+<span class="w-com">Prima: nessun contratto. Chi legge deve conoscere tutto il programma.</span>
+def calcola():
+    global risultato, valore, tolleranza     <span class="w-ev">← tre dipendenze invisibili</span>
+    risultato = valore
+    while abs(risultato*risultato - valore) &gt; tolleranza:
+        risultato = (risultato + valore/risultato) / 2
+
+<span class="w-com">Dopo: un contratto. Chi legge deve conoscere una riga.</span>
+def radice(valore, tolleranza=1e-9):
+    stima = valore
+    while abs(stima*stima - valore) &gt; tolleranza:
+        stima = (stima + valore/stima) / 2
+    return stima                              <span class="w-ev">← l'unica uscita dichiarata</span></pre>
+      <p class="w-codice-nota">Stesso algoritmo, due mondi diversi. Il secondo lo puoi provare, spostare in un altro file, chiamare da due thread, riscrivere da capo. Il primo no: è incastrato nel programma che lo circonda.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: la macchinetta del caffè</span>
+        <p>Metti una moneta, esce un caffè. Non sai se dentro c'è una caldaia, un ragazzo con un fornello o una pompa da 15 bar, e non è indifferenza: è che <em>non ti serve</em> saperlo per usarla, e il giorno in cui cambieranno la pompa il tuo gesto resterà lo stesso. Attenzione al limite dell'immagine, però: se la macchinetta, oltre al caffè, di nascosto sposta il tuo appuntamento in agenda, il contratto è rotto anche se il caffè è buono. Quella parte la chiameremo <em>side-effect</em>, ed è la tappa 05.</p>
+      </div>
+
+      <h3 class="w-h3">Il parametro è una copia — di che cosa, esattamente?</h3>
+      <p>Qui torna, e morde di nuovo, l'aliasing del <a href="Il-Primo-Soffio.dc.html#c6">libro 1</a>. Quando chiami <code>f(x)</code>, nella maggior parte dei linguaggi moderni il parametro riceve una <strong>copia del valore</strong> della cella. Se quel valore è un numero, la funzione può farne ciò che vuole: il tuo numero è al sicuro. Se quel valore è il <em>riferimento</em> a una lista, la copia è la copia dell'indirizzo — e la lista, quella vera, è raggiungibile e modificabile da dentro la funzione.</p>
+
+      <pre class="w-codice" data-lang="python">
+def aggiungi_zero(numeri):
+    numeri.append(0)          <span class="w-com">modifica la lista del chiamante: è la stessa</span>
+    numeri = [99]             <span class="w-com">ri-assegna solo il nome locale: il chiamante non se ne accorge</span>
+
+miei = [1, 2]
+aggiungi_zero(miei)
+print(miei)                   <span class="w-com">[1, 2, 0]  ← e non [99]</span></pre>
+      <p class="w-codice-nota">Le due righe dentro la funzione sembrano fare la stessa cosa e non potrebbero essere più diverse: la prima <em>muta l'oggetto</em>, la seconda <em>ri-punta il nome</em>. Distinguere questi due gesti è uno dei momenti in cui si diventa adulti.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Il contratto di una funzione non è la sua firma: è la firma <strong>più tutto ciò che tocca senza dirlo</strong>. Variabili globali lette, oggetti dei parametri modificati, file scritti, orologio consultato. Se la firma dice una cosa e il corpo ne fa un'altra, il chiamante non sta usando una funzione: sta correndo un rischio.</p>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 03 ======================= -->
+    <section class="w-tappa" id="c3">
+
+      <div class="w-tappa-kicker">Stack di chiamata e visibilità</div>
+      <h2 class="w-tappa-title">Il foglietto della chiamata</h2>
+      <p class="w-tappa-lead">Il contratto promette che ciò che accade dentro resta dentro. Perché quella promessa sia mantenuta serve un meccanismo — e quel meccanismo è una pila di foglietti.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Ogni volta che una funzione viene chiamata, la macchina prepara un <strong>foglietto</strong> nuovo: ci scrive i parametri ricevuti, lo spazio per le variabili locali, e l'indirizzo di ritorno — la cella di Wheeler della tappa 01. Il foglietto si appoggia sopra quelli già presenti, formando una pila. Quando la funzione finisce, il suo foglietto viene <strong>strappato</strong>: le variabili locali cessano di esistere e si riprende dal foglietto sotto, esattamente dove si era rimasti.</p>
+
+      <p>Questa struttura spiega tre cose che di solito si imparano a memoria come regole separate:</p>
+      <ul>
+        <li>perché una variabile locale <strong>non esiste più</strong> dopo il <code>return</code>: il suo foglietto è stato strappato;</li>
+        <li>perché due chiamate della stessa funzione non si disturbano: hanno due foglietti diversi, anche se il codice è lo stesso;</li>
+        <li>perché una funzione può chiamare se stessa senza confondersi — ogni chiamata ha il suo foglietto. È tutta la <a href="La-Vertigine.dc.html">ricorsione</a> del libro 3, e sta già qui.</li>
+      </ul>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: i post-it impilati sulla scrivania</span>
+        <p>Stai facendo una cosa, squilla il telefono, scrivi su un post-it dove eri arrivato e lo appoggi sopra la pila. Finita la telefonata prendi il post-it in cima, riprendi da lì, lo butti. Funziona perché la pila è <em>ordinata</em>: si aggiunge e si toglie sempre dalla stessa parte, e l'ultimo arrivato è il primo a uscire. Non serve nessuna intelligenza per gestirla, e infatti la macchina la gestisce con un solo registro che sale e scende.</p>
+      </div>
+
+      <p>Il nome di quella pila è <strong>stack</strong>, e il registro che la fa salire e scendere è lo <em>stack pointer</em>. Nel <a href="Il-Fantasma-nella-Macchina.dc.html">libro 5</a> ci metteremo dentro le mani per davvero, indirizzo per indirizzo; per adesso tieni l'immagine, perché ti serve subito per capire lo <strong>scope</strong>: la ragione per cui il codice dentro una funzione vede i propri parametri e non le variabili locali di chi l'ha chiamata è che quelle stanno su un altro foglietto — e il foglietto sotto, dalla cima della pila, non si legge.</p>
+
+      <div class="w-note w-note--warn">
+        <span class="w-note-title">Attenzione</span>
+        <p>La pila è di dimensione limitata, di solito qualche megabyte. Ogni chiamata annidata è un foglietto in più. Una ricorsione senza caso base non "gira a vuoto" come il ciclo infinito del libro 1: <strong>esaurisce lo spazio</strong> e il programma muore con <code>stack overflow</code>. Il ciclo infinito è un programma che non finisce mai; la ricorsione infinita è un programma che finisce malissimo — e la differenza fra i due errori si spiega interamente con i foglietti.</p>
+      </div>
+
+      <div class="w-note w-note--expert">
+        <span class="w-note-title">Livello esperto</span>
+        <p>«Le variabili locali muoiono col foglietto» ha un'eccezione che vale la pena conoscere subito: la <strong>chiusura</strong> (<em>closure</em>). Se una funzione interna cattura una variabile della funzione esterna e sopravvive a quest'ultima, quella variabile non può stare sul foglietto — verrebbe strappata. I linguaggi che hanno le chiusure la spostano allora sullo <em>heap</em>, la zona di memoria che non segue l'ordine delle chiamate (libro 5, tappa 03). È il motivo tecnico per cui in JavaScript un contatore catturato da una funzione continua a vivere per anni dentro un browser, e il motivo per cui in C, dove le chiusure non ci sono, restituire il puntatore a una variabile locale è un errore classico e catastrofico.</p>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 04 ======================= -->
+    <section class="w-tappa" id="c4">
+
+      <div class="w-tappa-kicker">Trasparenza referenziale</div>
+      <h2 class="w-tappa-title">Le funzioni pure: matematica senza macchia</h2>
+      <p class="w-tappa-lead">Adesso hai il contratto e hai il foglietto che lo fa rispettare. Resta una domanda che sembra filosofica e invece è la più pratica del libro: la funzione, oltre a restituire un valore, <em>fa</em> qualcosa?</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Una funzione si dice <strong>pura</strong> se rispetta due condizioni, e sono solo due. Primo: dati gli stessi argomenti restituisce sempre lo stesso risultato — sempre, oggi, domani, sull'altro continente, alla millesima chiamata. Secondo: non modifica niente fuori da sé — non scrive su variabili globali, non muta gli oggetti ricevuti, non tocca file, rete, schermo, orologio.</p>
+
+      <p>Detto così sembra una rinuncia. È invece il permesso di fare una cosa straordinaria: <strong>sostituire la chiamata con il suo risultato</strong> senza cambiare il significato del programma. Se <code>quadrato(4)</code> vale 16 ed è pura, allora ovunque nel tuo codice compaia <code>quadrato(4)</code> puoi cancellarlo e scriverci <code>16</code>, e nulla al mondo se ne accorge. Questa proprietà ha un nome — <strong>trasparenza referenziale</strong> — che Christopher Strachey prese dalla logica di Quine e portò nell'informatica nelle sue lezioni del 1967, le stesse in cui battezzò l'<em>l-value</em> e l'<em>r-value</em> che hai incontrato nel libro 1.</p>
+
+      <div class="w-demo">
+        <h4 class="w-demo-title">Prova tu — la stessa domanda, due funzioni</h4>
+        <p class="w-demo-hint">Due funzioni che sembrano gemelle. Chiamale con lo stesso argomento tutte le volte che vuoi e guarda le risposte: una si ripete sempre uguale, l'altra no — perché tiene un contatore fuori da sé. Poi accendi la <b>cache</b> e osserva che cosa si può memorizzare e che cosa no.</p>
+
+        <pre class="w-codice" data-lang="python">def pura(n):            def impura(n):
+    return n * n            global visite
+                            visite = visite + 1
+                            return n * n + visite</pre>
+
+        <div class="w-row">
+          <div class="w-cell is-on">{{ pnArg }}<b>argomento n</b></div>
+          <div class="w-cell is-ok">{{ pnPura }}<b>pura(n)</b></div>
+          <div class="w-cell is-ko">{{ pnImpura }}<b>impura(n)</b></div>
+          <div class="w-cell is-off">{{ pnVisite }}<b>visite (globale)</b></div>
+        </div>
+
+        <div class="w-demo-out">{{ pnLog }}</div>
+
+        <div class="w-row">
+          <button class="w-btn" onClick="{{ pnChiama }}">▶ chiama entrambe con n = {{ pnArg }}</button>
+          <button class="w-btn" onClick="{{ pnCambia }}">⇄ cambia n</button>
+          <button class="w-btn" onClick="{{ pnCache }}">{{ pnCacheLbl }}</button>
+          <button class="w-btn" onClick="{{ pnReset }}">↺ azzera</button>
+        </div>
+        <p class="w-demo-foot">{{ pnCacheNota }}</p>
+      </div>
+
+      <h3 class="w-h3">Che cosa ti compra, in pratica</h3>
+      <p>La purezza non è un ideale estetico: è una lista di permessi che il compilatore, la macchina e tu vi date a vicenda.</p>
+
+      <table class="w-table">
+        <tr><th>Se la funzione è pura…</th><th>…allora puoi</th></tr>
+        <tr><td>stesso input → stesso output</td><td><strong>memorizzare</strong> il risultato (cache, memoization) e non ricalcolarlo mai più</td></tr>
+        <tr><td>non tocca nulla fuori</td><td><strong>eseguirla in parallelo</strong> su mille dati senza un solo lock</td></tr>
+        <tr><td>non dipende dal momento</td><td><strong>testarla</strong> con tre righe: chiama, confronta, fine. Nessun mock, nessun setup</td></tr>
+        <tr><td>è sostituibile col risultato</td><td><strong>spostarla, rinviarla, eliminarla</strong> se il risultato non serve — e il compilatore lo fa per te</td></tr>
+        <tr><td>non ha memoria</td><td><strong>ragionarci sopra da solo</strong>, senza tenere a mente il resto del programma</td></tr>
+      </table>
+
+      <p>L'ultima riga è quella che conta più di tutte, e non ha niente a che fare con le prestazioni. Una funzione pura si capisce <strong>guardando solo lei</strong>. Una funzione impura si capisce guardando lei e tutto ciò che potrebbe averla preceduta. Il costo di leggere un programma non cresce con il numero di righe: cresce con il numero di cose che devi tenere a mente contemporaneamente.</p>
+
+      <div class="w-note w-note--memory">
+        <span class="w-note-title">Memoization: il premio più concreto</span>
+        <p>Se una funzione è pura, i suoi risultati si possono conservare in una tabella e riutilizzare. Il nome tecnico — <em>memo function</em> — lo coniò Donald Michie nel 1968 su <em>Nature</em>, presentandolo come una forma elementare di apprendimento automatico: un programma che ricorda ciò che ha già calcolato. Nel <a href="La-Vertigine.dc.html">libro 3</a> vedrai una ricorsione passare da tempi impraticabili a istantanea per l'aggiunta di una sola riga di cache. Questa è la riga.</p>
+      </div>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>La domanda da farsi davanti a ogni funzione è una sola: <strong>«posso cancellare questa chiamata e scriverci il suo risultato?»</strong>. Se sì, è pura, e allora è tua: la sposti, la memorizzi, la parallelizzi, la provi. Se no, non è un difetto — ma d'ora in poi devi sapere <em>perché</em> no.</p>
+      </div>
+
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">I paper che lo dimostrano</span>
+        <ul>
+          <li>Strachey, <em>Fundamental Concepts in Programming Languages</em> (lezioni di Copenaghen, 1967) — introduce in informatica <em>referential transparency</em>, <em>l-value</em> e <em>r-value</em> — <span class="w-ref">ripubblicato in Higher-Order and Symbolic Computation 13, 2000</span></li>
+          <li>Michie, <em>"Memo" Functions and Machine Learning</em> (1968) — <span class="w-ref">Nature 218</span></li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 05 ======================= -->
+    <section class="w-tappa" id="c5">
+
+      <div class="w-tappa-kicker">Effetti collaterali</div>
+      <h2 class="w-tappa-title">Il side-effect: dove il mondo entra dalla porta</h2>
+      <p class="w-tappa-lead">Hai appena visto la matematica senza macchia. Adesso la notizia che rende quel concetto utile invece che snob: un programma fatto solo di funzioni pure non serve rigorosamente a niente.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Un programma composto interamente di funzioni pure scalda il processore e non lascia traccia. Nessun pixel sullo schermo, nessuna riga in un database, nessun pacchetto sulla rete: tutte cose che cambiano lo stato del mondo, cioè per definizione <strong>side-effect</strong>. Il tuo lavoro esiste perché qualcuno vuole vedere qualcosa cambiare. La purezza non è la meta: <strong>è il materiale con cui si costruisce la parte grande</strong>.</p>
+
+      <p>Il salto di qualità, quello irreversibile, non è "usare funzioni pure". È accorgersi che ogni funzione appartiene a una delle due specie, saperlo dire ad alta voce per ognuna, e — questa è la mossa — <strong>disegnare il confine apposta</strong> invece di lasciarlo cadere dove capita.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: la camera bianca</span>
+        <p>Una fabbrica di microchip ha una camera sterile e un piazzale di carico. Nessuno pretende di sterilizzare il piazzale: sarebbe assurdo, lì entrano i camion. Quello che si fa è <em>decidere dove passa la porta</em>, presidiarla, e tenere il cuore del processo dall'altra parte. Un programma ben costruito è identico: un nucleo di logica pura, un guscio sottile che parla con il mondo. Se il confine non lo disegni tu, ti ritrovi la camera bianca con i camion dentro — cioè la chiamata al database in mezzo al calcolo dell'IVA.</p>
+      </div>
+
+      <pre class="w-codice" data-lang="python">
+<span class="w-com">✗ Guscio e nucleo mescolati: per provare il calcolo servono database, orologio e rete.</span>
+def applica_sconto(id_cliente):
+    cliente = db.query("SELECT * FROM clienti WHERE id=?", id_cliente)   <span class="w-com">mondo</span>
+    if datetime.now().month == 12:                                       <span class="w-com">mondo</span>
+        sconto = 0.2
+    else:
+        sconto = 0.1 if cliente.anni_fedelta &gt; 3 else 0
+    db.execute("UPDATE ordini SET sconto=? …", sconto)                   <span class="w-com">mondo</span>
+    log.info("sconto applicato")                                         <span class="w-com">mondo</span>
+    return sconto
+
+<span class="w-com">✓ Confine dichiarato: il nucleo è puro e si prova con una riga.</span>
+def calcola_sconto(anni_fedelta, mese):        <span class="w-ev">← pura: solo dati in ingresso</span>
+    if mese == 12:
+        return 0.2
+    return 0.1 if anni_fedelta &gt; 3 else 0
+
+def applica_sconto(id_cliente):                <span class="w-com">← il guscio: tutto il mondo, nessuna logica</span>
+    cliente = db.query(…)
+    sconto = calcola_sconto(cliente.anni_fedelta, datetime.now().month)
+    db.execute(…)
+    return sconto</pre>
+      <p class="w-codice-nota">Non è stata tolta una sola operazione: sono state <em>separate</em>. La prova di <code>calcola_sconto</code> è <code>assert calcola_sconto(5, 7) == 0.1</code>. La prova della prima versione richiede un database finto, un orologio finto e una giornata di lavoro.</p>
+
+      <h3 class="w-h3">I side-effect che non sembrano side-effect</h3>
+      <p>Scrivere su un file è ovvio. Questi no, e sono i quattro che si dimenticano sempre:</p>
+      <table class="w-table">
+        <tr><th>Gesto</th><th>Perché è impuro</th></tr>
+        <tr><td><code>datetime.now()</code>, <code>random()</code></td><td>stesso input, output diverso: è il mondo che entra travestito da funzione</td></tr>
+        <tr><td><code>lista.sort()</code></td><td>modifica l'oggetto del chiamante — <code>sorted(lista)</code> invece restituisce una copia ed è puro</td></tr>
+        <tr><td><code>print()</code>, <code>log.info()</code></td><td>cambia lo stato del mondo (lo schermo, un file). Innocuo, ma è un effetto</td></tr>
+        <tr><td>lanciare un'eccezione</td><td>l'uscita non è quella dichiarata dal contratto: chi chiama deve saperlo</td></tr>
+      </table>
+
+      <div class="w-note w-note--warn">
+        <span class="w-note-title">Attenzione</span>
+        <p>Il pericolo non è il side-effect: è il side-effect <strong>non dichiarato dal nome</strong>. Una funzione che si chiama <code>salva_utente()</code> e scrive sul disco fa il suo mestiere. Una che si chiama <code>valida_utente()</code> e, già che c'è, aggiorna un contatore in cache è una mina piazzata da te per te stesso fra sei mesi. Regola pratica che vale una carriera: <strong>se il nome è un sostantivo o una domanda, non deve cambiare niente; se è un verbo all'imperativo, può.</strong></p>
+      </div>
+
+      <div class="w-note w-note--expert">
+        <span class="w-note-title">Livello esperto</span>
+        <p>Alcuni linguaggi rendono il confine <em>visibile nei tipi</em> invece che nella disciplina. In Haskell una funzione che tocca il mondo ha tipo <code>IO qualcosa</code>, e il compilatore rifiuta di far passare quel valore per puro: il confine della camera bianca è controllato a compilazione. Rust fa una mossa diversa e altrettanto radicale sulla mutazione: <code>&amp;mut</code> garantisce che, mentre uno modifica un dato, nessun altro lo veda — l'aliasing del libro 1 diventa un errore di compilazione anziché un bug in produzione. Sono due risposte allo stesso problema che hai incontrato alla tappa 06 del primo libro.</p>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 06 ======================= -->
+    <section class="w-tappa" id="c6">
+
+      <div class="w-tappa-kicker">Ordine superiore e composizione</div>
+      <h2 class="w-tappa-title">Funzioni che prendono funzioni</h2>
+      <p class="w-tappa-lead">Sai racchiudere la logica dietro un nome e sai di che specie è. Ultimo passo, ed è quello che apre la porta a tutto il resto della serie: e se il valore che passi a una funzione fosse <em>un'altra funzione</em>?</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Guarda tre cicli qualsiasi del tuo codice. Uno somma, uno filtra, uno trasforma. Sono diversissimi in quello che fanno e <em>identici</em> nell'impalcatura: prendi il primo elemento, fai qualcosa, passa al successivo, fermati alla fine. L'impalcatura la riscrivi ogni volta; il "qualcosa" cambia. La tappa 01 ci ha insegnato che riscrivere la stessa cosa è un debito. Ma l'impalcatura non si può racchiudere in una funzione normale, perché il pezzo variabile non è un dato: è <strong>un'azione</strong>.</p>
+
+      <p>A meno che le azioni non siano dati anche loro. Se una funzione può essere messa in una variabile, passata come argomento e restituita come risultato — si dice allora che è di <strong>prima classe</strong> — allora l'impalcatura si scrive una volta sola.</p>
+
+      <pre class="w-codice" data-lang="python">
+<span class="w-com">Tre cicli. Guarda quanto si somigliano — e dove differiscono.</span>
+tot = 0
+for n in numeri: tot = tot + n
+
+grandi = []
+for n in numeri:
+    if n &gt; 10: grandi.append(n)
+
+doppi = []
+for n in numeri: doppi.append(n * 2)
+
+<span class="w-com">Le stesse tre cose, con l'impalcatura già scritta e l'azione passata come dato.</span>
+tot    = reduce(lambda a, b: a + b, numeri, 0)
+grandi = filter(lambda n: n &gt; 10, numeri)
+doppi  = map(lambda n: n * 2, numeri)</pre>
+      <p class="w-codice-nota">Non è concisione: è che nella seconda versione l'indice, il caso della lista vuota e la condizione d'uscita <strong>non possono più essere sbagliati</strong>, perché non li scrivi tu. Hai spostato un'intera classe di errori fuori dal tuo codice.</p>
+
+      <div class="w-demo">
+        <h4 class="w-demo-title">Prova tu — comporre come si montano dei tubi</h4>
+        <p class="w-demo-hint">Accendi e spegni i pezzi, cambia il numero di partenza e guarda il valore attraversare la catena. Ogni pezzo è una funzione pura; la composizione di funzioni pure è, sempre, un'altra funzione pura.</p>
+
+        <div class="w-row">
+          <sc-for list="{{ pipePezzi }}" as="p" hint-placeholder-count="4">
+            <button class="{{ p.cls }}" onClick="{{ p.tog }}">{{ p.nome }}</button>
+          </sc-for>
+        </div>
+
+        <div class="w-row">
+          <sc-for list="{{ pipeTappe }}" as="t" hint-placeholder-count="5">
+            <div class="{{ t.cls }}">{{ t.val }}<b>{{ t.eti }}</b></div>
+          </sc-for>
+        </div>
+
+        <div class="w-demo-out">{{ pipeFormula }}</div>
+
+        <div class="w-row">
+          <button class="w-btn" onClick="{{ pipeMeno }}">− x</button>
+          <button class="w-btn" onClick="{{ pipePiu }}">+ x</button>
+          <button class="w-btn" onClick="{{ pipeReset }}">↺ azzera</button>
+        </div>
+        <p class="w-demo-foot">Spegni tutti i pezzi: resta la funzione identità, quella che restituisce ciò che riceve. È l'elemento neutro della composizione — e il fatto che esista non è un dettaglio grazioso, è ciò che rende la composizione un'algebra.</p>
+      </div>
+
+      <h3 class="w-h3">Il riuso vero</h3>
+      <p>Adesso la frase che dà il titolo alla tappa 01 si può dire per intero. Il riuso del codice non è "copiare meno". Il riuso è che <strong>l'impalcatura e l'intenzione si separano</strong>: l'impalcatura viene scritta una volta da chi la sa scrivere bene, e tu ci metti dentro l'intenzione. Quando ordini una lista passando un criterio di confronto, stai usando un algoritmo di ordinamento scritto trent'anni fa, provato da un miliardo di esecuzioni, dentro il quale hai infilato tre parole tue. Ecco perché la funzione di ordine superiore non è un vezzo dei linguaggi funzionali: è la forma più densa di riuso mai inventata.</p>
+
+      <p>Nel 1977, ritirando il Turing Award, John Backus — l'uomo del Fortran, quello che ci aveva dato il segno <code>=</code> come assegnazione — salì sul palco e attaccò proprio ciò che aveva contribuito a costruire. La conferenza si intitola <em>Can Programming Be Liberated from the von Neumann Style?</em> e sostiene che il modo in cui programmiamo — una cella alla volta, un'assegnazione alla volta — sia una camicia di forza mentale ereditata dall'architettura della macchina, e che si debba programmare invece <strong>combinando funzioni</strong>. Vale la pena assaporare la scena: il padre del linguaggio imperativo di massa che, trent'anni dopo, dice al mondo che si può fare meglio.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Quando le funzioni sono valori, "combinare" diventa un'operazione come la somma: hai dei mattoni e un modo di attaccarli. Da qui in poi tutto il resto della serie è una variazione su questo tema — la <a href="La-Vertigine.dc.html">ricorsione</a> è una funzione che compone se stessa, i <a href="Eleganza-Esoterica.dc.html">linguaggi concatenativi</a> sono linguaggi in cui la composizione è l'unica cosa che esiste.</p>
+      </div>
+
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">I paper che lo dimostrano</span>
+        <ul>
+          <li>Backus, <em>Can Programming Be Liberated from the von Neumann Style? A Functional Style and Its Algebra of Programs</em> — Turing Award Lecture 1977 — <span class="w-ref">CACM 21(8), agosto 1978, 613–641</span></li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- ===== EPILOGO — non viene numerato ===== -->
+    <section class="w-tappa w-tappa--fine" id="fine">
+      <div class="w-tappa-kicker">Tutto insieme</div>
+      <h2 class="w-tappa-title">Il solido che puoi prendere in mano</h2>
+      <p class="w-tappa-lead">Un frammento di logica è diventato un oggetto con delle facce: un nome, degli ingressi, un'uscita, e una risposta chiara alla domanda "tocchi qualcosa?".</p>
+
+      <p>Ripercorri il movimento. Nella tappa 01 hai dato un nome a un gesto ripetuto, e hai scoperto che il problema difficile era ricordarsi dove tornare. Nella 02 il nome è diventato un contratto con ingressi e un'uscita. Nella 03 hai visto il meccanismo che fa rispettare quel contratto: una pila di foglietti. Nella 04 hai imparato a chiedere se una funzione è sostituibile con il suo risultato, e nella 05 che la risposta "no" non è una colpa — è una posizione da dichiarare sulla mappa. Nella 06 le funzioni sono diventate valori, e il riuso ha smesso di essere una raccomandazione morale per diventare un'operazione.</p>
+
+      <p>Una cosa sola, prima di andare avanti, perché è il ponte verso il libro 3. Alla tappa 03 hai visto che ogni chiamata ha il suo foglietto, indipendente da tutti gli altri. Tienila stretta: è l'unico motivo per cui, fra poche pagine, una funzione potrà chiamare <em>se stessa</em> mille volte senza confondere una singola variabile. <strong>La ricorsione non è un'idea nuova: è questa, guardata da vicino.</strong></p>
+
+      <div class="w-note w-note--memory">
+        <span class="w-note-title">Dal livello medio all'esperto assoluto: la palestra</span>
+        <ol>
+          <li><strong>Dieci minuti, subito.</strong> Apri un file qualunque del tuo codice e, accanto a ogni funzione, scrivi <code>P</code> o <code>I</code>: pura o impura. Non correggere niente, solo etichettare. Conta le <code>I</code> che ti hanno sorpreso: quelle sono le funzioni il cui nome mente.</li>
+          <li><strong>Spacca in due.</strong> Prendi la funzione più lunga che hai e separala in un nucleo puro e un guscio che parla col mondo, come nell'esempio dello sconto. Poi scrivi il test del nucleo: se ci vogliono più di tre righe, il confine è ancora nel posto sbagliato.</li>
+          <li><strong>Scrivi tu l'impalcatura.</strong> Implementa <code>map</code>, <code>filter</code> e <code>reduce</code> da zero, nel tuo linguaggio, con un ciclo dentro. Cinquanta righe in tutto. Poi riscrivi <code>map</code> e <code>filter</code> usando solo <code>reduce</code>: è il momento in cui capisci che uno dei tre è il padre degli altri due.</li>
+          <li><strong>Mettici una cache.</strong> Scrivi una funzione <code>memoizza(f)</code> che prende una funzione e ne restituisce una che ricorda i risultati già calcolati (in Python esiste già come <code>functools.lru_cache</code>: scrivila comunque a mano una volta). Provala su una funzione pura, poi su una impura, e guarda con i tuoi occhi il disastro nel secondo caso.</li>
+          <li><strong>Le letture, in quest'ordine.</strong> Il capitolo 1 di <em>Structure and Interpretation of Computer Programs</em> di Abelson e Sussman — è gratuito online e ti prepara il terreno per il libro 3 di questa serie. Poi la Turing Lecture di Backus del 1977, almeno le prime otto pagine, per sentire la polemica dalla voce di chi l'ha iniziata. Infine, se vuoi vedere il confine reso legge, i primi due capitoli di <em>Learn You a Haskell</em>: non per imparare Haskell, ma per vedere che aspetto ha un linguaggio che si rifiuta di lasciarti mentire sul contratto.</li>
+        </ol>
+      </div>
+
+      <div class="w-note w-note--bridge">
+        <span class="w-note-title">Il ponte con il libro 03</span>
+        <p>Una funzione che chiama un'altra funzione l'hai vista. Ma che cosa succede se chiama <strong>se stessa</strong>? Il foglietto della tappa 03 dice che si può fare senza confusione; il caso base dirà quando smettere. Ci aspetta un linguaggio fatto di parentesi in cui questo non è un caso particolare, ma <em>l'unico modo di fare qualsiasi cosa</em>. Vai a <a href="La-Vertigine.dc.html">La Vertigine</a>.</p>
+      </div>
+    </section>
+
+    <footer class="w-footer">
+      ~ · fine del quaderno · ~<br>
+      <a href="Biblioteca.dc.html">torna alla Biblioteca</a>
+    </footer>
+
+  </main>
+</div>
+
+</x-dc>
+
+<!-- Logica delle demo interattive. -->
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    /* demo 1 — pura vs impura */
+    n: 3, visite: 0, log: [], cacheOn: false, cache: {}, hit: 0,
+    /* demo 2 — composizione */
+    x: 3, attivi: [true, true, false]
+  }
+
+  renderVals() {
+    var self = this, s = this.state;
+
+    /* ============ demo 1 ============ */
+    var pura = s.n * s.n;
+    var impura = s.n * s.n + s.visite;
+    var chiaveInCache = Object.prototype.hasOwnProperty.call(s.cache, String(s.n));
+    var log = s.log.length ? s.log.join('  ·  ') : 'nessuna chiamata: premi il pulsante e osserva la terza cella.';
+    var notaCache = s.cacheOn
+      ? 'Cache accesa: ' + s.hit + ' risposte servite senza ricalcolare. Funziona solo per la funzione pura — per l\'altra, il valore giusto dipende da quante volte l\'hai già chiamata, e una cache non può saperlo.'
+      : 'Accendi la cache e richiama lo stesso n: la funzione pura risponde senza lavorare. Prova poi a immaginare la stessa cache sulla funzione impura.';
+
+    /* ============ demo 2 ============ */
+    var pezzi = [
+      { nome: 'raddoppia', f: function (v) { return v * 2; }, txt: 'x·2' },
+      { nome: 'aggiungi 3', f: function (v) { return v + 3; }, txt: '+3' },
+      { nome: 'quadrato', f: function (v) { return v * v; }, txt: '²' }
+    ];
+    var tappe = [{ val: s.x, eti: 'x di partenza', cls: 'w-cell is-on' }];
+    var v = s.x, formula = 'x';
+    pezzi.forEach(function (p, i) {
+      if (!s.attivi[i]) return;
+      v = p.f(v);
+      formula = (p.txt === '²') ? '(' + formula + ')²' : (p.txt === '+3' ? '(' + formula + ' + 3)' : '(' + formula + ' · 2)');
+      tappe.push({ val: v, eti: p.nome, cls: 'w-cell' });
+    });
+    tappe.push({ val: v, eti: 'risultato', cls: 'w-cell is-ok' });
+
+    var pipePezzi = pezzi.map(function (p, i) {
+      return {
+        nome: (s.attivi[i] ? '● ' : '○ ') + p.nome,
+        cls: 'w-btn',
+        tog: (function (idx) {
+          return function () {
+            self.setState(function (st) {
+              var a = st.attivi.slice();
+              a[idx] = !a[idx];
+              return { attivi: a };
+            });
+          };
+        })(i)
+      };
+    });
+
+    return {
+      /* demo 1 */
+      pnArg: s.n, pnPura: pura, pnImpura: impura, pnVisite: s.visite,
+      pnLog: log,
+      pnCacheLbl: (s.cacheOn ? '✓ cache accesa' : '○ accendi la cache'),
+      pnCacheNota: notaCache,
+      pnChiama: function () {
+        self.setState(function (st) {
+          var p = st.n * st.n;
+          var daCache = st.cacheOn && Object.prototype.hasOwnProperty.call(st.cache, String(st.n));
+          var c = Object.assign({}, st.cache);
+          if (st.cacheOn) c[String(st.n)] = p;
+          var voce = 'pura(' + st.n + ')=' + p + (daCache ? ' [dalla cache]' : '') +
+                     ' | impura(' + st.n + ')=' + (st.n * st.n + st.visite + 1);
+          var l = st.log.concat([voce]);
+          if (l.length > 4) l = l.slice(l.length - 4);
+          return { visite: st.visite + 1, log: l, cache: c, hit: st.hit + (daCache ? 1 : 0) };
+        });
+      },
+      pnCambia: function () { self.setState(function (st) { return { n: (st.n % 6) + 1 }; }); },
+      pnCache: function () { self.setState(function (st) { return { cacheOn: !st.cacheOn, cache: {}, hit: 0 }; }); },
+      pnReset: function () { self.setState({ n: 3, visite: 0, log: [], cache: {}, hit: 0 }); },
+
+      /* demo 2 */
+      pipePezzi: pipePezzi,
+      pipeTappe: tappe,
+      pipeFormula: 'f(x) = ' + formula + '   →   con x = ' + s.x + ' fa ' + v,
+      pipePiu: function () { self.setState(function (st) { return { x: st.x + 1 }; }); },
+      pipeMeno: function () { self.setState(function (st) { return { x: st.x - 1 }; }); },
+      pipeReset: function () { self.setState({ x: 3, attivi: [true, true, false] }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

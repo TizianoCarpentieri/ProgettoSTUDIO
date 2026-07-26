@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Perché studiare, oggi — comprensione profonda nell'era degli LLM</title>
+
+<!-- ===== CONNETTORE DELLA WIKI - righe fisse, non modificarle ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./wiki/wiki.css">
+<script src="./support.js"></script>
+<script defer src="./wiki/wiki.js"></script>
+<!-- =============================================================== -->
+</head>
+<body>
+<x-dc>
+
+<div class="w-page--toc">
+
+  <aside class="w-toc"
+         data-titolo="Libro 06 · Indice"
+         data-pie='<a href="Biblioteca.dc.html">Biblioteca</a><a href="Il-Fantasma-nella-Macchina.dc.html">Libro 05: sotto l&apos;astrazione</a><a href="Dentro-la-Macchina.dc.html">Dentro la Macchina</a>'></aside>
+
+  <main class="w-main">
+
+    <!-- ===== BRICIOLE DI PANE ===== -->
+    <nav class="w-nav">
+      <a class="w-nav-home" href="Biblioteca.dc.html">← BIBLIOTECA</a>
+      <span class="w-nav-sep">/</span>
+      <span class="w-nav-here">Libro 06 · Perché studiare, oggi</span>
+      <a class="w-nav-next" href="Dentro-la-Macchina.dc.html">Dentro la Macchina →</a>
+    </nav>
+
+    <!-- ===== COPERTINA ===== -->
+    <header class="w-hero a-blu">
+      <div class="w-hero-kicker">Il pensiero computazionale · libro 6 di 6</div>
+      <h1 class="w-hero-title">Perché studiare, <span class="w-mark">oggi</span></h1>
+      <p class="w-hero-sub">Ha ancora senso capire l'assegnazione, la ricorsione, lo stack, adesso che una macchina scrive il codice al posto tuo? Sì — e ne ha il doppio. Farsi tradurre un testo senza conoscere la lingua funziona benissimo, finché non devi muoverti nel mondo.</p>
+      <div class="w-hero-sign">— il tuo maestro di bottega, quaderno alla mano</div>
+    </header>
+
+    <!-- ===== COSA SI IMPARA QUI ===== -->
+    <div class="w-note w-note--info">
+      <span class="w-note-title">Cosa impari in questa pagina</span>
+      <p>Saprai rispondere alla domanda «ma tanto lo fa l'IA» con dei fatti invece che con un'opinione; saprai che cosa fa davvero un modello quando scrive codice, e quindi dove è formidabile e dove è cieco per costruzione; riconoscerai tre bug che nessuna rilettura distratta trova; e avrai — questa è la parte che conta — un motivo per studiare che non dipende dal mercato del lavoro.</p>
+    </div>
+
+    <div class="w-note w-note--bridge">
+      <span class="w-note-title">Da dove veniamo</span>
+      <p>Cinque libri: <a href="Il-Primo-Soffio.dc.html">lo stato e il tempo</a>, <a href="La-Cristallizzazione.dc.html">le funzioni e la purezza</a>, <a href="La-Vertigine.dc.html">la ricorsione e il codice che è dato</a>, <a href="Eleganza-Esoterica.dc.html">la pila e le continuazioni</a>, <a href="Il-Fantasma-nella-Macchina.dc.html">la memoria e le istruzioni</a>. Questo libro non aggiunge un concetto: aggiunge la ragione per cui gli altri cinque valgono ancora — anzi, valgono di più di prima.</p>
+    </div>
+
+    <!-- ===== SOMMARIO ===== -->
+    <h2 class="w-h2">Il viaggio in quattro tappe</h2>
+    <ol class="w-summary">
+      <li><a href="#c1"><span class="w-summary-n">01</span><span>La traduzione senza la lingua</span><span class="w-summary-tag">l'analogia</span></a></li>
+      <li><a href="#c2"><span class="w-summary-n">02</span><span>Che cosa fa davvero un modello quando scrive codice</span><span class="w-summary-tag">plausibilità</span></a></li>
+      <li><a href="#c3"><span class="w-summary-n">03</span><span>I due studi che vanno letti insieme</span><span class="w-summary-tag">i numeri</span></a></li>
+      <li><a href="#c4"><span class="w-summary-n">04</span><span>L'archeologo delle variabili antiche</span><span class="w-summary-tag">il piacere</span></a></li>
+    </ol>
+
+
+    <!-- ======================= TAPPA 01 ======================= -->
+    <section class="w-tappa" id="c1">
+
+      <div class="w-tappa-kicker">L'analogia portante</div>
+      <h2 class="w-tappa-title">La traduzione senza la lingua</h2>
+      <p class="w-tappa-lead">Prima dei fatti, l'immagine — perché è l'immagine che ti farà ricordare i fatti fra sei mesi, quando qualcuno ti dirà che non serve più studiare niente.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Immagina di dover leggere un contratto in inglese. Non sai l'inglese. Lo dai a un traduttore automatico, ottieni un testo italiano, lo leggi: hai capito il contratto. Ha funzionato. E funzionerà novantacinque volte su cento — <em>l'effetto</em> lo ottieni, ed è per questo che l'obiezione «ma tanto lo fa l'IA» non è stupida: è basata su un'esperienza reale.</p>
+
+      <p>Adesso però prova a fare le cose che si fanno davvero con una lingua. Cogliere che quella frase è una formula di cortesia e non un impegno. Accorgerti che il traduttore ha reso <em>shall</em> come <em>dovrebbe</em> quando in un contratto significa <em>deve</em>. Discutere una clausola al telefono. Sentire che l'interlocutore è a disagio. Capire una battuta. <strong>Con la traduzione ottieni il testo; con la lingua ti muovi nel mondo</strong>, e la differenza non si vede finché non ti serve — e quando ti serve, non hai il tempo di impararla.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Dove l'analogia si rompe, ed è la parte interessante</span>
+        <p>Un traduttore automatico traduce un testo che <em>esiste già</em> ed è stato scritto da qualcuno che sapeva cosa voleva dire. Un modello che scrive codice, no: <strong>l'originale non esiste</strong>. Non sta traducendo il tuo pensiero in Python — sta producendo il testo Python più plausibile date le tue parole. Se il tuo pensiero era confuso, il codice sarà chiarissimo e sbagliato: la fluidità della risposta non è mai una prova che la domanda avesse senso. È una differenza che rende l'analogia <em>ottimista</em>, non pessimista.</p>
+      </div>
+
+      <p>Chiariamo subito una cosa, perché il resto del libro non sia frainteso: <strong>non è un discorso contro l'uso degli strumenti</strong>. Sarebbe ridicolo — questa biblioteca stessa parla per metà di come funzionano quei modelli, e chi scrive codice oggi senza usarli lavora peggio. La tesi è un'altra, e più scomoda: <em>lo strumento moltiplica ciò che sei, e il fattore di moltiplicazione lo metti tu</em>. Se sai giudicare, ti fa volare. Se non sai giudicare, ti fa produrre più in fretta cose che non sai valutare — e questa non è una posizione morale, sono le due tappe che seguono.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>La domanda giusta non è «l'IA sa scrivere questo codice?». Quasi sempre sì. La domanda giusta è: <strong>«io sono in grado di dire se questo codice è giusto?»</strong>. Perché quella è l'unica parte del lavoro che non puoi delegare a chi non è responsabile del risultato.</p>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 02 ======================= -->
+    <section class="w-tappa" id="c2">
+
+      <div class="w-tappa-kicker">Come funziona, e cosa ne segue</div>
+      <h2 class="w-tappa-title">Che cosa fa davvero un modello quando scrive codice</h2>
+      <p class="w-tappa-lead">L'unico modo di sapere dove uno strumento è formidabile e dove è cieco è sapere <em>come</em> è fatto. Fortunatamente, in questa biblioteca c'è già un libro intero che lo spiega.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Un modello linguistico produce codice nello stesso modo in cui produce qualsiasi altro testo: <strong>un token alla volta, scegliendo ogni volta il pezzo più probabile dato tutto quello che c'è prima</strong>. Non c'è, nel mezzo, un momento in cui esegue mentalmente il programma; non c'è una fase in cui controlla che l'indice non esca dall'array. C'è una distribuzione di probabilità e un campionamento, ripetuti. Se questa frase ti sembra una semplificazione ingiusta, il posto per verificarla è <a href="Dentro-la-Macchina.dc.html">Dentro la Macchina</a>, che segue il percorso completo dal tasto Invio all'ultima parola; la matematica sotto sta in <a href="Fondamenti-Matematici-LLM.dc.html">La Matematica nascosta</a>.</p>
+
+      <p>Da questo unico fatto discendono, in modo abbastanza rigido, sia i punti di forza sia i punti ciechi. Vale la pena metterli in due colonne, perché quasi tutte le discussioni sull'argomento nascono dal confondere le due.</p>
+
+      <table class="w-table">
+        <tr><th>Formidabile quando…</th><th>Cieco quando…</th></tr>
+        <tr><td>il codice giusto <em>è</em> il codice più tipico: boilerplate, conversioni, API note, un parser di CSV</td><td>il codice giusto è <em>atipico</em>: il caso limite, il vincolo strano del tuo dominio, l'ottimizzazione che vale solo qui</td></tr>
+        <tr><td>ti serve una prima stesura da correggere, o una direzione quando sei bloccato</td><td>serve sapere che cosa succede <em>a tempo di esecuzione</em>: quel ciclo termina? quella ricorsione arriva in fondo?</td></tr>
+        <tr><td>devi ricordare la sintassi di qualcosa che usi due volte l'anno</td><td>il contesto che conta non è nel testo: la storia del progetto, il perché di quella scelta, il bug di tre anni fa</td></tr>
+        <tr><td>vuoi una spiegazione di codice altrui per orientarti</td><td>il codice è plausibile e sbagliato — e la plausibilità è esattamente ciò che il modello ottimizza</td></tr>
+      </table>
+
+      <p>La colonna di destra ha un nome tecnico che hai già incontrato: sono <strong>tutte le domande del <a href="Il-Fantasma-nella-Macchina.dc.html#c6">libro 5</a></strong>, quelle che si aprono quando un'astrazione perde. E c'è una simmetria che merita di essere detta ad alta voce: il modello è cieco esattamente dove tu hai passato cinque libri a imparare a vedere. Non è una coincidenza — sono le stesse cose difficili.</p>
+
+      <div class="w-note w-note--warn">
+        <span class="w-note-title">Attenzione</span>
+        <p>Il rischio non è il codice palesemente rotto: quello lo scopre il primo lancio. Il rischio è il codice <strong>quasi giusto</strong>. Funziona sui casi che provi, sbaglia sul caso limite, e ha l'aspetto rassicurante del codice scritto bene — nomi sensati, struttura ordinata, perfino i commenti. È il tipo di errore più costoso che esista, perché supera la revisione: <em>sembra giusto</em>. Nella prossima tappa ne trovi tre da smascherare con le tue mani.</p>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 03 ======================= -->
+    <section class="w-tappa" id="c3">
+
+      <div class="w-tappa-kicker">I numeri, non le opinioni</div>
+      <h2 class="w-tappa-title">I due studi che vanno letti insieme</h2>
+      <p class="w-tappa-lead">Su questo argomento tutti hanno un aneddoto e nessuno ha una misura. Le misure però esistono, sono due, e messe una accanto all'altra dicono una cosa molto più precisa di entrambe da sole.</p>
+
+      <h3 class="w-h3">Il primo: l'accelerazione è vera</h3>
+      <p class="w-drop">Nel 2022 GitHub e Microsoft hanno condotto un esperimento controllato: novantacinque sviluppatori professionisti, divisi a caso in due gruppi, con il compito di scrivere un server HTTP in JavaScript. Chi aveva Copilot ha finito in media in 1 ora e 11 minuti; chi non l'aveva, in 2 ore e 41. Circa il <strong>55% più veloce</strong>, con significatività statistica. Il risultato è pubblicato (Peng et al., <em>The Impact of AI on Developer Productivity</em>, 2023) ed è solido per ciò che misura.</p>
+
+      <h3 class="w-h3">Il secondo: e allo stesso tempo è falsa</h3>
+      <p>Nel luglio 2025 METR ha pubblicato un esperimento randomizzato di forma diversa: sedici sviluppatori <em>esperti</em>, 246 compiti <em>veri</em> presi dai loro progetti maturi — repository su cui lavoravano da cinque anni in media — con strumenti di frontiera. Risultato: con l'IA hanno impiegato il <strong>19% di tempo in più</strong>. Non il 19% in meno: in più.</p>
+
+      <p>E qui arriva il dato che, di tutto questo libro, è quello da portarsi a casa. Agli stessi sviluppatori è stato chiesto quanto pensassero di aver guadagnato. Prima di cominciare stimavano un risparmio del 24%. <strong>Dopo aver finito — a lavoro fatto, con l'esperienza in corpo — dichiaravano di essere andati il 20% più veloci. Erano andati il 19% più lenti.</strong></p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>I due studi non si contraddicono: misurano due situazioni diverse, ed è la differenza a dire tutto. <strong>Compito nuovo, tecnologia che non padroneggi, nessun codice preesistente</strong> → l'accelerazione è enorme e reale. <strong>Codice tuo, maturo, che conosci a fondo, con vincoli impliciti ovunque</strong> → il tempo se ne va nel leggere, valutare, correggere ciò che è stato proposto. Più sei esperto e più il contesto è denso, più il collo di bottiglia si sposta dalla scrittura al <em>giudizio</em>. E il giudizio è la cosa che si studia.</p>
+      </div>
+
+      <p>Un avvertimento onesto, che l'onestà di questa biblioteca impone: lo studio METR è un'istantanea su sedici persone con gli strumenti di metà 2025, e gli stessi autori lo presentano così. Non è la prova che l'IA rallenti sempre. Ma il divario di percezione — <em>credere di aver guadagnato il 20% mentre si perdeva il 19%</em> — è il genere di risultato che non dipende dalla versione del modello, perché riguarda noi. Ed è la ragione tecnica per cui la sensazione di velocità non è mai una misura di velocità.</p>
+
+      <div class="w-demo">
+        <h4 class="w-demo-title">Prova tu — tre frammenti plausibili, tre bug</h4>
+        <p class="w-demo-hint">Tre pezzi di codice come ne arrivano da un assistente: puliti, ordinati, con nomi sensati. In ognuno c'è un errore che non si vede rileggendo, e che si vede subito se hai letto uno dei cinque libri. Scegli il frammento, prova a trovarlo da solo, <b>poi</b> rivela.</p>
+
+        <div class="w-row">
+          <sc-for list="{{ bugSchede }}" as="s" hint-placeholder-count="3">
+            <button class="{{ s.cls }}" onClick="{{ s.scegli }}">{{ s.eti }}</button>
+          </sc-for>
+        </div>
+
+        <div class="w-prog">
+          <sc-for list="{{ bugRighe }}" as="r" hint-placeholder-count="6"><span class="{{ r.cls }}">{{ r.txt }}</span></sc-for>
+        </div>
+
+        <div class="w-demo-out">{{ bugTesto }}</div>
+
+        <div class="w-row">
+          <button class="w-btn" onClick="{{ bugRivela }}">{{ bugLabel }}</button>
+          <button class="w-btn" onClick="{{ bugReset }}">↺ richiudi</button>
+        </div>
+        <p class="w-demo-foot">{{ bugRimando }}</p>
+      </div>
+
+      <p>Nessuno di questi tre errori è esotico, e nessuno dei tre viene dal fatto che il modello sia scadente: vengono dal fatto che il codice più <em>tipico</em> per quella richiesta è quello sbagliato. Un revisore che conosce l'aliasing, i side-effect e il costo dello stack li vede in dieci secondi. Un revisore che non li conosce approva, e il bug esce con la prossima versione.</p>
+
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">Gli studi citati</span>
+        <ul>
+          <li>Peng, Kalliamvakou, Cihon &amp; Demirer, <em>The Impact of AI on Developer Productivity: Evidence from GitHub Copilot</em> (2023) — 95 sviluppatori, compito nuovo, ~55% più veloci — <span class="w-ref">arXiv:2302.06590</span></li>
+          <li>METR, <em>Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity</em> (luglio 2025) — 16 sviluppatori esperti, 246 compiti reali su repository maturi: 19% più lenti, mentre si stimavano il 20% più veloci — <span class="w-ref">arXiv:2507.09089</span></li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 04 ======================= -->
+    <section class="w-tappa" id="c4">
+
+      <div class="w-tappa-kicker">La ragione vera</div>
+      <h2 class="w-tappa-title">L'archeologo delle variabili antiche</h2>
+      <p class="w-tappa-lead">Fin qui abbiamo argomentato con i numeri, e i numeri servono per convincere gli altri. Adesso la ragione per cui studierai davvero, che con la produttività non ha niente a che fare.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Tutto quello che hai letto in questa serie è <strong>archeologia</strong>. La cella di Wheeler del 1951, dove si scriveva a mano l'indirizzo di ritorno. La <code>eval</code> che McCarthy aveva messo su carta come dimostrazione e Steve Russell tradusse in codice macchina ridendogli in faccia. Chuck Moore che nel 1968 costruisce un linguaggio intero per far girare un radiotelescopio con pochi kilobyte. La lettera di Dijkstra, ribattezzata da un direttore di rivista, che ha dato al mondo il modello di titolo polemico più imitato di sempre.</p>
+
+      <p>Toccare con mano quelle variabili antiche non serve a lavorare meglio. Serve a un'altra cosa, e questa serie esiste per quella: <strong>capire come funziona il pensiero umano specchiato nella macchina</strong>. Perché è di questo che si tratta, ogni volta. L'assegnazione è il tempo. La funzione è il nome dato a un gesto. La ricorsione è il coraggio di fidarsi di se stessi su un problema più piccolo. La continuazione è la memoria del futuro. Ogni concetto di questi cinque libri è un pezzo di mente umana reso eseguibile, e vederlo funzionare è un piacere che non somiglia a nessun altro.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: l'astronomo e il navigatore satellitare</span>
+        <p>Il navigatore ti porta ovunque senza che tu sappia niente del cielo. Funziona, ed è giusto usarlo. Ma chi conosce le stelle vede una cosa in più — non "in modo più efficiente": <em>una cosa in più</em>, che al navigatore non è mai passata per la testa di mostrare. E il giorno in cui il segnale cade, o ti manda contromano in una strada chiusa da un anno, l'astronomo se ne accorge un istante prima. Non è il motivo per cui ha studiato le stelle, ed è una conseguenza che si prende volentieri.</p>
+      </div>
+
+      <h3 class="w-h3">E allora: raddoppia</h3>
+      <p>Mettiamo insieme il pezzo pratico e quello personale, perché la conclusione è una sola. Quando la stesura del codice costa poco, il valore si sposta tutto sulle cose che la stesura non risolve: <strong>capire il problema, scegliere l'astrazione giusta, riconoscere che quella risposta plausibile è sbagliata, sapere quando scendere sotto la staccionata</strong>. Sono esattamente le competenze che non si ottengono facendo fare, perché si formano solo mentre si fa.</p>
+
+      <p>Ecco perché la risposta alla domanda del titolo non è "sì, ha ancora senso". È che <strong>ne ha il doppio</strong>. Prima, chi non capiva a fondo era comunque un po' utile: scriveva codice, lentamente. Adesso quella parte lì la fa la macchina, in un decimo del tempo. Ciò che resta di prezioso è <em>la comprensione</em> — cioè precisamente la cosa che sembrava non servisse più.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Chi sa saltare la staccionata farà la differenza. Non perché scriverà più codice degli altri — anzi, probabilmente meno. Perché sarà <strong>l'unico nella stanza in grado di dire perché quella cosa non funziona</strong>, e di dirlo prima che sia in produzione. In un mondo in cui produrre soluzioni plausibili costa quasi zero, l'unica competenza scarsa è saperle giudicare.</p>
+      </div>
+    </section>
+
+
+    <!-- ===== EPILOGO — non viene numerato ===== -->
+    <section class="w-tappa w-tappa--fine" id="fine">
+      <div class="w-tappa-kicker">Tutto insieme</div>
+      <h2 class="w-tappa-title">Sei libri, una sola mossa</h2>
+      <p class="w-tappa-lead">Se dovessi tenere una frase sola di tutta la serie, sarebbe questa: ogni volta che qualcosa si è definito in termini di se stesso, è nata una potenza nuova.</p>
+
+      <p>Una variabile in termini del proprio valore precedente: <strong>il tempo</strong>. Una funzione in termini di se stessa: <strong>la ricorsione</strong>. Un linguaggio in termini di se stesso — <code>eval</code> che chiama <code>apply</code> — <strong>le macro, il codice che scrive codice</strong>. Un programma che cattura il proprio futuro: <strong>le continuazioni</strong>. Un'astrazione che descrive l'astrazione sotto di sé: <strong>la staccionata, e la scoperta che non c'è un fondo</strong>. E infine, oggi, una macchina addestrata sul testo prodotto dagli umani che produce testo per gli umani: l'autoriferimento è arrivato a noi.</p>
+
+      <p>Il caso base — l'hai imparato nel libro 3 — è ciò che distingue una potenza da un paradosso. Nella tua carriera, il caso base sei tu: <strong>la persona che a un certo punto smette di delegare la domanda e va a vedere</strong>. Questa biblioteca esiste per rendere quel gesto più facile, e più divertente.</p>
+
+      <div class="w-note w-note--memory">
+        <span class="w-note-title">La palestra finale: sei esercizi, uno per libro</span>
+        <ol>
+          <li><strong>Il tempo.</strong> Fai svanire un incremento con due thread su un contatore condiviso, poi rimettici un lock. (<a href="Il-Primo-Soffio.dc.html">libro 1</a>)</li>
+          <li><strong>Il confine.</strong> Prendi la tua funzione più lunga e spaccala in un nucleo puro e un guscio che parla col mondo. Poi provala in tre righe. (<a href="La-Cristallizzazione.dc.html">libro 2</a>)</li>
+          <li><strong>L'interprete.</strong> Scrivi un Lisp in centoventi righe nel linguaggio che preferisci. È l'esercizio che divide in due una carriera. (<a href="La-Vertigine.dc.html">libro 3</a>)</li>
+          <li><strong>Il controllo.</strong> Costruisci un generatore usando solo <code>call/cc</code> in Racket, poi guarda <code>yield</code> nel tuo linguaggio con occhi nuovi. (<a href="Eleganza-Esoterica.dc.html">libro 4</a>)</li>
+          <li><strong>Il piano di sotto.</strong> Su godbolt, guarda in che cosa diventano tre righe di C a <code>-O0</code> e a <code>-O2</code>. Poi misura array contro lista concatenata. (<a href="Il-Fantasma-nella-Macchina.dc.html">libro 5</a>)</li>
+          <li><strong>Il giudizio.</strong> Per una settimana, ogni volta che accetti del codice generato, scrivi in una riga <em>perché</em> sei sicuro che sia giusto. Quando non riesci a scrivere quella riga, hai trovato la cosa che ti manca da studiare: è il modo più efficiente che conosco di scegliere il prossimo argomento.</li>
+        </ol>
+      </div>
+
+      <div class="w-note w-note--bridge">
+        <span class="w-note-title">Il ponte con l'altro scaffale</span>
+        <p>Hai capito come pensa un programmatore. Il passo naturale è capire come "pensa" la macchina a cui adesso chiedi di programmare: <a href="Dentro-la-Macchina.dc.html">Dentro la Macchina</a> segue un modello linguistico dal tasto Invio all'ultima parola, e <a href="Fondamenti-Matematici-LLM.dc.html">La Matematica nascosta</a> ne mostra l'algebra. Sono lo stesso viaggio, dall'altra parte del vetro.</p>
+      </div>
+    </section>
+
+    <footer class="w-footer">
+      ~ · fine del quaderno · ~<br>
+      <a href="Biblioteca.dc.html">torna alla Biblioteca</a>
+    </footer>
+
+  </main>
+</div>
+
+</x-dc>
+
+<!-- Logica delle demo interattive. -->
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { scheda: 0, rivelato: false }
+
+  _casi() {
+    return [
+      {
+        eti: '1 · accumulatore',
+        codice: [
+          'def raccogli(elemento, deposito=[]):',
+          '    """Aggiunge un elemento al deposito e lo restituisce."""',
+          '    deposito.append(elemento)',
+          '    return deposito',
+          '',
+          'a = raccogli("x")     # ["x"]',
+          'b = raccogli("y")     # ["y"] …ne sei sicuro?'
+        ],
+        bug: 'b vale ["x", "y"]. Il valore di default viene creato UNA VOLTA SOLA, alla definizione della funzione: tutte le chiamate senza argomento condividono la stessa lista. È l\'aliasing del libro 1 nascosto in una firma di funzione — e una funzione che sembra pura non lo è affatto: ha uno stato interno che sopravvive fra le chiamate.',
+        rimando: 'Lo vede chi ha letto: libro 1 (un oggetto, due nomi) e libro 2 (funzioni pure e side-effect).'
+      },
+      {
+        eti: '2 · ordinamento',
+        codice: [
+          'def per_punteggio(giocatori):',
+          '    """Restituisce i giocatori ordinati per punteggio."""',
+          '    return giocatori.sort(key=lambda g: g.punti, reverse=True)',
+          '',
+          'classifica = per_punteggio(squadra)',
+          'print(len(classifica))'
+        ],
+        bug: 'Due errori in una riga. Primo: sort() ordina sul posto e restituisce None — la variabile classifica vale None e len() esplode. Secondo, più subdolo: la funzione dice "restituisce" ma MODIFICA la lista del chiamante, che da quel momento è riordinata a sua insaputa. La versione giusta è sorted(giocatori, key=…), che lascia intatto l\'originale.',
+        rimando: 'Lo vede chi ha letto: libro 2 (il contratto è la firma più tutto ciò che tocca senza dirlo).'
+      },
+      {
+        eti: '3 · albero',
+        codice: [
+          'def peso_totale(cartella):',
+          '    """Somma la dimensione di tutti i file, anche nelle sottocartelle."""',
+          '    totale = 0',
+          '    for voce in cartella.figli:',
+          '        if voce.is_file:',
+          '            totale += voce.dimensione',
+          '        else:',
+          '            totale += peso_totale(voce)',
+          '    return totale'
+        ],
+        bug: 'La logica è corretta e il codice è pulito: su una cartella normale funziona benissimo. Poi arriva un albero profondo qualche migliaio di livelli — o un collegamento simbolico che punta a un antenato — e ottieni RecursionError, oppure un ciclo infinito che consuma un frame di stack per giro. Manca sia un limite di profondità sia la memoria dei nodi già visitati. È corretto e non è robusto: due cose diverse.',
+        rimando: 'Lo vede chi ha letto: libro 3 (la profondità si paga in memoria) e libro 5 (lo stack è una zona finita).'
+      }
+    ];
+  }
+
+  renderVals() {
+    var self = this, s = this.state;
+    var casi = self._casi();
+    var caso = casi[s.scheda];
+
+    var schede = casi.map(function (c, i) {
+      return {
+        eti: c.eti,
+        cls: 'w-btn',
+        scegli: (function (idx) {
+          return function () { self.setState({ scheda: idx, rivelato: false }); };
+        })(i)
+      };
+    });
+
+    var righe = caso.codice.map(function (t) { return { txt: t, cls: 'w-riga' }; });
+
+    return {
+      bugSchede: schede,
+      bugRighe: righe,
+      bugTesto: s.rivelato ? caso.bug : 'Guarda il codice e chiediti: che cosa succede alla SECONDA chiamata? chi possiede i dati che tocca? fin dove può arrivare? Quando hai una risposta, rivela.',
+      bugLabel: s.rivelato ? '✓ già rivelato' : '👁 rivela il bug',
+      bugRimando: s.rivelato ? caso.rimando : 'Suggerimento: nessuno dei tre errori riguarda la sintassi. Tutti e tre riguardano qualcosa che succede a tempo di esecuzione.',
+      bugRivela: function () { self.setState({ rivelato: true }); },
+      bugReset: function () { self.setState({ rivelato: false }); }
+    };
+  }
+}
+</script>
+</body>
+</html>
