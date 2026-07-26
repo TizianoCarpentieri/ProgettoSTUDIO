@@ -604,7 +604,12 @@ a.w-card:hover { color: var(--ink); transform: translate(-3px, -3px); box-shadow
 .w-frame.is-done { color: var(--ink-faint); border-left-color: var(--verde); }
 
 .w-prog { font-family: var(--font-mono); font-size: 13px; line-height: 1.75; margin: 10px 0; }
-.w-prog .w-riga { display: block; padding: 1px 8px; border-radius: 4px; white-space: pre; }
+/* `width: max-content` è ciò che fa scorrere davvero il programma su schermo
+   stretto: senza, la riga resta larga quanto il riquadro, il testo trabocca
+   fuori dal suo box e il contenitore non sa di doversi allargare — la fine
+   della riga diventa irraggiungibile. `min-width: 100%` tiene comunque
+   l'evidenziazione larga quanto il riquadro sulle righe corte. */
+.w-prog .w-riga { display: block; width: max-content; min-width: 100%; box-sizing: border-box; padding: 1px 8px; border-radius: 4px; white-space: pre; }
 .w-prog .w-riga.is-now { background: color-mix(in srgb, var(--accent) 16%, transparent); font-weight: 600; }
 
 .w-footer { margin-top: var(--s6); padding-top: var(--s4); border-top: 1px dashed var(--rule); font-size: 14px; color: var(--ink-soft); text-align: center; }
@@ -719,4 +724,84 @@ html.w-anim .w-reveal.is-in { opacity: 1; transform: none; }
   .w-brain { height: min(52vh, 380px); }
   .w-brain-hint { display: none; }
   .w-brain-panel { width: min(300px, 82vw); left: 14px; bottom: 14px; }
+
+  /* Sul telefono il canvas incorniciato NON prende il dito: trascinare per
+     scorrere la pagina deve scorrere la pagina, non ruotare il grafo. Il
+     cervello resta un poster vivo; per esplorarlo si apre a schermo intero,
+     dove il dito serve solo a lui. */
+  .w-brain canvas { pointer-events: none; }
+  .w-brainwrap.is-full .w-brain canvas { pointer-events: auto; }
+}
+
+
+/* ==========================================================================
+   8. TELEFONO
+   --------------------------------------------------------------------------
+   La wiki si legge molto sul telefono, quindi questa non è una riduzione: è
+   il secondo formato di lettura. Due principi.
+
+   1. NIENTE PUÒ SPINGERE LA PAGINA DI LATO. Un blocco più largo dello
+      schermo — un listato, un programma di una demo, una tabella — scorre
+      DENTRO il proprio riquadro. Il corpo della pagina non scorre mai in
+      orizzontale: è il modo più veloce di far sembrare rotto un sito.
+   2. Meno margini, non meno contenuto. Si stringono le cornici e si scala la
+      tipografia; non si nasconde niente che sul desktop si legga.
+   ========================================================================== */
+
+/* Vale a ogni larghezza: ciò che è lungo scorre per conto suo. */
+.w-prog { overflow-x: auto; }
+.w-demo-out { overflow-x: auto; }
+.w-demo { overflow-x: auto; }   /* rete di sicurezza: nessuna demo spinge la pagina */
+.w-frame { overflow-wrap: anywhere; }
+code { overflow-wrap: break-word; }
+
+@media (max-width: 720px) {
+  :root { --size-base: 16.5px; --grid-step: 24px; }
+
+  .w-page { padding: 0 15px 80px; }
+  .w-page--toc { padding: 0 15px 80px; gap: 0; }
+
+  .w-hero { padding: 40px 0 22px; }
+  .w-hero-sub { font-size: 17px; }
+  .w-hero-sign { font-size: 20px; }
+
+  .w-h2 { font-size: 30px; }
+  .w-h3 { font-size: 24px; }
+  .w-tappa-lead { font-size: 17px; }
+  .w-drop::first-letter { font-size: 52px; padding: 4px 9px 0 0; }
+
+  /* Il riquadro: meno rientro per l'icona, più larghezza per il testo. */
+  .w-note { padding: 14px 16px 14px 46px; }
+  .w-note::before { left: 15px; top: 16px; width: 18px; height: 18px; }
+  .w-note-title { font-size: 20px; }
+
+  .w-demo { padding: 14px; }
+  .w-codice { font-size: 12px; padding: 22px 13px 12px; }
+  .w-cell { font-size: 12.5px; padding: 6px 9px; }
+  /* Bersaglio di tocco: col dito servono ~44px, non i 33 che bastano al mouse. */
+  .w-btn { padding: 10px 15px; }
+
+  /* Il sommario: l'etichetta va a capo sotto il titolo invece di strizzarlo,
+     ma il numero resta accanto al titolo — se il titolo può prendersi tutta
+     la riga, il numero resta solo sopra e sembra un errore. */
+  .w-summary a { flex-wrap: wrap; }
+  .w-summary a > span:nth-child(2) { flex: 1 1 0; min-width: 0; }
+  .w-summary-tag { margin-left: 0; flex-basis: 100%; padding-left: 38px; }
+
+  /* Le tabelle di confronto: scorrono, invece di ridursi a due parole per riga. */
+  .w-table { display: block; overflow-x: auto; }
+  .w-table tbody { display: table; width: 100%; min-width: 460px; }
+
+  .w-brainwrap { padding: 0 15px; margin-top: var(--s5); }
+  .w-brainwrap-title { font-size: 28px; }
+
+  .w-themebtn { width: 42px; height: 42px; right: 12px; bottom: 12px; }
+}
+
+/* Telefoni stretti (iPhone SE e simili): solo un altro giro di vite. */
+@media (max-width: 400px) {
+  .w-page, .w-page--toc, .w-brainwrap { padding-left: 12px; padding-right: 12px; }
+  .w-note { padding: 13px 13px 13px 42px; }
+  .w-note::before { left: 13px; }
+  .w-codice { font-size: 11.5px; }
 }

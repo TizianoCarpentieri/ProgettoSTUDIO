@@ -27,4 +27,6 @@ Sette documenti, sette domande diverse. Parti da quello che risponde alla tua.
 | agganciare un modulo al grafo del sapere | i campi `nodo` / `concetti` / `collegamenti` in [wiki/wiki-index.js](wiki/wiki-index.js) |
 | capire il cervello 3D e il grafo | [wiki/graph/](wiki/graph/) e lo spec del cervello in [docs/decisioni/](docs/decisioni/) |
 | controllare che il grafo sia coerente | `node wiki/graph/valida.js` |
+| controllare che le pagine reggano su telefono e scrivania | `node strumenti/verifica-pagine.js` |
+| capire le regole per il telefono | [AgentFE.md](docs/AgentFE.md) § *Il telefono è il secondo formato* |
 | pubblicare le modifiche | [OVERVIEW.md](docs/OVERVIEW.md) § *Pubblicazione su GitHub* |

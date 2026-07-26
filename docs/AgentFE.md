@@ -279,6 +279,30 @@ Un'animazione non deve mai poter far sparire del contenuto. Con
 
 ---
 
+## Il telefono è il secondo formato, non un ripiego
+
+Metà della wiki si legge da telefono. Due regole, e la prima non ammette
+eccezioni:
+
+1. **Niente può spingere la pagina di lato.** Il corpo non scorre mai in
+   orizzontale — è il modo più veloce di far sembrare rotto un sito. Ciò che è
+   più largo dello schermo (un listato, il programma di una demo, una tabella
+   di confronto) deve scorrere **dentro il proprio riquadro**. Se aggiungi un
+   blocco largo, dagli `overflow-x: auto`.
+2. **Meno margini, non meno contenuto.** Sotto i 720px si stringono le cornici
+   e si scala la tipografia; non si nasconde niente che sul desktop si legga.
+   L'unica eccezione storica è l'indice laterale, che sotto i 1080px sparisce
+   perché il sommario a inizio pagina fa lo stesso lavoro.
+
+Il blocco `@media` in fondo a `wiki/wiki.css` fa questo lavoro per tutte le
+classi standard. Una trappola già pagata: dentro un contenitore che scorre, le
+righe di codice devono avere `width: max-content`, altrimenti restano larghe
+quanto il riquadro, il testo trabocca fuori dal loro box e **la fine della riga
+diventa irraggiungibile** anche se il contenitore scorre.
+
+Sul telefono il canvas del cervello 3D non prende il dito: trascinare deve
+scorrere la pagina. Per esplorarlo si apre a schermo intero.
+
 ## Come si verifica una pagina
 
 Prima di considerarla finita:
@@ -287,17 +311,26 @@ Prima di considerarla finita:
 2. scorri fino in fondo: il reticolo deve coprire tutta l'altezza;
 3. controlla che l'indice laterale elenchi tutte le tappe e si evidenzi;
 4. se ci sono demo, provale davvero;
-5. cerca `style="` nel file: dovrebbe comparire solo dentro le demo.
+5. cerca `style="` nel file: dovrebbe comparire solo dentro le demo;
+6. **restringi la finestra a 390px** e riscorri: niente deve sporgere.
 
-Verifica rapida che non siano rimasti binding irrisolti:
+Il controllo automatico fa i punti 4 e 6 su tutte le pagine, a larghezza di
+telefono e di scrivania:
 
 ```bash
-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
-  --headless --disable-gpu --virtual-time-budget=15000 \
-  --dump-dom "file://$PWD/NomePagina.dc.html" | grep -o '{{[^}]*}}'
+node strumenti/verifica-pagine.js            # tutte
+node strumenti/verifica-pagine.js Nome.dc.html
 ```
 
-Se non stampa nulla, i binding sono a posto.
+Controlla, in quest'ordine: che la pagina si sia **resa** (c'è testo visibile),
+che non restino binding `{{ … }}` sotto gli occhi del lettore, che il corpo non
+scorra in orizzontale, e che le demo siano vive.
+
+> Il primo controllo esiste per un errore vero: se il runtime non parte — di
+> solito perché manca la rete, che serve al primo caricamento per React — la
+> pagina resta piena di markup **invisibile**, e ogni verifica fatta sul
+> sorgente passa per finta. Se lo script dice *«PAGINA NON RESA»* su tutte le
+> pagine, guarda la rete prima del contenuto.
 
 ---
 
