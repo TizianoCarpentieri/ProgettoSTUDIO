@@ -24,7 +24,7 @@
   <a class="w-nav-home" href="Biblioteca.dc.html">← BIBLIOTECA</a>
   <span class="w-nav-sep">/</span>
   <span class="w-nav-here">Modulo 02 · Fondamenti matematici</span>
-  <a href="Dentro-la-Macchina.dc.html" style="margin-left:auto;color:var(--ink-soft);border-color:rgba(107,111,122,.3)">Modulo 01: come genera testo →</a>
+  <a class="w-nav-next a-ink" href="Dentro-la-Macchina.dc.html">Modulo 01: come genera testo →</a>
 </nav>
 
 <header class="w-hero">
@@ -34,19 +34,19 @@
   <div class="w-hero-sign">— il tuo maestro di bottega, gessetto alla mano</div>
 </header>
 
-<div style="border:2px solid var(--ink);border-radius:14px;background:var(--paper-raised);padding:18px 22px;margin:30px 0;box-shadow:4px 4px 0 rgba(32,36,44,.12)">
-  <h3 class="w-note-title" style="font-size:26px">La legenda delle penne ✒️</h3>
+<div class="w-legenda">
+  <h3 class="w-note-title">La legenda delle penne ✒️</h3>
   <p>Le stesse del primo quaderno, così i due libri si leggono in coppia:</p>
   <ul class="w-legend">
-    <li><i style="background:var(--ink)"></i> Struttura e testo — le idee portanti</li>
-    <li><i style="background:var(--blu)"></i> Calcolo — dove avviene la matematica</li>
-    <li><i style="background:var(--rosso)"></i> Note a margine — cose da non dimenticare</li>
-    <li><i style="background:var(--arancio)"></i> Prova tu — banchi con gli esperimenti interattivi</li>
-    <li><i style="background:var(--viola)"></i> Livello esperto — i dettagli da professionisti</li>
+    <li class="a-ink"><i></i> Struttura e testo — le idee portanti</li>
+    <li class="a-blu"><i></i> Calcolo — dove avviene la matematica</li>
+    <li class="a-rosso"><i></i> Note a margine — cose da non dimenticare</li>
+    <li class="a-arancio"><i></i> Prova tu — banchi con gli esperimenti interattivi</li>
+    <li class="a-viola"><i></i> Livello esperto — i dettagli da professionisti</li>
   </ul>
 </div>
 
-<nav style="margin:30px 0 10px">
+<nav class="w-summary-nav">
   <h2 class="w-h2">Il viaggio in sette tappe</h2>
   <ol class="w-summary">
     <li><a href="#c1"><span class="w-summary-n">01</span><span>I Vettori — dare coordinate al significato</span><span class="w-summary-tag">norma, prodotto scalare, coseno</span></a></li>
@@ -59,7 +59,7 @@
   </ol>
 </nav>
 
-<div class="w-note w-note--warn"><b style="color:var(--rosso)">Come leggere questo libro.</b> Ogni concetto arriva prima come <em>immagine mentale</em>, poi come numeri veri, e solo alla fine come formula. I banchi arancioni <b style="color:var(--arancio)">"Prova tu"</b> sono interattivi: muovi i cursori e guarda la matematica muoversi. Non serve saper già l'algebra lineare — te la costruiamo qui, mattone su mattone.</div>
+<div class="w-note w-note--warn"><b class="w-em a-rosso">Come leggere questo libro.</b> Ogni concetto arriva prima come <em>immagine mentale</em>, poi come numeri veri, e solo alla fine come formula. I banchi arancioni <b class="w-em a-arancio">"Prova tu"</b> sono interattivi: muovi i cursori e guarda la matematica muoversi. Non serve saper già l'algebra lineare — te la costruiamo qui, mattone su mattone.</div>
 
 <!-- ============ CAP 01 — VETTORI ============ -->
 <section class="w-tappa" id="c1">
@@ -68,7 +68,7 @@
   <p class="w-tappa-lead">Un numero da solo dice "quanto". Un vettore dice "quanto" in molte direzioni contemporaneamente. È l'unità con cui l'LLM rappresenta ogni cosa.</p>
 
   <h3 class="w-h3">L'idea: una lista di numeri con una direzione</h3>
-  <p>Immagina di descrivere una tazza di caffè con tre numeri: <em>quanto è caldo</em>, <em>quanto è amaro</em>, <em>quanto è pieno</em>. Metti questi tre numeri in fila e ottieni un <strong>vettore</strong>: <code>[82, 7, 0.5]</code>. Non è "un numero grande": è un <em>punto</em> in uno spazio a tre assi — o, in modo equivalente, una <em>freccia</em> che parte dall'origine e arriva a quel punto.</p>
+  <p class="w-drop">Immagina di descrivere una tazza di caffè con tre numeri: <em>quanto è caldo</em>, <em>quanto è amaro</em>, <em>quanto è pieno</em>. Metti questi tre numeri in fila e ottieni un <strong>vettore</strong>: <code>[82, 7, 0.5]</code>. Non è "un numero grande": è un <em>punto</em> in uno spazio a tre assi — o, in modo equivalente, una <em>freccia</em> che parte dall'origine e arriva a quel punto.</p>
   <p>Un LLM fa esattamente questo con le parole, ma con centinaia o migliaia di numeri invece di tre. Ogni parola diventa una freccia in uno spazio enorme. Per ora restiamo in 2 dimensioni, dove possiamo <em>disegnarle</em>.</p>
 
   <div class="w-note w-note--demo">
@@ -182,8 +182,8 @@
       <svg viewBox="0 0 260 260" style="width:100%;height:auto;background:var(--paper-raised);border-radius:8px">
         <line x1="10" y1="130" x2="250" y2="130" stroke="var(--rule)" stroke-width="1.5"/>
         <line x1="130" y1="10" x2="130" y2="250" stroke="var(--rule)" stroke-width="1.5"/>
-        <rect x="130" y="88" width="42" height="42" fill="rgba(36,86,184,.10)" stroke="var(--blu)" stroke-width="1.5" stroke-dasharray="4 3"/>
-        <polygon points="{{ sqPts }}" fill="rgba(217,116,30,.22)" stroke="var(--arancio)" stroke-width="2.5"/>
+        <rect x="130" y="88" width="42" height="42" fill="var(--blu)" fill-opacity=".10" stroke="var(--blu)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <polygon points="{{ sqPts }}" fill="var(--arancio)" fill-opacity=".22" stroke="var(--arancio)" stroke-width="2.5"/>
         <line x1="130" y1="130" x2="{{ iX }}" y2="{{ iY }}" stroke="var(--rosso)" stroke-width="2.5"/>
         <line x1="130" y1="130" x2="{{ jX }}" y2="{{ jY }}" stroke="var(--verde)" stroke-width="2.5"/>
         <circle cx="130" cy="130" r="3" fill="var(--ink)"/>
@@ -357,11 +357,11 @@
 
   <h3 class="w-h3">La formula, smontata pezzo per pezzo</h3>
   <div class="w-formula">\[ \operatorname{Attention}(Q,K,V)=\operatorname{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d_k}}\right)V \]</div>
-  <ul style="margin:0 0 1em;padding-left:20px">
-    <li><b style="color:var(--blu)">\(QK^{\top}\)</b> — ogni Query fa il prodotto scalare con ogni Key: una matrice di <em>punteggi di rilevanza</em> (parola × parola). Cap. 1, all'opera.</li>
-    <li><b style="color:var(--rosso)">\(/\sqrt{d_k}\)</b> — si divide per la radice della dimensione. Senza, con \(d_k\) grande i prodotti scalari diventano enormi e la softmax si "satura" (un solo 1, tutti 0), uccidendo i gradienti. È un semplice riscalamento che tiene i numeri gestibili.</li>
-    <li><b style="color:var(--arancio)">\(\operatorname{softmax}(\cdot)\)</b> — cap. 4: trasforma i punteggi di ogni riga in <em>pesi</em> che sommano a 1. Ecco "quanta attenzione" dedicare a ciascuna parola.</li>
-    <li><b style="color:var(--verde)">\(\cdots\,V\)</b> — si fa la media dei Value pesata da quei pesi. Il risultato è il nuovo vettore della parola, <em>arricchito dal contesto</em>.</li>
+  <ul class="w-list">
+    <li><b class="w-em a-blu">\(QK^{\top}\)</b> — ogni Query fa il prodotto scalare con ogni Key: una matrice di <em>punteggi di rilevanza</em> (parola × parola). Cap. 1, all'opera.</li>
+    <li><b class="w-em a-rosso">\(/\sqrt{d_k}\)</b> — si divide per la radice della dimensione. Senza, con \(d_k\) grande i prodotti scalari diventano enormi e la softmax si "satura" (un solo 1, tutti 0), uccidendo i gradienti. È un semplice riscalamento che tiene i numeri gestibili.</li>
+    <li><b class="w-em a-arancio">\(\operatorname{softmax}(\cdot)\)</b> — cap. 4: trasforma i punteggi di ogni riga in <em>pesi</em> che sommano a 1. Ecco "quanta attenzione" dedicare a ciascuna parola.</li>
+    <li><b class="w-em a-verde">\(\cdots\,V\)</b> — si fa la media dei Value pesata da quei pesi. Il risultato è il nuovo vettore della parola, <em>arricchito dal contesto</em>.</li>
   </ul>
 
   <div class="w-demo">
@@ -397,7 +397,7 @@
   <h2 class="w-tappa-title">Tutto insieme — dall'algebra al Transformer</h2>
   <p class="w-tappa-lead">Rimettiamo i pezzi in fila. Segui una parola che entra come testo ed esce come probabilità: ogni freccia di questo percorso è uno dei concetti che hai appena imparato.</p>
 
-  <figure style="margin:24px 0;background:var(--paper-raised);border:2px solid var(--ink);border-radius:14px;padding:16px;box-shadow:4px 4px 0 rgba(32,36,44,.12)">
+  <figure class="w-figure">
     <svg viewBox="0 0 700 250" role="img" aria-label="flusso dai token alle probabilita">
       <defs><marker id="fl" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="var(--rosso)" stroke-width="1.5"/></marker></defs>
       <g font-family="IBM Plex Mono" font-size="12.5">
@@ -419,7 +419,7 @@
 
   <h3 class="w-h3">Le dimensioni vere (Llama 3 8B)</h3>
   <table class="w-table">
-    <thead><tr><th style="border:1px solid var(--rule);padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:var(--paper-sunken)">Grandezza</th><th style="border:1px solid var(--rule);padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:var(--paper-sunken)">Valore</th><th style="border:1px solid var(--rule);padding:8px 10px;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:var(--paper-sunken)">Concetto</th></tr></thead>
+    <thead><tr><th>Grandezza</th><th>Valore</th><th>Concetto</th></tr></thead>
     <tbody>
       <tr><td>dimensione embedding \(d\)</td><td>4096</td><td>lunghezza di ogni vettore-parola (c.1,3)</td></tr>
       <tr><td>vocabolario</td><td>128.256</td><td>righe softmax finale (c.4)</td></tr>
@@ -429,7 +429,7 @@
     </tbody>
   </table>
 
-  <div class="w-note w-note--warn"><b style="color:var(--rosso)">Il ponte col Modulo 01.</b> Ora che padroneggi la matematica, rileggi <a href="Dentro-la-Macchina.dc.html">"Dentro la Macchina"</a>: quello che lì era descritto a parole — token, embedding, attention, KV-cache, softmax, sampling — qui ha una formula precisa. I due libri sono la stessa storia raccontata a due profondità.</div>
+  <div class="w-note w-note--warn"><b class="w-em a-rosso">Il ponte col Modulo 01.</b> Ora che padroneggi la matematica, rileggi <a href="Dentro-la-Macchina.dc.html">"Dentro la Macchina"</a>: quello che lì era descritto a parole — token, embedding, attention, KV-cache, softmax, sampling — qui ha una formula precisa. I due libri sono la stessa storia raccontata a due profondità.</div>
 </section>
 
 <!-- ============ EPILOGO ============ -->
@@ -440,7 +440,7 @@
 
   <div class="w-note w-note--memory">
     <span class="w-note-title">La palestra, in ordine</span>
-    <ol style="margin:0;padding-left:20px">
+    <ol>
       <li><b>Rifai i conti a mano:</b> prendi due vettori di 3 numeri, calcola norma, prodotto scalare e coseno con carta e penna. Poi una softmax su 3 logit.</li>
       <li><b>Impara NumPy:</b> reimplementa gli stessi conti in 5 righe; verifica che tornino. Aggiungi la moltiplicazione matrice×vettore.</li>
       <li><b>Attention da zero:</b> scrivi <code>softmax(Q@K.T/sqrt(d))@V</code> in NumPy su una frase di 4 parole. È letteralmente una riga.</li>
@@ -453,12 +453,17 @@
   <div class="w-note w-note--paper">
     <span class="w-note-title">Per andare a fondo</span>
     <ul>
-      <li style="margin-bottom:4px">Vaswani et al., <em>Attention Is All You Need</em> — <span class="w-ref">arXiv:1706.03762</span> (la formula del cap. 6)</li>
-      <li style="margin-bottom:4px">Mikolov et al., <em>Efficient Estimation of Word Representations</em> (Word2Vec) — <span class="w-ref">arXiv:1301.3781</span> (re−uomo+donna, cap. 3)</li>
-      <li style="margin-bottom:4px">Kingma &amp; Ba, <em>Adam: A Method for Stochastic Optimization</em> — <span class="w-ref">arXiv:1412.6980</span> (cap. 5)</li>
-      <li style="margin-bottom:4px">Elhage et al., <em>Toy Models of Superposition</em> — Anthropic, 2022 (la geometria dello spazio, cap. 1,3)</li>
+      <li>Vaswani et al., <em>Attention Is All You Need</em> — <span class="w-ref">arXiv:1706.03762</span> (la formula del cap. 6)</li>
+      <li>Mikolov et al., <em>Efficient Estimation of Word Representations</em> (Word2Vec) — <span class="w-ref">arXiv:1301.3781</span> (re−uomo+donna, cap. 3)</li>
+      <li>Kingma &amp; Ba, <em>Adam: A Method for Stochastic Optimization</em> — <span class="w-ref">arXiv:1412.6980</span> (cap. 5)</li>
+      <li>Elhage et al., <em>Toy Models of Superposition</em> — Anthropic, 2022 (la geometria dello spazio, cap. 1,3)</li>
       <li>G. Strang, <em>Introduction to Linear Algebra</em>; 3Blue1Brown, <em>Essence of Linear Algebra</em> (le basi, visivamente)</li>
     </ul>
+  </div>
+
+  <div class="w-note w-note--bridge">
+    <span class="w-note-title">Dove continua</span>
+    <p>Queste sono le operazioni; il <a href="Dentro-la-Macchina.dc.html">Modulo 01</a> è la macchina che le esegue in fila, dal tasto Invio all'ultima parola. Adesso che sai leggere \(\operatorname{softmax}(QK^{\top}/\sqrt{d_k})V\), quella pagina si legge in un altro modo: rileggi la tappa sul <a href="Dentro-la-Macchina.dc.html#c3">Blocco Transformer</a> e vedrai le stesse matrici al lavoro.</p>
   </div>
 
 </section>
