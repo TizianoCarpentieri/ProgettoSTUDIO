@@ -22,6 +22,21 @@ Vale nei tre casi: libro nuovo chiesto a voce, libro nuovo ricavato da un
 documento fornito, modifica o ampliamento di un libro esistente. Non serve che
 la richiesta lo ricordi — è il modo di lavorare predefinito del progetto.
 
+## Prima di cominciare, guarda chi altro sta lavorando
+
+Su questo progetto lavorano più sessioni in parallelo, e **`git branch -a`
+mostra solo ciò che il clone ha già scaricato** — in una sessione appena creata
+può essere una fotografia parziale. Le due domande da fare al server, non al
+clone:
+
+```bash
+git ls-remote --heads origin     # tutti i rami che esistono davvero
+```
+
+più l'elenco delle **pull request aperte**. Un libro scritto altrove, o una
+homepage già ridisegnata, cambiano completamente il lavoro da fare: scoprirlo
+dopo costa il doppio, e rischia di rifare da capo cose già fatte.
+
 ## Il ciclo di lavoro
 
 1. Stabilisci da dove parte il lettore. Se non è deducibile, chiedilo.
