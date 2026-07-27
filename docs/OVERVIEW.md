@@ -120,7 +120,14 @@ Il progetto è ora versionato con **git** e pubblicato su GitHub.
 - **Repository**: <https://github.com/TizianoCarpentieri/ProgettoSTUDIO> — visibilità **pubblica**.
 - **Branch principale**: `main`. Due commit iniziali: il primo con tutti i contenuti già esistenti più `README.md` e `.gitignore`, il secondo con `index.html` per le GitHub Pages.
 - **Autenticazione (questo Mac)**: chiave **SSH ed25519** in `~/.ssh/id_ed25519`, con la parte pubblica registrata sull'account GitHub. Il remote `origin` punta all'URL SSH `git@github.com:TizianoCarpentieri/ProgettoSTUDIO.git`, quindi `git push` funziona senza password né token a scadenza.
-- **GitHub Pages**: predisposte per servire dalla **radice del branch `main`**. Grazie al redirect di `index.html`, l'indirizzo pubblico <https://tizianocarpentieri.github.io/ProgettoSTUDIO/> apre direttamente la Biblioteca. L'attivazione va fatta una sola volta da *Settings → Pages → Source: Deploy from a branch → `main` / `(root)`*.
+- **GitHub Pages**: servono dalla **radice del branch `main`**. Grazie al redirect di `index.html`, l'indirizzo pubblico <https://tizianocarpentieri.github.io/ProgettoSTUDIO/> apre direttamente la Biblioteca. L'attivazione va fatta una sola volta da *Settings → Pages → Source: Deploy from a branch → `main` / `(root)`*.
+
+  **La sorgente dev'essere `main`, mai un ramo di lavoro.** Un ramo di lavoro
+  smette di ricevere aggiornamenti nel momento in cui viene unito: continua a
+  pubblicare la fotografia del giorno in cui è nato, e il sito mostra difetti
+  già corretti da settimane senza che niente sembri fuori posto. È successo il
+  27-07-2026, ed è costato mezza giornata di indagine su un difetto che in
+  `main` non esisteva più.
 
 ### Flussi tipici
 
