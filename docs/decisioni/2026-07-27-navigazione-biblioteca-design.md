@@ -6,6 +6,29 @@ Sostituisce: le parti sull'esploratore 3D di
 [2026-07-20-grafo-cervello-pipeline-design.md](2026-07-20-grafo-cervello-pipeline-design.md)
 (il modello dei dati di quel documento resta valido)
 
+## Aggiornamento del 27-07 (sera): i due rami si sono incontrati
+
+Questo documento è stato scritto guardando una biblioteca di due libri. In
+parallelo, su un altro ramo, ne erano nati altri sei — lo scaffale «Il pensiero
+computazionale» — insieme a una prima mossa nella stessa direzione: il cervello
+3D tolto dalla cima della homepage e messo **in fondo**, incorniciato, che si
+accende solo quando entra in vista
+([decisione del 26-07](2026-07-26-cervello-secondario-design.md)).
+
+Le due linee sono state unite. Cambia il punto di partenza, non la direzione:
+
+- la **fase 2** non deve più sfrattare il grafo dalla home — l'ha già fatto
+  quella decisione. Resta da trasformare gli scaffali in oggetti veri, con la
+  loro identità (`slug`, `accento`, `descrizione`, ora nei dati);
+- la **fase 3** guadagna un secondo scaffale su cui provare la costellazione,
+  che è il caso interessante: due materie invece di una;
+- l'analisi del problema qui sotto resta valida per il *grafo*, non più per la
+  sua posizione nella pagina.
+
+Da quella unione è uscita anche una regola nuova, in `AgentFE.md`: tutto ciò
+che si mette **fuori da `<x-dc>`** va misurato a schermo, perché il runtime dà
+all'host `height: 100%` e il fratello successivo finisce sopra il contenuto.
+
 ## Problema
 
 Il progetto è nato come biblioteca: una raccolta di libri — non spiegazioni, ma

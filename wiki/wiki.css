@@ -528,6 +528,7 @@ a.w-card:hover { color: var(--ink); transform: translate(-3px, -3px); box-shadow
 .w-shelf-title { display: flex; align-items: center; gap: 14px; margin: 40px 0 18px; }
 .w-shelf-title span { font-family: var(--font-mano); font-size: 30px; color: var(--ink); }
 .w-shelf-title::after { content: ""; flex: 1; height: 2px; background: var(--ink); }
+.w-shelf-sub { margin: -8px 0 20px; font-size: var(--size-small); color: var(--ink-soft); max-width: 72ch; }
 
 /* --- Legenda ------------------------------------------------------------------ */
 
@@ -562,6 +563,72 @@ a.w-card:hover { color: var(--ink); transform: translate(-3px, -3px); box-shadow
 .w-figure svg { width: 100%; height: auto; display: block; }
 .w-figure figcaption { font-size: 13.5px; color: var(--ink-soft); font-style: italic; margin-top: 8px; text-align: center; }
 
+/* --- Listati di codice ---------------------------------------------------------
+   Il `code` inline sta nella sezione 4. Qui c'è il listato su più righe: nei
+   libri di programmazione è una figura a tutti gli effetti. Nessun a capo
+   automatico (il codice si legge come è scritto), scorrimento orizzontale,
+   barra dell'accento a sinistra. La lingua si dichiara con data-lang="python"
+   e la scrive il foglio di stile: non si aggiunge markup.
+   --------------------------------------------------------------------------- */
+
+.w-codice {
+  position: relative;
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.6;
+  background: var(--paper-sunken); color: var(--ink);
+  border: var(--border-thin) solid var(--rule);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius-small);
+  padding: 22px 16px 13px; margin: 18px 0;
+  overflow-x: auto; white-space: pre; tab-size: 2;
+}
+.w-codice[data-lang]::before {
+  content: attr(data-lang);
+  position: absolute; top: 4px; right: 12px;
+  font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint);
+}
+.w-codice-nota { font-size: 13.5px; color: var(--ink-soft); font-style: italic; margin: -10px 0 18px; }
+.w-com { color: var(--ink-soft); font-style: italic; }   /* commento */
+.w-ev  { color: var(--accent); font-weight: 600; }       /* riga da guardare */
+
+/* --- Elementi visivi delle demo -------------------------------------------------
+   Mattoncini generici usati dentro .w-demo: celle di memoria, pile di frame,
+   righe di programma che si illuminano. Esistono per non dover scrivere
+   style="..." dentro le demo.
+   --------------------------------------------------------------------------- */
+
+.w-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0; }
+
+.w-cell {
+  font-family: var(--font-mono); font-size: 13px; text-align: center;
+  min-width: 44px; background: var(--paper);
+  border: var(--border-thin) solid var(--rule); border-radius: var(--radius-small);
+  padding: 7px 10px;
+}
+.w-cell.is-on  { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--paper)); color: var(--accent); font-weight: 600; }
+.w-cell.is-off { color: var(--ink-faint); }
+.w-cell.is-ok  { border-color: var(--verde); color: var(--verde); }
+.w-cell.is-ko  { border-color: var(--rosso); color: var(--rosso); }
+.w-cell b { display: block; font-family: var(--font-testo); font-size: 10.5px; font-weight: 400; color: var(--ink-soft); }
+
+.w-stack { display: flex; flex-direction: column-reverse; gap: 4px; margin: 10px 0; }
+.w-frame {
+  font-family: var(--font-mono); font-size: 12.5px;
+  background: var(--paper); border: var(--border-thin) solid var(--rule);
+  border-left: 4px solid var(--ink-faint); border-radius: var(--radius-small);
+  padding: 6px 10px;
+}
+.w-frame.is-top  { border-left-color: var(--accent); color: var(--accent); }
+.w-frame.is-done { color: var(--ink-faint); border-left-color: var(--verde); }
+
+.w-prog { font-family: var(--font-mono); font-size: 13px; line-height: 1.75; margin: 10px 0; }
+/* `width: max-content` è ciò che fa scorrere davvero il programma su schermo
+   stretto: senza, la riga resta larga quanto il riquadro, il testo trabocca
+   fuori dal suo box e il contenitore non sa di doversi allargare — la fine
+   della riga diventa irraggiungibile. `min-width: 100%` tiene comunque
+   l'evidenziazione larga quanto il riquadro sulle righe corte. */
+.w-prog .w-riga { display: block; width: max-content; min-width: 100%; box-sizing: border-box; padding: 1px 8px; border-radius: 4px; white-space: pre; }
+.w-prog .w-riga.is-now { background: color-mix(in srgb, var(--accent) 16%, transparent); font-weight: 600; }
+
 .w-footer { margin-top: var(--s6); padding-top: var(--s4); border-top: 1px dashed var(--rule); font-size: 14px; color: var(--ink-soft); text-align: center; }
 
 
@@ -590,13 +657,47 @@ html.w-anim .w-reveal.is-in { opacity: 1; transform: none; }
 /* ==========================================================================
    7. CERVELLO 3D  (solo la homepage)
    --------------------------------------------------------------------------
+   Il cervello è un DI PIÙ in fondo alla homepage, non la porta d'ingresso:
+   sta dentro una cornice larga quanto la colonna di lettura, alto poco più di
+   mezza finestra, e si allarga a schermo intero solo se l'utente lo chiede.
+   L'esposizione classica — scaffali e card — resta la via principale.
+
    Il contenitore parte NASCOSTO: lo mostra wiki/graph/explorer.js solo se il
    3D può partire (aggiunge .is-live). Così, senza WebGL o senza la libreria,
    non resta un rettangolo nero: valgono le card della Biblioteca. Il fondo è
    volutamente profondo in entrambi i temi, perché i nodi possano brillare.
    ========================================================================== */
 
-.w-brain { display: none; position: relative; width: 100%; height: 92vh; min-height: 560px; overflow: hidden;
+/* --- La cornice attorno al cervello ----------------------------------------- */
+/* L'host del runtime dc deve avvolgere il suo contenuto.
+   `support.js` gli mette `height:100%` (FULL_PAGE_CSS): la scatola resta alta
+   quanto lo schermo mentre il contenuto la sfonda, e tutto ciò che segue
+   `</x-dc>` nel body si posiziona come se la pagina finisse lì — finendo
+   SOPRA le card. Finché il grafo stava in cima non si vedeva; da quando sta in
+   fondo, sì. Il selettore è più specifico di quello iniettato, quindi vince
+   comunque venga inserito. */
+html body #dc-root,
+html body #dc-root > .sc-host { height: auto; }
+
+.w-brainwrap { max-width: 1040px; margin: var(--s6) auto var(--s5); padding: 0 20px; }
+.w-brainwrap-head { display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap; margin-bottom: 14px; }
+.w-brainwrap-kicker { font-family: var(--font-mono); font-size: var(--size-tiny); letter-spacing: .18em; text-transform: uppercase; color: var(--ink-soft); }
+.w-brainwrap-title { font-family: var(--font-mano); font-size: 34px; margin: 2px 0 0; }
+.w-brainwrap-sub { flex: 1 1 300px; font-size: var(--size-small); color: var(--ink-soft); margin: 0; }
+.w-brain-nope { font-size: var(--size-small); color: var(--ink-soft); font-style: italic; }
+
+/* Schermo intero: la cornice diventa la finestra. Fondo di carta, così il
+   titolo e il pulsante restano leggibili in entrambi i temi. */
+.w-brainwrap.is-full {
+  position: fixed; inset: 0; z-index: 80; max-width: none; margin: 0;
+  padding: 16px 20px 20px; background: var(--paper);
+  display: flex; flex-direction: column;
+}
+.w-brainwrap.is-full .w-brainwrap-head { margin-bottom: 12px; }
+.w-brainwrap.is-full .w-brain { flex: 1 1 auto; height: auto; min-height: 0; }
+
+.w-brain { display: none; position: relative; width: 100%; height: min(58vh, 520px); min-height: 340px; overflow: hidden;
+  border: var(--border) solid var(--ink); border-radius: var(--radius); box-shadow: var(--shadow);
   background:
     radial-gradient(1200px 720px at 60% 40%, rgba(60, 84, 165, .30) 0%, rgba(60, 84, 165, 0) 60%),
     radial-gradient(900px 620px at 28% 72%, rgba(120, 62, 150, .20) 0%, rgba(120, 62, 150, 0) 55%),
@@ -609,11 +710,10 @@ html.w-anim .w-reveal.is-in { opacity: 1; transform: none; }
 .w-brain-ui { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
 .w-brain-ui > * { pointer-events: auto; }
 
-.w-brain-head { position: absolute; top: 22px; left: 24px; max-width: 460px; }
-.w-brain-kicker { font-family: var(--font-mono); font-size: 12px; letter-spacing: .25em; text-transform: uppercase; color: #8FA6D8; }
-.w-brain-title { font-family: var(--font-mano); font-weight: 700; font-size: clamp(34px, 5vw, 54px); line-height: 1; margin: 6px 0 8px; color: #FFFFFF; }
-.w-brain-title span { color: #7EA6F0; }
-.w-brain-hint { font-family: var(--font-testo); font-size: 14px; line-height: 1.5; color: #B9C0D4; max-width: 420px; margin: 0; }
+/* Il titolo sta nella pagina, non sul canvas: qui resta solo un promemoria
+   dei gesti, in alto a sinistra. */
+.w-brain-hint { position: absolute; top: 16px; left: 18px; max-width: 300px; margin: 0;
+  font-family: var(--font-testo); font-size: 12.5px; line-height: 1.45; color: #A8B2CB; }
 
 .w-brain-panel { position: absolute; left: 24px; bottom: 24px; width: min(340px, 74vw);
   background: rgba(16, 19, 28, .86); backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
@@ -648,7 +748,87 @@ html.w-anim .w-reveal.is-in { opacity: 1; transform: none; }
   text-shadow: 0 1px 5px rgba(0,0,0,.98), 0 0 8px currentColor; }
 
 @media (max-width: 720px) {
-  .w-brain { height: 74vh; }
+  .w-brain { height: min(52vh, 380px); }
   .w-brain-hint { display: none; }
-  .w-brain-head { max-width: 60vw; }
+  .w-brain-panel { width: min(300px, 82vw); left: 14px; bottom: 14px; }
+
+  /* Sul telefono il canvas incorniciato NON prende il dito: trascinare per
+     scorrere la pagina deve scorrere la pagina, non ruotare il grafo. Il
+     cervello resta un poster vivo; per esplorarlo si apre a schermo intero,
+     dove il dito serve solo a lui. */
+  .w-brain canvas { pointer-events: none; }
+  .w-brainwrap.is-full .w-brain canvas { pointer-events: auto; }
+}
+
+
+/* ==========================================================================
+   8. TELEFONO
+   --------------------------------------------------------------------------
+   La wiki si legge molto sul telefono, quindi questa non è una riduzione: è
+   il secondo formato di lettura. Due principi.
+
+   1. NIENTE PUÒ SPINGERE LA PAGINA DI LATO. Un blocco più largo dello
+      schermo — un listato, un programma di una demo, una tabella — scorre
+      DENTRO il proprio riquadro. Il corpo della pagina non scorre mai in
+      orizzontale: è il modo più veloce di far sembrare rotto un sito.
+   2. Meno margini, non meno contenuto. Si stringono le cornici e si scala la
+      tipografia; non si nasconde niente che sul desktop si legga.
+   ========================================================================== */
+
+/* Vale a ogni larghezza: ciò che è lungo scorre per conto suo. */
+.w-prog { overflow-x: auto; }
+.w-demo-out { overflow-x: auto; }
+.w-demo { overflow-x: auto; }   /* rete di sicurezza: nessuna demo spinge la pagina */
+.w-frame { overflow-wrap: anywhere; }
+code { overflow-wrap: break-word; }
+
+@media (max-width: 720px) {
+  :root { --size-base: 16.5px; --grid-step: 24px; }
+
+  .w-page { padding: 0 15px 80px; }
+  .w-page--toc { padding: 0 15px 80px; gap: 0; }
+
+  .w-hero { padding: 40px 0 22px; }
+  .w-hero-sub { font-size: 17px; }
+  .w-hero-sign { font-size: 20px; }
+
+  .w-h2 { font-size: 30px; }
+  .w-h3 { font-size: 24px; }
+  .w-tappa-lead { font-size: 17px; }
+  .w-drop::first-letter { font-size: 52px; padding: 4px 9px 0 0; }
+
+  /* Il riquadro: meno rientro per l'icona, più larghezza per il testo. */
+  .w-note { padding: 14px 16px 14px 46px; }
+  .w-note::before { left: 15px; top: 16px; width: 18px; height: 18px; }
+  .w-note-title { font-size: 20px; }
+
+  .w-demo { padding: 14px; }
+  .w-codice { font-size: 12px; padding: 22px 13px 12px; }
+  .w-cell { font-size: 12.5px; padding: 6px 9px; }
+  /* Bersaglio di tocco: col dito servono ~44px, non i 33 che bastano al mouse. */
+  .w-btn { padding: 10px 15px; }
+
+  /* Il sommario: l'etichetta va a capo sotto il titolo invece di strizzarlo,
+     ma il numero resta accanto al titolo — se il titolo può prendersi tutta
+     la riga, il numero resta solo sopra e sembra un errore. */
+  .w-summary a { flex-wrap: wrap; }
+  .w-summary a > span:nth-child(2) { flex: 1 1 0; min-width: 0; }
+  .w-summary-tag { margin-left: 0; flex-basis: 100%; padding-left: 38px; }
+
+  /* Le tabelle di confronto: scorrono, invece di ridursi a due parole per riga. */
+  .w-table { display: block; overflow-x: auto; }
+  .w-table tbody { display: table; width: 100%; min-width: 460px; }
+
+  .w-brainwrap { padding: 0 15px; margin-top: var(--s5); }
+  .w-brainwrap-title { font-size: 28px; }
+
+  .w-themebtn { width: 42px; height: 42px; right: 12px; bottom: 12px; }
+}
+
+/* Telefoni stretti (iPhone SE e simili): solo un altro giro di vite. */
+@media (max-width: 400px) {
+  .w-page, .w-page--toc, .w-brainwrap { padding-left: 12px; padding-right: 12px; }
+  .w-note { padding: 13px 13px 13px 42px; }
+  .w-note::before { left: 13px; }
+  .w-codice { font-size: 11.5px; }
 }

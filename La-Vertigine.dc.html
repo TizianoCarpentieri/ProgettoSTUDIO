@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Vertigine — Lisp, la ricorsione e il codice che è dato</title>
+
+<!-- ===== CONNETTORE DELLA WIKI - righe fisse, non modificarle ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./wiki/wiki.css">
+<script src="./support.js"></script>
+<script defer src="./wiki/wiki.js"></script>
+<!-- =============================================================== -->
+</head>
+<body>
+<x-dc>
+
+<div class="w-page--toc">
+
+  <aside class="w-toc"
+         data-titolo="Libro 03 · Indice"
+         data-pie='<a href="Biblioteca.dc.html">Biblioteca</a><a href="La-Cristallizzazione.dc.html">Libro 02: le funzioni</a><a href="Eleganza-Esoterica.dc.html">Libro 04: lo stack e call/cc</a>'></aside>
+
+  <main class="w-main">
+
+    <!-- ===== BRICIOLE DI PANE ===== -->
+    <nav class="w-nav">
+      <a class="w-nav-home" href="Biblioteca.dc.html">← BIBLIOTECA</a>
+      <span class="w-nav-sep">/</span>
+      <span class="w-nav-here">Libro 03 · La vertigine</span>
+      <a class="w-nav-next" href="Eleganza-Esoterica.dc.html">Libro 04: call/cc</a>
+    </nav>
+
+    <!-- ===== COPERTINA ===== -->
+    <header class="w-hero a-viola">
+      <div class="w-hero-kicker">Il pensiero computazionale · libro 3 di 6</div>
+      <h1 class="w-hero-title">La <span class="w-mark">vertigine</span></h1>
+      <p class="w-hero-sub">Una funzione che chiama se stessa. Un linguaggio in cui tutto è una lista — comprese le liste che sono programmi. E in fondo l'abisso: il codice che, letto come dato, produce altro codice. È il linguaggio che scrive se stesso.</p>
+      <div class="w-hero-sign">— il tuo maestro di bottega, quaderno alla mano</div>
+    </header>
+
+    <!-- ===== COSA SI IMPARA QUI ===== -->
+    <div class="w-note w-note--info">
+      <span class="w-note-title">Cosa impari in questa pagina</span>
+      <p>Saprai scrivere una funzione ricorsiva senza "seguire i giri con la testa"; saprai perché una ricorsione ingenua può metterci giorni e la stessa con una riga in più impiega un millesimo di secondo; saprai che cos'è una chiamata in coda e perché in alcuni linguaggi non consuma memoria; e saprai finalmente che cosa intendono i lispisti quando dicono che <em>il codice è dato</em> — non come slogan, ma con le mani.</p>
+    </div>
+
+    <div class="w-note w-note--bridge">
+      <span class="w-note-title">Da dove veniamo</span>
+      <p>Nel <a href="La-Cristallizzazione.dc.html#c3">libro 2</a> hai visto che ogni chiamata di funzione riceve un foglietto tutto suo, con i suoi parametri e le sue variabili locali. Questo libro non fa che prendere quella frase sul serio fino alle sue estreme conseguenze: <strong>se ogni chiamata ha un foglietto indipendente, allora una funzione può chiamare se stessa senza confondersi</strong>.</p>
+    </div>
+
+    <!-- ===== SOMMARIO ===== -->
+    <h2 class="w-h2">Il viaggio in sei tappe</h2>
+    <ol class="w-summary">
+      <li><a href="#c1"><span class="w-summary-n">01</span><span>La definizione che si nomina da sé</span><span class="w-summary-tag">caso base</span></a></li>
+      <li><a href="#c2"><span class="w-summary-n">02</span><span>Le parentesi: il codice prende forma di lista</span><span class="w-summary-tag">Lisp, s-expression</span></a></li>
+      <li><a href="#c3"><span class="w-summary-n">03</span><span>L'abisso: quando la ricorsione divora</span><span class="w-summary-tag">albero di chiamate</span></a></li>
+      <li><a href="#c4"><span class="w-summary-n">04</span><span>La ricorsione che è un ciclo</span><span class="w-summary-tag">tail call</span></a></li>
+      <li><a href="#c5"><span class="w-summary-n">05</span><span>eval e apply: il linguaggio che si spiega da sé</span><span class="w-summary-tag">omoiconicità</span></a></li>
+      <li><a href="#c6"><span class="w-summary-n">06</span><span>Le macro: il linguaggio che scrive se stesso</span><span class="w-summary-tag">syntax-rules</span></a></li>
+    </ol>
+
+
+    <!-- ======================= TAPPA 01 ======================= -->
+    <section class="w-tappa" id="c1">
+
+      <div class="w-tappa-kicker">Autoriferimento, secondo movimento</div>
+      <h2 class="w-tappa-title">La definizione che si nomina da sé</h2>
+      <p class="w-tappa-lead">Nel primo libro una variabile si è definita in termini di se stessa e ne è nato il tempo. Adesso lo fa una funzione, e ne nasce qualcosa di più vertiginoso: una definizione che sembra un imbroglio e funziona.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">La prima volta che leggi una definizione ricorsiva provi un disagio preciso: mi stanno spiegando una cosa <em>usando la cosa stessa</em>. Se non so cos'è il fattoriale, che aiuto è dirmi che il fattoriale di 5 è 5 per il fattoriale di 4? Sembra il vocabolario che alla voce "sedia" scrive "oggetto simile a una sedia".</p>
+
+      <p>Il disagio si scioglie appena vedi che nella definizione ci sono <strong>due rami, non uno</strong>. Uno rimanda a se stesso, ma su un problema <em>più piccolo</em>. L'altro non rimanda a niente: dà una risposta secca. Quel secondo ramo si chiama <strong>caso base</strong>, ed è il pavimento della discesa. Senza pavimento non hai una definizione: hai un pozzo.</p>
+
+      <pre class="w-codice" data-lang="python">
+def fattoriale(n):
+    if n == 0:                       <span class="w-ev">← il pavimento: qui la discesa finisce</span>
+        return 1
+    return n * fattoriale(n - 1)     <span class="w-com">← lo stesso problema, ma più piccolo di uno</span></pre>
+      <p class="w-codice-nota">Due righe di logica. Confronta con la versione iterativa: un accumulatore, un contatore, una condizione di uscita, e tre modi di sbagliare l'off-by-one del libro 1.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: la fila allo sportello</span>
+        <p>Sei in coda e vuoi sapere quanti siete. Non ti sporgi a contare: chiedi a quello davanti «tu quanti ne hai davanti?» e prometti di rispondere a chi ti sta dietro «quello che mi hanno detto, più uno». La domanda risale la fila fino al primo della coda, che risponde «zero» — <em>quello è il caso base</em> — e da lì la risposta ridiscende, cresciuta di uno a ogni persona. Nessuno ha visto la fila intera. Ognuno ha fatto due cose: passare la domanda a un problema più piccolo e aggiungere il proprio pezzo alla risposta di ritorno.</p>
+        <p>Tieni a mente questa immagine, perché contiene il segreto della tappa 04: c'è una <em>salita</em> (le domande) e una <em>discesa</em> (le risposte). Alcune ricorsioni hanno bisogno della discesa, altre no — e quelle che non ne hanno bisogno sono cicli travestiti.</p>
+      </div>
+
+      <div class="w-demo">
+        <h4 class="w-demo-title">Prova tu — guarda i foglietti impilarsi e strapparsi</h4>
+        <p class="w-demo-hint">Ogni chiamata è un foglietto sullo stack, esattamente come nel libro 2. Premi <b>un passo</b>: prima li vedi scendere fino al caso base (nessuno ha ancora risposto), poi li vedi tornare indietro portando ognuno il suo pezzo di moltiplicazione.</p>
+
+        <div class="w-stack">
+          <sc-for list="{{ fatFrames }}" as="f" hint-placeholder-count="4">
+            <div class="{{ f.cls }}">{{ f.txt }}</div>
+          </sc-for>
+        </div>
+
+        <div class="w-demo-out">{{ fatStato }}</div>
+
+        <div class="w-row">
+          <button class="w-btn" onClick="{{ fatPasso }}">▶ un passo</button>
+          <button class="w-btn" onClick="{{ fatTutto }}">▶▶ fino in fondo</button>
+          <button class="w-btn" onClick="{{ fatPiu }}">+ n</button>
+          <button class="w-btn" onClick="{{ fatMeno }}">− n</button>
+          <button class="w-btn" onClick="{{ fatReset }}">↺ azzera</button>
+        </div>
+        <p class="w-demo-foot">La pila cresce mentre <em>scende</em> il problema. È il motivo per cui la profondità della ricorsione si paga in memoria, e non in tempo: ogni foglietto occupa spazio finché la risposta non risale fino a lui.</p>
+      </div>
+
+      <h3 class="w-h3">Come si scrive senza impazzire</h3>
+      <p>C'è una disciplina che trasforma la ricorsione da acrobazia a mestiere, ed è di tre domande — le stesse tre dell'invariante di ciclo del libro 1, tradotte:</p>
+      <ol>
+        <li><strong>Qual è il caso più piccolo</strong> di cui so rispondere senza pensare? (la lista vuota, lo zero, l'albero senza figli)</li>
+        <li><strong>Se qualcun altro risolvesse il problema per il caso appena più piccolo</strong>, io cosa ci aggiungerei per risolvere il mio?</li>
+        <li><strong>Ogni chiamata si avvicina davvero al caso base?</strong> (è la <em>variante</em> del libro 1: se non decresce, hai scritto un pozzo)</li>
+      </ol>
+      <p>Il punto 2 è quello che tutti sbagliano, e si sbaglia sempre nello stesso modo: cercando di seguire con la testa cosa succede a due, tre, quattro livelli di profondità. Non si fa. Devi concederti quello che i matematici chiamano ipotesi induttiva e i programmatori chiamano, meno elegantemente, <em>salto di fede</em>: <strong>assumi che la chiamata più piccola funzioni già</strong> e limitati a scrivere il pezzo che aggiungi tu.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Una funzione ricorsiva non si <em>simula</em>, si <em>legge</em>. Se ti trovi a seguire con il dito la seconda o la terza chiamata annidata, non stai capendo meglio: stai facendo a mano il lavoro della macchina. Fidati del caso base, fidati della chiamata più piccola, controlla che il problema decresca. Sono le uniche tre cose che devi verificare.</p>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 02 ======================= -->
+    <section class="w-tappa" id="c2">
+
+      <div class="w-tappa-kicker">Lisp, 1958–1960</div>
+      <h2 class="w-tappa-title">Le parentesi: il codice prende forma di lista</h2>
+      <p class="w-tappa-lead">La ricorsione, in Python, è una possibilità fra le altre. Esiste un linguaggio in cui è quasi l'unica — e per arrivarci ha dovuto rinunciare a qualcosa che tutti gli altri linguaggi considerano irrinunciabile: una sintassi.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Nel 1960 John McCarthy pubblica sulle <em>Communications of the ACM</em> un articolo che si chiama <em>Recursive Functions of Symbolic Expressions and Their Computation by Machine, Part I</em>. Non voleva costruire un linguaggio di programmazione: voleva un <strong>formalismo matematico</strong> per ragionare su funzioni che manipolano simboli. Per farlo gli servivano due sole cose: un modo di scrivere liste, e la ricorsione. Ne uscì il Lisp — e la parte II, promessa dal titolo, non arrivò mai.</p>
+
+      <p>La scelta radicale è nella notazione. Una lista si scrive fra parentesi: <code>(1 2 3)</code>. Una chiamata di funzione si scrive… anch'essa fra parentesi, con il nome della funzione al primo posto: <code>(+ 1 2)</code>. Le due cose sono <strong>indistinguibili come forma</strong>. Non è un'ambiguità: è la decisione fondativa da cui discende tutto ciò che rende Lisp diverso, e la sua conseguenza — la tappa 05 — cambia la definizione stessa di cosa sia un programma.</p>
+
+      <pre class="w-codice" data-lang="scheme">
+<span class="w-com">Aritmetica in notazione prefissa: l'operatore è sempre il primo elemento</span>
+(+ 1 2)                 <span class="w-com">→ 3</span>
+(* 2 (+ 3 4))           <span class="w-com">→ 14   niente precedenze da ricordare: le dicono le parentesi</span>
+
+<span class="w-com">Definire una funzione: stessa forma, sempre una lista</span>
+(define (fattoriale n)
+  (if (= n 0)
+      1
+      (* n (fattoriale (- n 1)))))
+
+<span class="w-com">La stessa idea sulle liste, che in Lisp sono l'unica struttura dati che serve</span>
+(define (lunghezza lst)
+  (if (null? lst)            <span class="w-ev">← caso base: la lista vuota</span>
+      0
+      (+ 1 (lunghezza (cdr lst)))))   <span class="w-com">cdr = la lista senza il primo elemento</span></pre>
+      <p class="w-codice-nota">Tre operazioni bastano a lavorare su qualsiasi lista: <code>car</code> (il primo elemento), <code>cdr</code> (tutto il resto), <code>cons</code> (attacca un elemento davanti). I nomi vengono dai registri dell'IBM 704 del 1959 — <em>Contents of the Address Register</em> e <em>Contents of the Decrement Register</em> — e sono sopravvissuti a sessantacinque anni di buon gusto contrario.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: le scatole cinesi</span>
+        <p>Una lista Lisp non è un array: è una <strong>coppia</strong>. Il primo scomparto contiene un elemento, il secondo contiene… un'altra coppia identica, e così via fino a una scatola vuota. Per questo la ricorsione su una lista è naturale al punto da sembrare tautologica: la struttura dei dati <em>ha la stessa forma</em> del programma che la percorre. Fai una cosa con il primo scomparto, poi ripeti il gesto su ciò che c'è nel secondo. Quando i dati sono ricorsivi, il codice ricorsivo non è una scelta di stile: è l'unico che non combatte con la forma delle cose.</p>
+      </div>
+
+      <h3 class="w-h3">L'aneddoto che vale un capitolo</h3>
+      <p>Nel suo articolo McCarthy definisce, come esercizio teorico, una funzione chiamata <code>eval</code>: una funzione Lisp che prende <em>una espressione Lisp</em> e ne calcola il valore. Serviva a dimostrare che il formalismo era universale — la stessa mossa con cui Turing aveva definito la macchina universale — e McCarthy la considerava roba da leggere, non da eseguire.</p>
+
+      <p>Steve Russell, uno studente che lavorava per lui, propose di tradurre quella <code>eval</code> in codice macchina per l'IBM 704. McCarthy, per sua stessa ammissione, gli rispose ridendo che stava confondendo la teoria con la pratica. Russell lo fece lo stesso. Ne uscì il primo interprete Lisp: <strong>un linguaggio nato dalla dimostrazione matematica della propria universalità, compilata a mano</strong>. Da quel giorno esiste un modo diverso di costruire un linguaggio, che non passa dal progettare una sintassi ma dallo scrivere la funzione che la interpreta.</p>
+
+      <div class="w-note w-note--expert">
+        <span class="w-note-title">Livello esperto</span>
+        <p>Nella stessa impresa nasce un'altra cosa che oggi dai per scontata. Le liste di McCarthy si allocano dinamicamente e vengono abbandonate di continuo: qualcuno doveva recuperare la memoria non più raggiungibile. La soluzione — inventata da McCarthy attorno al 1959 per il Lisp e descritta nell'articolo del 1960 — si chiama <strong>garbage collection</strong>. Java, Python, JavaScript, Go e C# la usano tutti; il primo motivo per cui esiste è che nessuno riusciva a scrivere a mano il <code>free</code> per una struttura ricorsiva condivisa. Ne riparliamo con le mani nello heap nel <a href="Il-Fantasma-nella-Macchina.dc.html#c3">libro 5</a>.</p>
+      </div>
+
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">I paper che lo dimostrano</span>
+        <ul>
+          <li>McCarthy, <em>Recursive Functions of Symbolic Expressions and Their Computation by Machine, Part I</em> (1960) — <span class="w-ref">CACM 3(4), 184–195</span></li>
+          <li>McCarthy, <em>History of Lisp</em> (1979) — il racconto in prima persona, compreso l'episodio di Steve Russell e di <code>eval</code></li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 03 ======================= -->
+    <section class="w-tappa" id="c3">
+
+      <div class="w-tappa-kicker">Costo e profondità</div>
+      <h2 class="w-tappa-title">L'abisso: quando la ricorsione divora</h2>
+      <p class="w-tappa-lead">Il salto di fede della tappa 01 ti fa scrivere codice giusto. Non ti dice niente su quanto costa — e su questo la ricorsione sa essere spietata come nessun'altra costruzione.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Il fattoriale chiama se stesso una volta sola per livello: la pila scende dritta, come la fila allo sportello. Ma guarda cosa succede quando una funzione chiama se stessa <strong>due volte</strong>. La forma delle chiamate smette di essere una fila e diventa un albero — e gli alberi, con la profondità, esplodono.</p>
+
+      <pre class="w-codice" data-lang="python">
+def fib(n):
+    if n &lt; 2: return n
+    return fib(n-1) + fib(n-2)     <span class="w-ev">← due chiamate: qui nasce l'albero</span></pre>
+      <p class="w-codice-nota">Questa funzione è corretta. È anche una delle peggiori righe di codice che si possano scrivere, e il bello è che nulla nel suo aspetto lo lascia sospettare.</p>
+
+      <div class="w-demo">
+        <h4 class="w-demo-title">Prova tu — quanto costa davvero</h4>
+        <p class="w-demo-hint">Alza <code>n</code> e guarda le due colonne. A sinistra la versione qui sopra; a destra la stessa identica funzione con una riga di cache in più — la <em>memoization</em> del <a href="La-Cristallizzazione.dc.html#c4">libro 2</a>, che si può fare solo perché <code>fib</code> è pura.</p>
+
+        <div class="w-row">
+          <div class="w-cell is-on">{{ fbN }}<b>n</b></div>
+          <div class="w-cell is-ko">{{ fbNaive }}<b>chiamate senza cache</b></div>
+          <div class="w-cell is-ok">{{ fbMemo }}<b>chiamate con cache</b></div>
+          <div class="w-cell is-off">{{ fbRapporto }}<b>rapporto</b></div>
+        </div>
+
+        <div class="w-demo-out">fib({{ fbN }}) = {{ fbVal }} &nbsp;·&nbsp; {{ fbTempo }}</div>
+
+        <div class="w-row">
+          <button class="w-btn" onClick="{{ fbMeno }}">− n</button>
+          <button class="w-btn" onClick="{{ fbPiu }}">+ n</button>
+          <button class="w-btn" onClick="{{ fbSalto }}">n + 5</button>
+          <button class="w-btn" onClick="{{ fbReset }}">↺ azzera</button>
+        </div>
+        <p class="w-demo-foot">La colonna rossa raddoppia circa a ogni passo di <code>n</code>; quella verde cresce di uno. È la differenza fra un albero e una fila, e in fondo è tutta qui la parola "esponenziale".</p>
+      </div>
+
+      <p>Il motivo dell'esplosione è banale una volta visto: <code>fib(5)</code> chiama <code>fib(4)</code> e <code>fib(3)</code>; <code>fib(4)</code> a sua volta chiama <code>fib(3)</code>. Quel <code>fib(3)</code> viene calcolato due volte da zero, e dentro di sé ricalcola tutto ciò che gli sta sotto. La macchina rifà migliaia di volte lo stesso lavoro identico perché <strong>non sa che è lo stesso</strong>. Aggiungere la cache non significa "ottimizzare": significa dirle quello che tu già sai, cioè che la funzione è pura e la sua risposta non cambia.</p>
+
+      <div class="w-note w-note--warn">
+        <span class="w-note-title">Attenzione</span>
+        <p>La ricorsione ha un secondo costo, indipendente dal primo: <strong>la profondità</strong>. Ogni chiamata aperta è un foglietto sullo stack, e lo stack è piccolo — qualche megabyte. Python si ferma per default attorno alle mille chiamate annidate e ti lancia un errore; altri linguaggi arrivano più in là e poi muoiono di colpo. Una ricorsione su una lista di un milione di elementi non è "elegante ma lenta": è un programma che non arriva in fondo. La tappa 04 dice quando questo problema sparisce del tutto.</p>
+      </div>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Guarda <strong>quante volte</strong> una funzione ricorsiva nomina se stessa nel corpo. Una volta sola: una fila, costo lineare, pila profonda quanto il problema. Due volte: un albero, e allora chiediti subito se i rami calcolano cose già calcolate — se sì, una tabella di risultati ti fa passare da esponenziale a lineare senza toccare la logica.</p>
+      </div>
+
+      <div class="w-note w-note--expert">
+        <span class="w-note-title">Livello esperto</span>
+        <p>La ricorsione doppia non è di per sé un male: è la forma naturale del <em>divide et impera</em>. Mergesort e quicksort chiamano se stessi due volte e restano <em>n</em>·log <em>n</em>, perché i due rami lavorano su <strong>metà dati ciascuno</strong> e non si sovrappongono mai. La differenza fra mergesort e la Fibonacci ingenua non è il numero di chiamate: è che nel primo caso l'unione dei sottoproblemi copre esattamente i dati una volta sola, nel secondo si accavalla. Quando i sottoproblemi si sovrappongono e si possono memorizzare, il nome tecnico di ciò che stai facendo è <em>programmazione dinamica</em>.</p>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 04 ======================= -->
+    <section class="w-tappa" id="c4">
+
+      <div class="w-tappa-kicker">Chiamata in coda</div>
+      <h2 class="w-tappa-title">La ricorsione che è un ciclo</h2>
+      <p class="w-tappa-lead">Hai appena visto che la profondità si paga in memoria. Adesso il colpo di scena: esiste una forma di ricorsione che non costa <em>niente</em> in memoria — e non perché sia più furba, ma perché non è più una ricorsione.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Torna all'immagine della fila allo sportello. Il foglietto di ogni chiamata serve a ricordare <em>che cosa fare con la risposta quando arriva</em>: nel fattoriale, moltiplicarla per <code>n</code>. Ma se la funzione, dopo aver chiamato se stessa, <strong>non ha più niente da fare con il risultato</strong> — se lo restituisce e basta — allora quel foglietto non serve a nessuno. Si può strappare <em>prima</em> di fare la chiamata, riusando il suo posto.</p>
+
+      <p>Una chiamata di questo tipo si chiama <strong>chiamata in coda</strong> (<em>tail call</em>): è l'ultima cosa che la funzione fa. E un linguaggio che se ne accorge trasforma la ricorsione in un salto all'indietro — cioè, letteralmente, nel ciclo del libro 1.</p>
+
+      <pre class="w-codice" data-lang="scheme">
+<span class="w-com">NON in coda: dopo la chiamata resta ancora una moltiplicazione da fare.</span>
+(define (fatt n)
+  (if (= n 0) 1
+      (* n (fatt (- n 1)))))        <span class="w-ev">← il risultato serve ancora: il foglietto va tenuto</span>
+
+<span class="w-com">In coda: il risultato che torna è già quello finale. Nessuno deve aspettarlo.</span>
+(define (fatt n)
+  (aiuto n 1))
+(define (aiuto n acc)
+  (if (= n 0) acc
+      (aiuto (- n 1) (* n acc))))   <span class="w-ev">← l'ultima cosa che faccio: nessun foglietto da tenere</span></pre>
+      <p class="w-codice-nota">Il trucco è l'<strong>accumulatore</strong>: invece di aspettare la risposta per moltiplicarla, il pezzo di lavoro viene fatto <em>prima</em> e portato avanti. La discesa delle risposte sparisce, resta solo la salita delle domande — che non ha bisogno di memoria.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: il testimone della staffetta</span>
+        <p>Nella ricorsione normale ogni atleta aspetta fermo in pista che tutti gli altri finiscano, per poi fare la sua parte al ritorno: alla fine hai mille atleti fermi in piedi, ed è esattamente la pila di foglietti. Nella ricorsione in coda ogni atleta passa il testimone — l'accumulatore — e <strong>se ne va a casa</strong>. In pista c'è sempre e solo una persona. Ecco perché la memoria non cresce: non c'è nessuno da aspettare.</p>
+      </div>
+
+      <h3 class="w-h3">Un requisito, non un'ottimizzazione</h3>
+      <p>Qui la differenza fra i linguaggi diventa sostanziale e vale la pena sapere da che parte sta il tuo. In Scheme la <strong>proper tail recursion</strong> non è un'ottimizzazione che il compilatore fa se ne ha voglia: è un <em>requisito dello standard</em>, presente da R5RS fino a R7RS. Un'implementazione che non la garantisce non è Scheme. La conseguenza pratica è che in Scheme si scrivono cicli infiniti come ricorsioni infinite e nessuno batte ciglio, perché non consumano un byte di stack.</p>
+
+      <p>Fu Guy Steele a metterlo per iscritto nel modo più memorabile, in una delle celebri <em>Lambda Papers</em> del MIT: la chiamata di procedura, se avviene in coda, <strong>è</strong> un <code>goto</code> che passa degli argomenti. Il titolo di quel memo del 1977 dice tutto: <em>Lambda: The Ultimate GOTO</em>. Rileggilo tenendo a mente la tappa 03 del libro 1 — il salto condizionale che scrive nel program counter — e vedrai che le due cose sono la stessa, viste da due altezze diverse della staccionata.</p>
+
+      <table class="w-table">
+        <tr><th>Linguaggio</th><th>Chiamata in coda</th><th>Cosa significa per te</th></tr>
+        <tr><td>Scheme, Erlang, Elixir</td><td>garantita dallo standard</td><td>la ricorsione è il ciclo: scrivila senza pensarci</td></tr>
+        <tr><td>Lua, molti Common Lisp, Kotlin (<code>tailrec</code>)</td><td>garantita o richiedibile</td><td>funziona, ma va scritta nella forma giusta</td></tr>
+        <tr><td>C, C++, Rust</td><td>di solito fatta dal compilatore in release</td><td>affidabile in pratica, non garantita dal linguaggio</td></tr>
+        <tr><td>Python, Java, JavaScript</td><td>assente</td><td>la profondità è un limite vero: oltre le migliaia di livelli, usa un ciclo</td></tr>
+      </table>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Ricorsione e iterazione non sono due filosofie in lotta: sono <strong>la stessa cosa scritta in due modi</strong>. Un ciclo con un accumulatore e una ricorsione in coda con un accumulatore compilano nello stesso salto all'indietro. Ciò che cambia è che nella forma ricorsiva ciò che si accumula è <em>dichiarato negli argomenti</em>, sotto gli occhi, invece di essere una variabile che qualcuno modifica in un angolo del corpo del ciclo.</p>
+      </div>
+
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">I paper che lo dimostrano</span>
+        <ul>
+          <li>Sussman &amp; Steele, <em>Scheme: An Interpreter for Extended Lambda Calculus</em> (1975) — <span class="w-ref">MIT AI Memo 349</span></li>
+          <li>Steele, <em>Debunking the "Expensive Procedure Call" Myth, or, Procedure Call Implementations Considered Harmful, or, Lambda: The Ultimate GOTO</em> (1977) — <span class="w-ref">MIT AI Memo 443</span></li>
+          <li><em>Revised<sup>7</sup> Report on the Algorithmic Language Scheme</em> (R7RS, 2013) — la proper tail recursion come requisito, non come ottimizzazione</li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 05 ======================= -->
+    <section class="w-tappa" id="c5">
+
+      <div class="w-tappa-kicker">Omoiconicità</div>
+      <h2 class="w-tappa-title">eval e apply: il linguaggio che si spiega da sé</h2>
+      <p class="w-tappa-lead">Nella tappa 02 hai lasciato in sospeso un fatto che sembrava una curiosità tipografica: in Lisp una chiamata di funzione e una lista di dati si scrivono nello stesso identico modo. È il momento di scoprire che cosa ci si può fare.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">In quasi tutti i linguaggi il tuo programma, prima di essere eseguito, viene tradotto in una struttura ad albero che si chiama AST — <em>abstract syntax tree</em>. L'albero esiste, ma vive dentro il compilatore: tu non lo vedi, non lo puoi toccare, e il testo che hai scritto è solo un modo di descriverlo a parole. In Lisp quella traduzione <strong>non serve</strong>, perché ciò che scrivi <em>è già</em> l'albero: le parentesi non descrivono la struttura, sono la struttura.</p>
+
+      <p>La proprietà ha un nome, coniato nel 1965 da Calvin Mooers per il suo linguaggio TRAC: <strong>omoiconico</strong>, dal greco <em>homo</em> (stesso) e <em>icon</em> (rappresentazione) — perché il programma ha la stessa rappresentazione dentro e fuori dall'elaboratore. Alan Kay riprese il termine nella sua tesi di dottorato del 1969, ed è da lì che è arrivato fino a noi.</p>
+
+      <div class="w-demo">
+        <h4 class="w-demo-title">Prova tu — la stessa lista, letta come dato e come codice</h4>
+        <p class="w-demo-hint">In alto c'è una espressione Lisp. Puoi trattarla come una <b>lista</b> (prenderne pezzi, cambiarne il primo elemento) o come un <b>programma</b> (valutarla). Cambia l'operatore e poi valuta: hai appena modificato un programma con le stesse funzioni con cui modificheresti la spesa del supermercato.</p>
+
+        <div class="w-demo-out">espressione corrente: &nbsp; <b>{{ sxTesto }}</b></div>
+
+        <div class="w-row">
+          <div class="w-cell is-on">{{ sxCar }}<b>(car e)</b></div>
+          <div class="w-cell is-on">{{ sxCdr }}<b>(cdr e)</b></div>
+          <div class="w-cell is-off">{{ sxLen }}<b>elementi</b></div>
+          <div class="w-cell is-ok">{{ sxVal }}<b>(eval e)</b></div>
+        </div>
+
+        <div class="w-demo-out">{{ sxLog }}</div>
+
+        <div class="w-row">
+          <button class="w-btn" onClick="{{ sxOp }}">⇄ cambia l'operatore in {{ sxProxOp }}</button>
+          <button class="w-btn" onClick="{{ sxArg }}">⇄ cambia il primo argomento</button>
+          <button class="w-btn" onClick="{{ sxAnnida }}">＋ annida: (* e 2)</button>
+          <button class="w-btn" onClick="{{ sxReset }}">↺ azzera</button>
+        </div>
+        <p class="w-demo-foot">Nessun linguaggio ti vieta di costruire una stringa che assomiglia a un programma. Qui però non stai manipolando <em>testo</em>: stai manipolando l'albero, con le stesse tre funzioni di sempre. È tutta la differenza fra <code>eval("...")</code> e l'omoiconicità.</p>
+      </div>
+
+      <h3 class="w-h3">Il programma che contiene il proprio interprete</h3>
+      <p>Se il codice è una struttura dati, allora una funzione può <em>leggere</em> il codice. E se può leggerlo, può eseguirlo. Ne segue una delle cose più belle che l'informatica abbia prodotto: l'<strong>interprete metacircolare</strong>, cioè un interprete di Lisp scritto in Lisp, che sta in un paio di pagine. È il capitolo 4 di <em>Structure and Interpretation of Computer Programs</em>, e il suo cuore è una coppia di funzioni che si chiamano a vicenda per sempre:</p>
+
+      <pre class="w-codice" data-lang="scheme">
+<span class="w-com">Il motore di un intero linguaggio, in due funzioni mutuamente ricorsive.</span>
+(define (eval espr ambiente)
+  (cond ((numero? espr) espr)                       <span class="w-com">un numero vale se stesso</span>
+        ((simbolo? espr) (cerca espr ambiente))     <span class="w-com">un nome: guarda cosa c'è dentro</span>
+        ((if? espr) (eval-if espr ambiente))        <span class="w-com">il salto condizionale del libro 1</span>
+        (else (apply (eval (car espr) ambiente)     <span class="w-ev">← valuta la funzione…</span>
+                     (valuta-tutti (cdr espr) ambiente)))))   <span class="w-ev">← …e i suoi argomenti</span>
+
+(define (apply funzione argomenti)
+  (eval (corpo funzione)                            <span class="w-ev">← e apply richiama eval: il cerchio si chiude</span>
+        (estendi (ambiente funzione) (parametri funzione) argomenti)))</pre>
+      <p class="w-codice-nota"><code>eval</code> chiama <code>apply</code>, <code>apply</code> richiama <code>eval</code>. Questa mutua ricorsione <em>è</em> il linguaggio: tutto il resto sono comodità. Ed è la stessa <code>eval</code> che McCarthy aveva scritto come dimostrazione e che Russell tradusse in codice macchina.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Omoiconico non vuol dire "pieno di parentesi": vuol dire che <strong>il programma è un valore del linguaggio</strong>, manipolabile con le stesse funzioni con cui manipoli qualsiasi altro dato. È la premessa senza la quale la prossima tappa — le macro — sarebbe una funzionalità del compilatore anziché una cosa che puoi scrivere tu, di martedì, in dieci righe.</p>
+      </div>
+
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">I paper che lo dimostrano</span>
+        <ul>
+          <li>Mooers &amp; Deutsch, <em>TRAC, A Text-Handling Language</em> (1965) — il conio del termine <em>homoiconic</em> — <span class="w-ref">Proc. 20th ACM National Conference</span></li>
+          <li>Kay, <em>The Reactive Engine</em> (tesi di dottorato, 1969) — la ripresa del termine che è arrivata fino a oggi</li>
+          <li>Abelson &amp; Sussman, <em>Structure and Interpretation of Computer Programs</em> (MIT Press, 1985; 2ª ed. 1996) — cap. 4, l'interprete metacircolare</li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 06 ======================= -->
+    <section class="w-tappa" id="c6">
+
+      <div class="w-tappa-kicker">Macro e igiene</div>
+      <h2 class="w-tappa-title">Le macro: il linguaggio che scrive se stesso</h2>
+      <p class="w-tappa-lead">Il codice è un dato. Una funzione può leggerlo e costruirne di nuovo. Manca un solo pezzo perché questo diventi il potere più grande del mestiere: che il nuovo codice venga poi <em>eseguito al posto</em> del vecchio.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Una funzione riceve <strong>valori</strong> e restituisce un valore. Una <strong>macro</strong> riceve <em>pezzi di codice non ancora valutati</em> e restituisce <em>altro codice</em>, che il sistema mette al posto della chiamata prima di eseguire. Non è una funzione più potente: lavora in un altro momento della vita del programma. La funzione lavora quando il programma gira; la macro lavora <em>mentre il programma viene costruito</em>.</p>
+
+      <p>Perché è tanto importante? Perché ti mette nelle mani la cosa che in ogni altro linguaggio è riservata a chi lo ha progettato: <strong>aggiungere costrutti</strong>. Se nel tuo linguaggio manca un <code>unless</code>, in Java aspetti la prossima versione o scrivi una funzione che ci somiglia vagamente; in Lisp lo aggiungi tu in tre righe, e da quel momento è indistinguibile da quelli che c'erano già.</p>
+
+      <pre class="w-codice" data-lang="scheme">
+<span class="w-com">Perché non basta una funzione: gli argomenti di una funzione sono già valutati.</span>
+(define (mio-if c a b) (if c a b))
+(mio-if (= x 0) 'zero (/ 10 x))    <span class="w-ev">← divide per zero ANCHE quando x è 0</span>
+
+<span class="w-com">Una macro riceve il codice, non il valore: può decidere di non valutarlo affatto.</span>
+(define-syntax a-meno-che
+  (syntax-rules ()
+    ((_ condizione corpo ...)       <span class="w-com">← lo schema da riconoscere</span>
+     (if (not condizione)           <span class="w-com">← il codice da produrre al suo posto</span>
+         (begin corpo ...)))))
+
+(a-meno-che (porta-aperta?) (suona-allarme) (registra-evento))
+
+<span class="w-com">…che prima dell'esecuzione diventa, letteralmente, questo:</span>
+(if (not (porta-aperta?))
+    (begin (suona-allarme) (registra-evento)))</pre>
+      <p class="w-codice-nota">La macro non ha "chiamato" niente: ha <strong>riscritto il tuo programma</strong>. A tempo di esecuzione la macro non esiste più — è come se avessi scritto tu l'<code>if</code>.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: il traduttore che riscrive il libro prima che tu lo legga</span>
+        <p>Una funzione è un interprete che sta accanto a te mentre leggi e ti spiega le parole difficili: lavora <em>mentre</em> succede. Una macro è un traduttore che ha lavorato di notte e ti consegna al mattino un libro già interamente in italiano: quando cominci a leggere, di lui non c'è più traccia. È per questo che una macro non può dipendere da valori che esisteranno solo a tempo di esecuzione — lei ha già finito il suo lavoro da un pezzo.</p>
+      </div>
+
+      <h3 class="w-h3">La trappola dell'igiene</h3>
+      <p>Il potere di riscrivere il codice altrui ha un pericolo esatto: la macro introduce dei nomi propri, e quei nomi finiscono nel <em>tuo</em> codice. Se una macro usa internamente una variabile <code>tmp</code> e tu, nel corpo che le passi, hai anche tu una <code>tmp</code>, la sostituzione le fa collidere — e ottieni un bug che non è né nel tuo codice né in quello della macro, ma nella loro somma.</p>
+
+      <p>La risposta si chiama <strong>igiene</strong> (<em>hygiene</em>): le macro igieniche rinominano automaticamente i propri nomi interni, in modo che non possano mai catturare i tuoi. Scheme fu il primo linguaggio a portarla nello standard, con <code>syntax-rules</code>, comparsa nell'appendice del rapporto R4RS del 1991 e poi entrata a pieno titolo nella lingua; la base teorica è nel lavoro di Eugene Kohlbecker e colleghi del 1986. Common Lisp fa la scelta opposta — <code>defmacro</code> non è igienico — e chiede al programmatore di generare a mano nomi unici con <code>gensym</code>: più potere, più fiducia, più modi di farsi male.</p>
+
+      <div class="w-note w-note--warn">
+        <span class="w-note-title">Attenzione</span>
+        <p>La regola che ogni lispista impara a proprie spese: <strong>non scrivere una macro se una funzione basta</strong>. Una macro non è un valore, quindi non la puoi passare a <code>map</code>, non la puoi comporre, non la puoi mettere in una lista; complica i messaggi d'errore e i debugger; e chi legge il tuo codice deve tenere a mente due momenti diversi invece di uno. Le macro servono quando devi controllare <em>se</em> e <em>quando</em> qualcosa viene valutato, o quando vuoi introdurre una forma sintattica nuova. Per tutto il resto, una funzione è meglio.</p>
+      </div>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Con le macro il confine fra "usare un linguaggio" e "progettarne uno" smette di esistere. Non stai scrivendo un programma in Lisp: stai <strong>costruendo il dialetto</strong> in cui il tuo problema si esprime meglio, e poi scrivendo tre righe in quel dialetto. È la ragione per cui in quel mondo si dice che non si programma in Lisp — si programma <em>verso</em> Lisp, partendo dal problema e andandogli incontro.</p>
+      </div>
+
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">I paper che lo dimostrano</span>
+        <ul>
+          <li>Kohlbecker, Friedman, Felleisen &amp; Duba, <em>Hygienic Macro Expansion</em> (1986) — <span class="w-ref">ACM Conf. on LISP and Functional Programming</span></li>
+          <li><em>Revised<sup>4</sup> Report on the Algorithmic Language Scheme</em> (1991) — <code>syntax-rules</code> compare in appendice: è il primo standard con le macro igieniche</li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- ===== EPILOGO — non viene numerato ===== -->
+    <section class="w-tappa w-tappa--fine" id="fine">
+      <div class="w-tappa-kicker">Tutto insieme</div>
+      <h2 class="w-tappa-title">Il serpente che si morde la coda, tre volte</h2>
+      <p class="w-tappa-lead">Guarda indietro e conta le volte in cui, in questa serie, una cosa si è definita in termini di se stessa.</p>
+
+      <p>La prima è stata <code>x = x + 1</code>: una variabile in termini del proprio valore precedente, e ne è nato il tempo. La seconda è stata la funzione ricorsiva: una definizione in termini di se stessa su un problema più piccolo, e ne è nato un modo di pensare che rende banali problemi che iterativamente sono contorti. La terza l'hai appena vista: un linguaggio in termini di se stesso — <code>eval</code> che chiama <code>apply</code> che richiama <code>eval</code> — e ne è nata la possibilità di modificare il linguaggio dall'interno.</p>
+
+      <p><strong>È sempre la stessa mossa, applicata a un livello più alto.</strong> E il fatto che funzioni tre volte non è una coincidenza: è il motivo per cui l'autoriferimento, che in matematica è il posto dove nascono i paradossi, in informatica è il posto dove nasce la potenza. La differenza fra i due mondi è una sola: il caso base. Un paradosso è un autoriferimento senza pavimento.</p>
+
+      <div class="w-note w-note--memory">
+        <span class="w-note-title">Dal livello medio all'esperto assoluto: la palestra</span>
+        <ol>
+          <li><strong>Un quarto d'ora, subito.</strong> Scrivi <code>fib</code> ricorsiva nel tuo linguaggio e cronometrala con n = 35. Poi aggiungi una cache (in Python bastano <code>@lru_cache</code> e una riga) e cronometrala di nuovo con n = 200. Il rapporto fra i due numeri è una cosa che non si dimentica più.</li>
+          <li><strong>Ricorsione su una struttura, non su un numero.</strong> Scrivi una funzione che, data una cartella, ne calcoli il peso totale scendendo nelle sottocartelle. È la ricorsione nella sua forma più onesta: i dati sono un albero, il codice ha la forma dell'albero.</li>
+          <li><strong>Trasforma in coda.</strong> Prendi tre funzioni ricorsive che hai scritto e riscrivile con un accumulatore, in forma di tail call. Poi riscrivi le stesse con un <code>while</code>: guarda che sono lo stesso programma con i nomi spostati.</li>
+          <li><strong>Scrivi un interprete.</strong> È l'esercizio che divide in due una carriera. Fai <em>Build Your Own Lisp</em> o segui il saggio di Peter Norvig <em>(How to Write a) Lisp Interpreter in Python</em> — centoventi righe. Quando il tuo <code>eval</code> valuterà per la prima volta <code>(* 2 (+ 3 4))</code>, avrai capito i linguaggi di programmazione in un modo che nessun libro può darti.</li>
+          <li><strong>Una macro vera.</strong> In Racket o in Clojure, scrivi una macro <code>a-meno-che</code> e una <code>tempo</code> che misura quanto ci mette un blocco a girare. Poi prova a scrivere la seconda come funzione, e osserva perché non funziona.</li>
+          <li><strong>Le letture, in quest'ordine.</strong> SICP, capitoli 1 e 2, saltando gli esercizi che non ti divertono (è gratuito online). Poi <em>The Little Schemer</em> di Friedman e Felleisen: è tutto domande e risposte, sembra un libro per bambini ed è il modo più efficace mai inventato per far entrare la ricorsione nel corpo. Poi, per il gusto della storia, <em>History of Lisp</em> di McCarthy.</li>
+        </ol>
+      </div>
+
+      <div class="w-note w-note--bridge">
+        <span class="w-note-title">Il ponte con il libro 04</span>
+        <p>Lisp toglie la sintassi e lascia le parentesi. Esiste una famiglia di linguaggi che va oltre e toglie anche <strong>i nomi degli argomenti</strong>: nessuna variabile, nessuna parentesi, solo una pila e delle parole messe una dopo l'altra. E da lì, per la strada più corta, si arriva al costrutto più vertiginoso di tutti: catturare l'istante presente di un programma e conservarlo come un valore. Vai a <a href="Eleganza-Esoterica.dc.html">Eleganza Esoterica</a>.</p>
+      </div>
+    </section>
+
+    <footer class="w-footer">
+      ~ · fine del quaderno · ~<br>
+      <a href="Biblioteca.dc.html">torna alla Biblioteca</a>
+    </footer>
+
+  </main>
+</div>
+
+</x-dc>
+
+<!-- Logica delle demo interattive. -->
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    /* demo 1 — lo stack del fattoriale */
+    fn: 4, fidx: 0,
+    /* demo 2 — costo di fib */
+    fbn: 10,
+    /* demo 3 — codice come dato */
+    op: '+', primo: 1, annidamenti: 0
+  }
+
+  _fatt(k) { var r = 1; for (var i = 2; i <= k; i++) r *= i; return r; }
+
+  /* chiamate della versione ingenua: c(n) = 1 + c(n-1) + c(n-2) */
+  _chiamate(n) {
+    var a = 1, b = 1;                 /* c(0), c(1) */
+    if (n === 0) return 1;
+    if (n === 1) return 1;
+    for (var i = 2; i <= n; i++) { var c = 1 + a + b; a = b; b = c; }
+    return b;
+  }
+  _fib(n) { var a = 0, b = 1; for (var i = 0; i < n; i++) { var c = a + b; a = b; b = c; } return a; }
+
+  renderVals() {
+    var self = this, s = this.state;
+
+    /* ============ demo 1: fattoriale sullo stack ============ */
+    var n = s.fn, idx = s.fidx, passiTot = 2 * n + 1;
+    var aperte = Math.min(idx, n) + 1;
+    var ritorni = Math.max(0, idx - n);
+    var presenti = Math.max(0, aperte - ritorni);
+    var frames = [];
+    for (var j = 0; j < presenti; j++) {
+      var arg = n - j;
+      var inCima = (j === presenti - 1);
+      var nota = '';
+      if (inCima && ritorni === 0) {
+        nota = (arg === 0) ? '   ← caso base: restituisce 1' : '   ← chiama fatt(' + (arg - 1) + ')';
+      } else if (inCima && ritorni > 0) {
+        nota = '   ← riceve ' + self._fatt(ritorni - 1) + ', restituisce ' + arg + '×' + self._fatt(ritorni - 1) + ' = ' + self._fatt(arg);
+      }
+      frames.push({
+        txt: 'fatt(' + arg + ')' + nota,
+        cls: 'w-frame' + (inCima ? ' is-top' : '')
+      });
+    }
+    var fatStato;
+    if (idx === 0) fatStato = 'lo stack è vuoto: sto per chiamare fatt(' + n + ')';
+    else if (ritorni === 0) fatStato = 'discesa: ' + presenti + ' chiamate aperte, nessuna ha ancora risposto';
+    else if (presenti > 0) fatStato = 'risalita: ' + ritorni + ' foglietti già strappati, ultimo valore restituito ' + self._fatt(ritorni - 1);
+    else fatStato = 'finito: fatt(' + n + ') = ' + self._fatt(n) + ' — la pila è di nuovo vuota';
+
+    /* ============ demo 2: costo di fib ============ */
+    var naive = self._chiamate(s.fbn);
+    var memo = s.fbn + 1;
+    var rapporto = Math.round(naive / memo);
+    /* stima di tempo: circa 100 milioni di chiamate al secondo */
+    var sec = naive / 1e8;
+    var tempo;
+    if (sec < 0.001) tempo = 'senza cache: meno di un millesimo di secondo';
+    else if (sec < 60) tempo = 'senza cache: circa ' + sec.toFixed(2) + ' secondi (a ~100 milioni di chiamate al secondo)';
+    else if (sec < 3600) tempo = 'senza cache: circa ' + (sec / 60).toFixed(1) + ' minuti';
+    else if (sec < 86400) tempo = 'senza cache: circa ' + (sec / 3600).toFixed(1) + ' ore';
+    else tempo = 'senza cache: circa ' + (sec / 86400).toFixed(1) + ' giorni';
+
+    /* ============ demo 3: codice come dato ============ */
+    var ops = ['+', '*', '-'];
+    var prox = ops[(ops.indexOf(s.op) + 1) % ops.length];
+    var interno = '(' + s.op + ' ' + s.primo + ' (* 2 3))';
+    var testo = interno, prec = null;
+    for (var k = 0; k < s.annidamenti; k++) { prec = testo; testo = '(* ' + testo + ' 2)'; }
+    var valInterno = (s.op === '+') ? s.primo + 6 : (s.op === '*' ? s.primo * 6 : s.primo - 6);
+    var val = valInterno * Math.pow(2, s.annidamenti);
+    var car = s.annidamenti > 0 ? '*' : s.op;
+    var cdr = s.annidamenti > 0 ? '(' + prec + ' 2)' : '(' + s.primo + ' (* 2 3))';
+    var sxLog = 'La stessa lista, due letture: come dato è una lista di tre elementi il cui primo è il simbolo ' +
+                car + '; come programma vale ' + val + '.';
+
+    return {
+      /* demo 1 */
+      fatFrames: frames,
+      fatStato: fatStato,
+      fatPasso: function () { self.setState(function (st) { return { fidx: Math.min(st.fidx + 1, 2 * st.fn + 1) }; }); },
+      fatTutto: function () { self.setState(function (st) { return { fidx: 2 * st.fn + 1 }; }); },
+      fatPiu: function () { self.setState(function (st) { return { fn: Math.min(st.fn + 1, 8), fidx: 0 }; }); },
+      fatMeno: function () { self.setState(function (st) { return { fn: Math.max(st.fn - 1, 1), fidx: 0 }; }); },
+      fatReset: function () { self.setState({ fidx: 0 }); },
+
+      /* demo 2 */
+      fbN: s.fbn,
+      fbNaive: naive.toLocaleString('it-IT'),
+      fbMemo: memo,
+      fbRapporto: rapporto.toLocaleString('it-IT') + '×',
+      fbVal: self._fib(s.fbn).toLocaleString('it-IT'),
+      fbTempo: tempo,
+      fbPiu: function () { self.setState(function (st) { return { fbn: Math.min(st.fbn + 1, 45) }; }); },
+      fbMeno: function () { self.setState(function (st) { return { fbn: Math.max(st.fbn - 1, 2) }; }); },
+      fbSalto: function () { self.setState(function (st) { return { fbn: Math.min(st.fbn + 5, 45) }; }); },
+      fbReset: function () { self.setState({ fbn: 10 }); },
+
+      /* demo 3 */
+      sxTesto: testo,
+      sxCar: car,
+      sxCdr: cdr,
+      sxLen: 3,
+      sxVal: val,
+      sxLog: sxLog,
+      sxProxOp: prox,
+      sxOp: function () { self.setState(function (st) { var o = ['+', '*', '-']; return { op: o[(o.indexOf(st.op) + 1) % o.length] }; }); },
+      sxArg: function () { self.setState(function (st) { return { primo: (st.primo % 5) + 1 }; }); },
+      sxAnnida: function () { self.setState(function (st) { return { annidamenti: (st.annidamenti + 1) % 3 }; }); },
+      sxReset: function () { self.setState({ op: '+', primo: 1, annidamenti: 0 }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

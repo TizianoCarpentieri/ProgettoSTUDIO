@@ -35,9 +35,11 @@ la richiesta lo ricordi — è il modo di lavorare predefinito del progetto.
 6. Registra il modulo in `wiki/wiki-index.js` — senza quel passo la pagina
    esiste ma non compare nella Biblioteca. Ogni concetto dichiara la sua
    `tappa` (`"c4"`): è l'àncora con cui il grafo apre il libro al punto giusto.
-7. **Esegui `node wiki/verifica.js`.** Zero errori, sempre. Controlla la
-   struttura del libro, la catena che fa esistere l'indice laterale, la
-   corrispondenza concetti ↔ tappe e i due divieti qui sotto.
+7. **Esegui i due verificatori.** Zero errori, sempre.
+   `node wiki/verifica.js` legge il sorgente: struttura del libro, catena che
+   fa esistere l'indice laterale, corrispondenza concetti ↔ tappe, i due
+   divieti qui sotto. `node strumenti/verifica-pagine.js` apre un browser:
+   testo sovrapposto, sfondamenti, binding visibili, demo morte.
 8. Verifica il resto a mano: la checklist di contenuto in `docs/AgentAutore.md`,
    quella di forma in `docs/AgentFE.md`.
 

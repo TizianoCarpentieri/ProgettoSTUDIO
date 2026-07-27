@@ -304,6 +304,9 @@
     for (var i = 0; i < window.WIKI_INDEX.length; i++) {
       var scaffale = window.WIKI_INDEX[i];
       html += '<div class="w-shelf-title"><span>Scaffale · ' + esc(scaffale.scaffale) + '</span></div>';
+      /* Facoltativa: una riga che dice di che parla lo scaffale e in che
+         ordine si legge. Serve all'esplorazione classica, che è la principale. */
+      if (scaffale.descrizione) html += '<p class="w-shelf-sub">' + esc(scaffale.descrizione) + '</p>';
       html += '<div class="w-grid">';
       for (var j = 0; j < scaffale.moduli.length; j++) html += cardHtml(scaffale.moduli[j]);
       html += '</div>';

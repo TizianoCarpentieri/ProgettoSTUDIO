@@ -29,4 +29,6 @@ Sette documenti, sette domande diverse. Parti da quello che risponde alla tua.
 | capire il cervello 3D e il grafo | [wiki/graph/](wiki/graph/) e lo spec del cervello in [docs/decisioni/](docs/decisioni/) |
 | capire come cambierà la navigazione (sala → scaffale → libro) | [la decisione del 27-07-2026](docs/decisioni/2026-07-27-navigazione-biblioteca-design.md) |
 | controllare che il grafo sia coerente | `node wiki/graph/valida.js` |
+| controllare che le pagine reggano a schermo (sovrapposizioni, sfondamenti, demo vive) | `node strumenti/verifica-pagine.js` |
+| capire le regole per il telefono | [AgentFE.md](docs/AgentFE.md) § *Il telefono è il secondo formato* |
 | pubblicare le modifiche | [OVERVIEW.md](docs/OVERVIEW.md) § *Pubblicazione su GitHub* |

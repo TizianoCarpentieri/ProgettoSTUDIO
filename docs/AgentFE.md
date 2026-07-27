@@ -86,8 +86,31 @@ Per **una materia nuova** (non un modulo, uno scaffale intero) aggiungi un
 blocco al livello superiore dello stesso file:
 
 ```js
-{ scaffale: "Statistica", moduli: [ … ] }
+{
+  scaffale: "Statistica",
+  descrizione: "Facoltativa: di che parla lo scaffale e in che ordine si legge.",
+  moduli: [ … ]
+}
 ```
+
+### Il cervello 3D non è la porta d'ingresso
+
+Nella homepage l'indice (scaffali e card) viene **prima**; il grafo 3D sta in
+fondo, dentro `.w-brainwrap`, incorniciato, e si accende quando entra in vista.
+Qualunque visualizzazione futura segue la stessa regola: si aggiunge in fondo,
+non in cima. Il perché è in
+[decisioni/2026-07-26-cervello-secondario-design.md](decisioni/2026-07-26-cervello-secondario-design.md).
+
+### Tutto ciò che sta fuori da `<x-dc>` va misurato a schermo
+
+Il runtime dc sostituisce solo l'elemento `<x-dc>` e gli dà `height: 100%`
+(`FULL_PAGE_CSS` in `support.js`). La scatola resta quindi alta **quanto lo
+schermo** anche quando il contenuto è dieci volte più lungo: qualunque
+fratello messo *dopo* `</x-dc>` si posiziona come se la pagina finisse alla
+prima schermata, e finisce **sopra** il contenuto. `wiki.css` lo corregge
+rimettendo `height: auto` sull'host, con un selettore più specifico di quello
+iniettato. Se un giorno aggiungi un altro blocco fuori da `<x-dc>`, non fidarti
+del sorgente: `node strumenti/verifica-pagine.js` è l'unico che se ne accorge.
 
 ---
 
@@ -191,6 +214,27 @@ classe `Component` in fondo al file.
 | `w-legenda` | il riquadro «la legenda delle penne», che apre ogni libro |
 | `w-legend` | l'elenco dentro: `<li class="a-blu"><i></i> Calcolo — …</li>` |
 | `w-summary-nav` | il `<nav>` che avvolge titolo e sommario delle tappe |
+### Codice
+
+| Classe | Uso |
+|---|---|
+| `code` | codice **dentro** una frase — non serve nessuna classe |
+| `w-codice` | listato su più righe: si scrive su `<pre>`, mai a capo automatico |
+| `w-codice-nota` | la riga in corsivo che commenta il listato, subito sotto |
+| `w-com` | un commento dentro il listato |
+| `w-ev` | la riga (o il pezzo) del listato da guardare |
+
+La lingua del listato si dichiara con `data-lang` e la scrive il foglio di
+stile: `<pre class="w-codice" data-lang="scheme">`. Non aggiungere markup per
+l'etichetta.
+
+### Mattoncini per le demo
+
+Servono a non scrivere `style="..."` dentro una demo: `w-row` (una riga di
+elementi) · `w-cell` + `is-on` `is-off` `is-ok` `is-ko` (celle di memoria,
+token, valori) · `w-stack` + `w-frame` + `is-top` `is-done` (una pila che
+cresce verso l'alto) · `w-prog` + `w-riga` + `is-now` (un programma di cui si
+illumina la riga corrente).
 
 ### Altro
 
@@ -264,6 +308,30 @@ Un'animazione non deve mai poter far sparire del contenuto. Con
 
 ---
 
+## Il telefono è il secondo formato, non un ripiego
+
+Metà della wiki si legge da telefono. Due regole, e la prima non ammette
+eccezioni:
+
+1. **Niente può spingere la pagina di lato.** Il corpo non scorre mai in
+   orizzontale — è il modo più veloce di far sembrare rotto un sito. Ciò che è
+   più largo dello schermo (un listato, il programma di una demo, una tabella
+   di confronto) deve scorrere **dentro il proprio riquadro**. Se aggiungi un
+   blocco largo, dagli `overflow-x: auto`.
+2. **Meno margini, non meno contenuto.** Sotto i 720px si stringono le cornici
+   e si scala la tipografia; non si nasconde niente che sul desktop si legga.
+   L'unica eccezione storica è l'indice laterale, che sotto i 1080px sparisce
+   perché il sommario a inizio pagina fa lo stesso lavoro.
+
+Il blocco `@media` in fondo a `wiki/wiki.css` fa questo lavoro per tutte le
+classi standard. Una trappola già pagata: dentro un contenitore che scorre, le
+righe di codice devono avere `width: max-content`, altrimenti restano larghe
+quanto il riquadro, il testo trabocca fuori dal loro box e **la fine della riga
+diventa irraggiungibile** anche se il contenitore scorre.
+
+Sul telefono il canvas del cervello 3D non prende il dito: trascinare deve
+scorrere la pagina. Per esplorarlo si apre a schermo intero.
+
 ## Come si verifica una pagina
 
 Prima di tutto, la parte che non dipende dal giudizio:
@@ -285,17 +353,34 @@ Poi, quello che serve un paio d'occhi:
 2. scorri fino in fondo: il reticolo deve coprire tutta l'altezza;
 3. controlla che l'indice laterale elenchi tutte le tappe e si evidenzi;
 4. se ci sono demo, provale davvero;
-5. cerca `style="` nel file: dovrebbe comparire solo dentro le demo.
+5. cerca `style="` nel file: dovrebbe comparire solo dentro le demo;
+6. **restringi la finestra a 390px** e riscorri: niente deve sporgere.
 
-Verifica rapida che non siano rimasti binding irrisolti:
+Il controllo automatico fa i punti 4 e 6 su tutte le pagine, a larghezza di
+telefono e di scrivania:
 
 ```bash
-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
-  --headless --disable-gpu --virtual-time-budget=15000 \
-  --dump-dom "file://$PWD/NomePagina.dc.html" | grep -o '{{[^}]*}}'
+node strumenti/verifica-pagine.js            # tutte
+node strumenti/verifica-pagine.js Nome.dc.html
 ```
 
-Se non stampa nulla, i binding sono a posto.
+Controlla, in quest'ordine: che la pagina si sia **resa** (c'è testo visibile),
+che non restino binding `{{ … }}` sotto gli occhi del lettore, che il corpo non
+scorra in orizzontale, che le demo siano vive, e che **nessun testo finisca
+sopra altro testo**.
+
+I due verificatori sono una coppia, e la divisione è netta: `wiki/verifica.js`
+legge il **sorgente** e risponde a *«questo libro è fatto come gli altri?»*;
+`strumenti/verifica-pagine.js` apre un **browser** e risponde a *«a schermo si
+vede quello che deve?»*. Il secondo esiste perché il primo, per costruzione,
+non può vedere due blocchi scritti benissimo e finiti uno sopra l'altro — che è
+esattamente com'è nata la regola su `#dc-root` più sotto.
+
+> Il primo controllo esiste per un errore vero: se il runtime non parte — di
+> solito perché manca la rete, che serve al primo caricamento per React — la
+> pagina resta piena di markup **invisibile**, e ogni verifica fatta sul
+> sorgente passa per finta. Se lo script dice *«PAGINA NON RESA»* su tutte le
+> pagine, guarda la rete prima del contenuto.
 
 ---
 
