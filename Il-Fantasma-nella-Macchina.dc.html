@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Il Fantasma nella Macchina — memoria, stack, heap, istruzioni</title>
+
+<!-- ===== CONNETTORE DELLA WIKI - righe fisse, non modificarle ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./wiki/wiki.css">
+<script src="./support.js"></script>
+<script defer src="./wiki/wiki.js"></script>
+<!-- =============================================================== -->
+</head>
+<body>
+<x-dc>
+
+<div class="w-page--toc">
+
+  <aside class="w-toc"
+         data-titolo="Libro 05 · Indice"
+         data-pie='<a href="Biblioteca.dc.html">Biblioteca</a><a href="Eleganza-Esoterica.dc.html">Libro 04: call/cc</a><a href="Perche-Studiare-Oggi.dc.html">Libro 06: perché studiare</a>'></aside>
+
+  <main class="w-main">
+
+    <!-- ===== BRICIOLE DI PANE ===== -->
+    <nav class="w-nav">
+      <a class="w-nav-home" href="Biblioteca.dc.html">← BIBLIOTECA</a>
+      <span class="w-nav-sep">/</span>
+      <span class="w-nav-here">Libro 05 · Il fantasma nella macchina</span>
+      <a class="w-nav-next" href="Perche-Studiare-Oggi.dc.html">Libro 06: perché studiare</a>
+    </nav>
+
+    <!-- ===== COPERTINA ===== -->
+    <header class="w-hero a-verde">
+      <div class="w-hero-kicker">Il pensiero computazionale · libro 5 di 6</div>
+      <h1 class="w-hero-title">Il fantasma nella <span class="w-mark">macchina</span></h1>
+      <p class="w-hero-sub">Sotto la staccionata dell'astrazione. Indirizzi, stack che cresce all'ingiù, heap che si frammenta, registri che si scambiano valori. Non per nostalgia: perché la vera maestria è saltare da una parte all'altra della staccionata senza sforzo.</p>
+      <div class="w-hero-sign">— il tuo maestro di bottega, quaderno alla mano</div>
+    </header>
+
+    <!-- ===== COSA SI IMPARA QUI ===== -->
+    <div class="w-note w-note--info">
+      <span class="w-note-title">Cosa impari in questa pagina</span>
+      <p>Saprai dire dove vive fisicamente ogni variabile che scrivi e chi la cancella; saprai perché scorrere un array è molte volte più veloce che scorrere una lista concatenata con gli stessi elementi; saprai leggere quattro istruzioni macchina e quattro di bytecode e riconoscerci dentro il tuo codice; e saprai <em>quando</em> vale la pena guardare sotto — che è la parte che quasi nessuno insegna.</p>
+    </div>
+
+    <div class="w-note w-note--bridge">
+      <span class="w-note-title">Da dove veniamo</span>
+      <p>Nei quattro libri precedenti abbiamo costruito verso l'alto: celle, funzioni, ricorsione, continuazioni. Ogni volta abbiamo lasciato in sospeso la stessa promessa — <em>«nel libro 5 andremo a vedere dove sta fisicamente questa roba»</em>. Ci siamo. Questo libro paga tutti i debiti: il foglietto della chiamata, l'indirizzo di ritorno di Wheeler, il perché delle chiusure sullo heap, e la pila del <a href="Eleganza-Esoterica.dc.html">libro 4</a> che ricompare come architettura di una macchina vera.</p>
+    </div>
+
+    <!-- ===== SOMMARIO ===== -->
+    <h2 class="w-h2">Il viaggio in sei tappe</h2>
+    <ol class="w-summary">
+      <li><a href="#c1"><span class="w-summary-n">01</span><span>Sotto il nome c'è un indirizzo</span><span class="w-summary-tag">puntatori</span></a></li>
+      <li><a href="#c2"><span class="w-summary-n">02</span><span>Lo stack: i foglietti, per davvero</span><span class="w-summary-tag">frame, SP</span></a></li>
+      <li><a href="#c3"><span class="w-summary-n">03</span><span>Lo heap: la stanza senza ordine</span><span class="w-summary-tag">malloc, GC</span></a></li>
+      <li><a href="#c4"><span class="w-summary-n">04</span><span>Registri e istruzioni: x = x + 1, di nuovo</span><span class="w-summary-tag">assembly</span></a></li>
+      <li><a href="#c5"><span class="w-summary-n">05</span><span>La macchina che non esiste</span><span class="w-summary-tag">bytecode, JIT</span></a></li>
+      <li><a href="#c6"><span class="w-summary-n">06</span><span>Saltare la staccionata</span><span class="w-summary-tag">astrazioni bucate</span></a></li>
+    </ol>
+
+
+    <!-- ======================= TAPPA 01 ======================= -->
+    <section class="w-tappa" id="c1">
+
+      <div class="w-tappa-kicker">Indirizzi e puntatori</div>
+      <h2 class="w-tappa-title">Sotto il nome c'è un indirizzo</h2>
+      <p class="w-tappa-lead">Nel primo libro abbiamo detto che una variabile è «una casella con un post-it sopra», e abbiamo aggiunto che il post-it serve a te, non alla macchina. È ora di guardare la casella.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">La memoria di un calcolatore è una cosa sola, ed è di una semplicità brutale: <strong>un array gigantesco di byte, numerati da zero in su</strong>. Nient'altro. Non ci sono variabili, non ci sono oggetti, non ci sono stringhe: c'è una fila lunghissima di caselle da otto bit e ognuna ha un numero, che si chiama <em>indirizzo</em>. Tutto ciò che hai imparato nei quattro libri precedenti è una convenzione costruita sopra questa fila.</p>
+
+      <p>Il compilatore, quando incontra <code>int x = 7</code>, fa due cose: sceglie un posto nella fila e si annota che «x» significa quel numero. Il nome sparisce; resta l'indirizzo. Un <strong>puntatore</strong> non è allora niente di esotico: è una variabile che, invece di contenere un dato, contiene <em>l'indirizzo di un dato</em>. Sempre un numero è; solo che quel numero va letto come «vai a vedere lì».</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: la via con i numeri civici</span>
+        <p>La memoria è una via lunghissima con le case numerate. Una variabile è ciò che c'è dentro una casa; un puntatore è un bigliettino su cui è scritto un numero civico. Se ti do il bigliettino puoi andare tu a cambiare i mobili — ed è per questo che, quando passi un puntatore a una funzione, quella può modificare il <em>tuo</em> dato: non le hai dato una copia dei mobili, le hai dato l'indirizzo di casa. È esattamente l'aliasing del <a href="Il-Primo-Soffio.dc.html#c6">libro 1</a>, guardato dal piano di sotto: in Python non vedi i bigliettini, ma ci sono.</p>
+      </div>
+
+      <div class="w-demo">
+        <h4 class="w-demo-title">Prova tu — quattro righe di C, e la memoria che cambia</h4>
+        <p class="w-demo-hint">A sinistra il programma, a destra la fila delle caselle con i loro indirizzi. Esegui una riga alla volta e guarda che cosa contiene <code>p</code>: non un dato, un <em>numero civico</em>.</p>
+
+        <div class="w-prog">
+          <sc-for list="{{ memRighe }}" as="r" hint-placeholder-count="4"><span class="{{ r.cls }}">{{ r.txt }}</span></sc-for>
+        </div>
+
+        <div class="w-row">
+          <sc-for list="{{ memCelle }}" as="m" hint-placeholder-count="3">
+            <div class="{{ m.cls }}">{{ m.val }}<b>{{ m.eti }}</b></div>
+          </sc-for>
+        </div>
+
+        <div class="w-demo-out">{{ memStato }}</div>
+
+        <div class="w-row">
+          <button class="w-btn" onClick="{{ memPasso }}">▶ esegui la riga</button>
+          <button class="w-btn" onClick="{{ memTutto }}">▶▶ fino alla fine</button>
+          <button class="w-btn" onClick="{{ memReset }}">↺ azzera</button>
+        </div>
+        <p class="w-demo-foot">Alla fine <code>y</code> vale 9 e non 7, e nel programma non compare mai la riga <code>x = 9</code>. Il valore è cambiato attraverso il bigliettino.</p>
+      </div>
+
+      <p>Da qui discendono, tutte insieme, cose che di solito si imparano come regole slegate. Perché un array è veloce da indicizzare? Perché <code>a[i]</code> è una somma: indirizzo di partenza più <em>i</em> volte la dimensione di un elemento. Perché gli indici partono da zero? Perché lo zero è lo scostamento del primo elemento dall'inizio, e con questa convenzione la formula non ha correzioni. Perché in C una stringa "finisce" con un byte zero? Perché nella fila di caselle non c'è nessun posto dove scrivere quanto è lunga: bisogna metterci un segnale dentro.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Ogni linguaggio ti nasconde gli indirizzi in un modo diverso, ma <strong>nessuno li elimina</strong>. In Java e in Python ogni variabile che contiene un oggetto contiene un indirizzo — lo chiamano riferimento e ti vietano di farci aritmetica, ed è un'ottima idea. Ma il <code>NullPointerException</code>, il <code>None</code> inatteso e la lista che cambia sotto i piedi sono tutti fenomeni di superficie di questo unico fatto: sotto il nome c'è un numero civico.</p>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 02 ======================= -->
+    <section class="w-tappa" id="c2">
+
+      <div class="w-tappa-kicker">Lo stack</div>
+      <h2 class="w-tappa-title">Lo stack: i foglietti, per davvero</h2>
+      <p class="w-tappa-lead">Nel libro 2 ti ho chiesto di credere a un'immagine: ogni chiamata di funzione riceve un foglietto che poi viene strappato. Il foglietto ha un indirizzo, una dimensione e un nome tecnico.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Alla fine della fila di caselle — di solito agli indirizzi alti — il sistema riserva una zona chiamata <strong>stack</strong>, e un registro del processore, lo <em>stack pointer</em>, punta alla sua cima. Ogni chiamata di funzione ci deposita un blocco, lo <strong>stack frame</strong>, che contiene tre cose: i parametri ricevuti, lo spazio per le variabili locali, e l'<em>indirizzo di ritorno</em> — cioè la cella che David Wheeler doveva riempire a mano nel 1951, e che oggi ci mette il processore.</p>
+
+      <p>Il dettaglio bizzarro, e vero su quasi tutte le architetture: <strong>lo stack cresce verso il basso</strong>, dagli indirizzi alti verso quelli bassi. Chiamare una funzione significa <em>sottrarre</em> dallo stack pointer; ritornare significa sommare. Non c'è nessuna ragione profonda: si è scelto così per far crescere lo stack e i dati l'uno incontro all'altro dai due estremi della memoria, e la convenzione è rimasta.</p>
+
+      <div class="w-demo">
+        <h4 class="w-demo-title">Prova tu — chiama, entra, ritorna</h4>
+        <p class="w-demo-hint">Ogni chiamata deposita un frame e abbassa lo stack pointer; ogni ritorno lo rialza. Guarda l'indirizzo dello stack pointer scendere e risalire — e nota che i frame "strappati" non vengono cancellati: vengono solo dimenticati.</p>
+
+        <div class="w-stack">
+          <sc-for list="{{ stkFrames }}" as="f" hint-placeholder-count="3">
+            <div class="{{ f.cls }}">{{ f.txt }}</div>
+          </sc-for>
+        </div>
+
+        <div class="w-row">
+          <div class="w-cell is-on">{{ stkSp }}<b>stack pointer</b></div>
+          <div class="w-cell is-off">{{ stkProf }}<b>profondità</b></div>
+          <div class="w-cell is-off">{{ stkUsati }}<b>byte usati</b></div>
+        </div>
+
+        <div class="w-demo-out">{{ stkStato }}</div>
+
+        <div class="w-row">
+          <button class="w-btn" onClick="{{ stkChiama }}">▶ chiama {{ stkProssima }}</button>
+          <button class="w-btn" onClick="{{ stkRitorna }}">↩ ritorna</button>
+          <button class="w-btn" onClick="{{ stkReset }}">↺ azzera</button>
+        </div>
+        <p class="w-demo-foot">Prova a chiamare finché non finisce lo spazio: quello è lo <code>stack overflow</code>, e adesso sai che non è una metafora — è una sottrazione che scende sotto il limite.</p>
+      </div>
+
+      <p>Tre cose che sapevi a memoria e che adesso hanno una spiegazione fisica:</p>
+      <ul>
+        <li><strong>Le variabili locali sono velocissime.</strong> Non c'è nessuna ricerca: sono a uno scostamento fisso dal frame corrente, e quella zona di memoria è quasi sempre già nella cache del processore, perché è la stessa che il programma sta usando in continuazione.</li>
+        <li><strong>Restituire il puntatore a una variabile locale è un disastro.</strong> Il frame è stato «strappato», cioè lo stack pointer è risalito. Il dato è ancora lì, per un istante, e la prossima chiamata ci scriverà sopra. Il bug più cattivo che esista è quello che funziona in prova e cede in produzione, e questo lo fa per definizione.</li>
+        <li><strong>Lo stack overflow della ricorsione infinita.</strong> Nel <a href="La-Vertigine.dc.html#c3">libro 3</a> lo avevamo distinto dal ciclo infinito: adesso vedi perché. Il ciclo infinito non consuma memoria, la ricorsione sì — un frame per giro, finché la sottrazione non esce dalla zona.</li>
+      </ul>
+
+      <div class="w-note w-note--warn">
+        <span class="w-note-title">Attenzione</span>
+        <p>Se una funzione scrive in un array locale più byte di quanti ne ha riservati, il di più finisce sui byte accanto — e lì c'è <strong>l'indirizzo di ritorno</strong>. Chi controlla quei byte controlla dove salterà il processore quando la funzione finisce. Si chiama <em>buffer overflow</em>, ha reso possibile il worm Morris del 1988 e un quarto di secolo di intrusioni, e il testo che lo ha reso patrimonio comune è <em>Smashing the Stack for Fun and Profit</em>, pubblicato su Phrack nel 1996. Le difese moderne — stack canary, ASLR, memoria non eseguibile — sono tutte toppe su questa singola geometria.</p>
+      </div>
+
+      <div class="w-note w-note--expert">
+        <span class="w-note-title">Livello esperto</span>
+        <p>Questa è la ragione tecnica per cui <code>call/cc</code> del <a href="Eleganza-Esoterica.dc.html#c5">libro 4</a> costa tanto agli implementatori. Una continuazione riutilizzabile è, in sostanza, una <em>copia dello stack</em> conservata per dopo: se il programma può tornarci in qualunque momento futuro, quei frame non si possono strappare. Le soluzioni sono due, entrambe costose: copiare lo stack alla cattura, oppure allocare i frame sullo heap invece che sullo stack — che è precisamente ciò che fanno i linguaggi con le chiusure, ed è l'argomento della prossima tappa.</p>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 03 ======================= -->
+    <section class="w-tappa" id="c3">
+
+      <div class="w-tappa-kicker">Lo heap</div>
+      <h2 class="w-tappa-title">Lo heap: la stanza senza ordine</h2>
+      <p class="w-tappa-lead">Lo stack è ordinatissimo: si mette e si toglie sempre dalla stessa parte. Ma metà delle cose che scrivi non ha nessuna intenzione di rispettare quell'ordine — e per loro serve un'altra stanza.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Lo stack funziona per una ragione sola: <strong>la durata dei dati coincide con l'ordine delle chiamate</strong>. Ciò che nasce dentro una funzione muore quando la funzione finisce. Ma prova a scrivere una funzione che costruisce una lista e la restituisce, o un oggetto che sopravvive a chi lo ha creato, o una chiusura che cattura una variabile: in tutti questi casi il dato deve vivere <em>più a lungo</em> del frame che lo ha generato. Per loro c'è lo <strong>heap</strong>: una zona di memoria in cui si può chiedere spazio in qualsiasi momento, di qualsiasi dimensione, e restituirlo in qualsiasi ordine.</p>
+
+      <p>Il prezzo di questa libertà si paga tutto insieme, ed è il grande tema della programmazione di sistema: <strong>chi lo restituisce?</strong> Sullo stack la risposta è automatica. Sullo heap no.</p>
+
+      <table class="w-table">
+        <tr><th></th><th>Stack</th><th>Heap</th></tr>
+        <tr><td>Chi assegna lo spazio</td><td>il compilatore, a tempo di compilazione</td><td>tu (o il runtime), mentre il programma gira</td></tr>
+        <tr><td>Chi lo libera</td><td>il ritorno dalla funzione, sempre</td><td><code>free</code>, oppure il garbage collector, oppure nessuno</td></tr>
+        <tr><td>Costo di un'allocazione</td><td>una sottrazione</td><td>una ricerca in una struttura di blocchi liberi</td></tr>
+        <tr><td>Quanto dura il dato</td><td>fino alla fine della funzione</td><td>quanto vuoi — e questo è il problema</td></tr>
+        <tr><td>Cosa può andare storto</td><td>overflow, puntatore a locale morta</td><td>leak, doppia liberazione, uso dopo la liberazione</td></tr>
+      </table>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: il guardaroba del teatro</span>
+        <p>Lo stack è la fila all'uscita: l'ultimo entrato è il primo a uscire, e nessuno deve tenere il conto. Lo heap è il guardaroba: lasci il cappotto quando vuoi e lo ritiri quando vuoi, ma <em>devi avere lo scontrino</em>. Perdi lo scontrino e il cappotto resta lì per sempre — quello è un <strong>memory leak</strong>. Presenti due volte lo stesso scontrino e il guardarobiere impazzisce — quello è il <em>double free</em>. Ritiri il cappotto e poi torni a cercarlo con lo scontrino vecchio, e ti danno il cappotto di qualcun altro — quello è lo <em>use after free</em>, ed è la categoria di bug da cui è nata buona parte delle vulnerabilità gravi degli ultimi trent'anni.</p>
+      </div>
+
+      <pre class="w-codice" data-lang="c">
+int *fai_lista(int n) {
+    int locale[100];                 <span class="w-com">sullo STACK: muore col ritorno</span>
+    int *v = malloc(n * sizeof(int)); <span class="w-ev">← sullo HEAP: sopravvive, e ora è affar tuo</span>
+    if (!v) return NULL;             <span class="w-com">lo heap può dire di no. Lo stack no.</span>
+    return v;                        <span class="w-com">restituire questo va bene; restituire `locale` no</span>
+}
+
+int *v = fai_lista(10);
+free(v);                             <span class="w-com">lo scontrino, restituito</span>
+v = NULL;                            <span class="w-ev">← e adesso lo scontrino è strappato: niente use-after-free</span></pre>
+      <p class="w-codice-nota">Due righe di disciplina che in C sono la differenza fra un programma solido e una vulnerabilità. In Java, Python o Go queste righe non ci sono — ma il lavoro qualcuno lo fa lo stesso.</p>
+
+      <h3 class="w-h3">Chi passa a raccogliere</h3>
+      <p>La soluzione che ha vinto nei linguaggi applicativi la conosci già dal <a href="La-Vertigine.dc.html#c2">libro 3</a>: il <strong>garbage collector</strong>, inventato da John McCarthy attorno al 1959 per il Lisp, per il motivo più concreto del mondo — nessuno riusciva a scrivere a mano il <code>free</code> di strutture ricorsive condivise. L'idea è di rovesciare la domanda: invece di chiedersi «questo dato è ancora utile?», che nessuno sa dire, ci si chiede <strong>«questo dato è ancora raggiungibile?»</strong>. Si parte dalle radici — le variabili sullo stack, le globali — e si segue ogni indirizzo. Ciò che non si raggiunge non potrà mai più essere usato da nessuno, quindi si può recuperare.</p>
+
+      <div class="w-note w-note--memory">
+        <span class="w-note-title">Il garbage collector non abolisce i leak</span>
+        <p>Cambia solo il modo di farli. Non puoi più dimenticare un <code>free</code>, ma puoi benissimo <strong>dimenticare un riferimento</strong>: una cache che non svuoti mai, un ascoltatore di eventi mai rimosso, una lista statica a cui si aggiunge e basta. Il dato è raggiungibile, quindi il collector lo conserva doverosamente per sempre. È il leak dell'era moderna, ed è più insidioso di quello vecchio perché nessuno strumento te lo segnala come errore: sta facendo esattamente ciò che gli hai chiesto.</p>
+      </div>
+
+      <div class="w-note w-note--expert">
+        <span class="w-note-title">Livello esperto</span>
+        <p>Le tre grandi risposte alla domanda «chi libera?» sono tre filosofie, non tre tecniche. <strong>C</strong>: lo fai tu, massimo controllo e massima responsabilità. <strong>Java, Go, Python, C#</strong>: lo fa un collector, paghi in pause imprevedibili e in memoria occupata. <strong>Rust</strong>: lo decide il compilatore, tracciando chi è il proprietario di ogni dato e quando esce di scena — niente collector e niente <code>free</code> a mano, ma un modello di possesso che va imparato. Rust è, in un certo senso, la risposta più elegante alla tappa 06 del <a href="Il-Primo-Soffio.dc.html#c6">libro 1</a>: rende l'aliasing un errore di compilazione.</p>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 04 ======================= -->
+    <section class="w-tappa" id="c4">
+
+      <div class="w-tappa-kicker">Registri e codice macchina</div>
+      <h2 class="w-tappa-title">Registri e istruzioni: x = x + 1, di nuovo</h2>
+      <p class="w-tappa-lead">Abbiamo aperto la serie con tre caratteri che spezzavano la matematica. Chiudiamo il cerchio: guardiamo che cosa diventano quei tre caratteri quando arrivano in fondo.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Il processore non sa lavorare direttamente sulla memoria per la maggior parte delle operazioni. Ha una manciata di celle personali, velocissime, dentro di sé: i <strong>registri</strong> — sedici, su un x86-64, con nomi come <code>rax</code> e <code>rbx</code>. Il ciclo della sua vita è sempre lo stesso e non è cambiato dal <em>First Draft</em> di von Neumann del 1945: <em>porta un valore dalla memoria a un registro, fai il conto fra registri, riporta il risultato in memoria</em>.</p>
+
+      <pre class="w-codice" data-lang="da x = x + 1 a tre istruzioni">
+<span class="w-com">C:</span>            x = x + 1;
+
+<span class="w-com">x86-64 (x è una locale sullo stack, a -4 dal frame pointer):</span>
+    mov  eax, DWORD PTR [rbp-4]     <span class="w-com">leggi x dalla memoria in un registro</span>
+    add  eax, 1                     <span class="w-com">somma 1, dentro il registro</span>
+    mov  DWORD PTR [rbp-4], eax     <span class="w-ev">← riscrivi in memoria: l'assegnazione</span>
+
+<span class="w-com">…oppure, se al compilatore basta, una sola istruzione:</span>
+    add  DWORD PTR [rbp-4], 1       <span class="w-com">e su molte macchine esiste perfino `inc`</span></pre>
+      <p class="w-codice-nota">Ecco, nero su bianco, i «due tempi» del <a href="Il-Primo-Soffio.dc.html#c1">primo libro</a>: leggi a destra (la prima <code>mov</code>), scrivi a sinistra (la seconda). E la race condition della tappa 06 di quel libro adesso è visibile a occhio nudo: fra la prima e la terza riga c'è dello spazio, e in quello spazio può infilarsi un altro processore.</p>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: il banco da lavoro</span>
+        <p>La memoria è il magazzino, i registri sono il banco di lavoro davanti a te. Non avviti un bullone dentro lo scaffale: porti il pezzo sul banco, lavori, rimetti a posto. Il banco è piccolo — sedici posti — e per questo l'arte del compilatore è decidere <em>quali</em> valori tenerci sopra: si chiama <em>register allocation</em>, ed è uno dei problemi più studiati della compilazione. Quando ci sono troppi valori vivi e il banco non basta, si scaricano in memoria: si chiama <em>spilling</em>, e si sente nelle prestazioni.</p>
+      </div>
+
+      <p>Un'ultima cosa, che chiude anche il discorso sul salto condizionale del libro 1. Il processore non esegue un'istruzione alla volta aspettando che finisca: le esegue <strong>a catena di montaggio</strong>, con una decina di stadi, cominciando la successiva prima che la precedente sia finita. Quando arriva un <code>if</code>, però, non sa quale sarà la prossima istruzione finché il confronto non è concluso. Allora <em>indovina</em>, e va avanti sulla strada indovinata. Se ha indovinato bene non ha perso niente; se ha sbagliato butta via tutto il lavoro già fatto e ricomincia. È il motivo per cui un ramo imprevedibile costa decine di volte un ramo prevedibile, e per cui certo codice critico si scrive apposta senza <code>if</code>.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Non serve saper <em>scrivere</em> assembly. Serve saperlo <strong>leggere</strong> per venti righe, perché è l'unico posto dove certe domande hanno una risposta definitiva: il compilatore ha davvero eliminato quel controllo? questa variabile sta in un registro o in memoria? le mie tre righe eleganti diventano tre istruzioni o trecento? Su <a href="https://godbolt.org">godbolt.org</a> ci vogliono dieci secondi per chiederlo, e la risposta è spesso sorprendente.</p>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 05 ======================= -->
+    <section class="w-tappa" id="c5">
+
+      <div class="w-tappa-kicker">Macchine virtuali</div>
+      <h2 class="w-tappa-title">La macchina che non esiste</h2>
+      <p class="w-tappa-lead">Fra il tuo codice e il processore, in mezzo mondo del software, c'è un piano in più: una macchina inventata, con le sue istruzioni e la sua memoria, che nessuno ha mai costruito in silicio. Ed è il posto dove due libri di questa serie si incontrano.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Il compilatore Java non produce istruzioni x86. Produce istruzioni per una macchina che non esiste — la <strong>Java Virtual Machine</strong> — e poi un programma, sulla tua macchina vera, le esegue. Il vantaggio ovvio è la portabilità. Quello meno ovvio, e più profondo, è che quel piano intermedio è un <em>punto di osservazione</em>: siccome il codice passa da lì, lì si può misurare, ottimizzare, ricompilare a caldo.</p>
+
+      <p>E adesso guarda che forma ha questa macchina inventata: <strong>è una macchina a pila</strong>. Non ha registri per i tuoi conti; ha uno <em>stack degli operandi</em> su cui si caricano i valori e in cui si depositano i risultati. Esattamente il Forth del <a href="Eleganza-Esoterica.dc.html#c1">libro 4</a>. Il linguaggio più aziendale del pianeta, sotto, parla postfisso.</p>
+
+      <div class="w-demo">
+        <h4 class="w-demo-title">Prova tu — esegui il bytecode a mano</h4>
+        <p class="w-demo-hint">La stessa riga del primo libro, <code>x = x + 1</code>, in bytecode JVM. Esegui un'istruzione alla volta e guarda lo stack degli operandi riempirsi e svuotarsi. Poi passa alla versione con <code>iinc</code>: una sola istruzione, che lavora <b>senza</b> toccare la pila — ed è per questo che è l'istruzione dei cicli.</p>
+
+        <div class="w-prog">
+          <sc-for list="{{ bcRighe }}" as="b" hint-placeholder-count="4"><span class="{{ b.cls }}">{{ b.txt }}</span></sc-for>
+        </div>
+
+        <div class="w-row">
+          <sc-for list="{{ bcPila }}" as="o" hint-placeholder-count="2">
+            <div class="{{ o.cls }}">{{ o.v }}<b>{{ o.eti }}</b></div>
+          </sc-for>
+          <div class="w-cell is-ok">{{ bcX }}<b>variabile locale 1 (x)</b></div>
+        </div>
+
+        <div class="w-demo-out">{{ bcStato }}</div>
+
+        <div class="w-row">
+          <button class="w-btn" onClick="{{ bcPasso }}">▶ un'istruzione</button>
+          <button class="w-btn" onClick="{{ bcTutto }}">▶▶ fino alla fine</button>
+          <button class="w-btn" onClick="{{ bcCambia }}">⇄ {{ bcAltra }}</button>
+          <button class="w-btn" onClick="{{ bcReset }}">↺ azzera</button>
+        </div>
+        <p class="w-demo-foot">Quattro istruzioni contro una. Il compilatore Java sceglie <code>iinc</code> quando può, ed è il motivo per cui un <code>for</code> in Java non paga il traffico sulla pila a ogni giro.</p>
+      </div>
+
+      <p>Il bytecode, però, è solo l'inizio della storia. Se il programma si limitasse a interpretarlo, Java sarebbe lento come si diceva negli anni Novanta. Quello che succede davvero è più interessante: la JVM <strong>osserva quali pezzi di codice girano di più</strong> e, per quelli, chiama un compilatore che li traduce in istruzioni macchina vere, mentre il programma è in esecuzione. Si chiama <em>JIT</em>, compilazione al volo, e ha un vantaggio che un compilatore tradizionale non può avere: <strong>sa cosa sta succedendo davvero</strong>. Sa che quel metodo, in pratica, riceve sempre lo stesso tipo; sa che quel ramo dell'<code>if</code> non viene mai preso. E ottimizza in base ai fatti, non alle ipotesi.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Le macchine virtuali sono la dimostrazione più concreta che «sopra» e «sotto» non sono due mondi ma un <strong>continuo</strong>: la JVM è un programma che fa da macchina, il tuo interprete Lisp del libro 3 era un programma che faceva da linguaggio, il sistema operativo è un programma che fa da macchina per i tuoi. Ogni livello è codice che qualcuno ha scritto, e a ogni livello si può scendere.</p>
+      </div>
+
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">I documenti che lo dimostrano</span>
+        <ul>
+          <li><em>The Java Virtual Machine Specification</em> — capitolo sul set di istruzioni: <code>iload</code>, <code>iconst</code>, <code>iadd</code>, <code>istore</code>, e <code>iinc</code>, l'unica che incrementa una variabile locale senza passare dalla pila degli operandi</li>
+          <li>von Neumann, <em>First Draft of a Report on the EDVAC</em> (1945) — il ciclo carica-calcola-riscrivi che stiamo ancora eseguendo</li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- ======================= TAPPA 06 ======================= -->
+    <section class="w-tappa" id="c6">
+
+      <div class="w-tappa-kicker">Astrazioni bucate</div>
+      <h2 class="w-tappa-title">Saltare la staccionata</h2>
+      <p class="w-tappa-lead">Adesso sai guardare sotto. Resta la domanda che vale più di tutto il resto del libro, e che nessuno insegna: <em>quando</em> conviene farlo — e quando è solo un modo raffinato di perdere tempo.</p>
+
+      <h3 class="w-h3">L'idea</h3>
+      <p class="w-drop">Nel novembre del 2002 Joel Spolsky ha scritto un articolo che ha dato un nome a un'esperienza che tutti avevano: la <strong>legge delle astrazioni bucate</strong>. Dice così: <em>tutte le astrazioni non banali, in una certa misura, perdono</em>. L'astrazione ti promette di non doverti occupare di ciò che sta sotto; per il 95% del tempo mantiene la promessa; e nel restante 5% il piano di sotto risale in superficie, e in quel momento chi non sa cosa c'è sotto è <strong>bloccato</strong>. Non lento: bloccato, perché il problema che vede non ha spiegazione nel mondo in cui sa ragionare.</p>
+
+      <table class="w-table">
+        <tr><th>L'astrazione promette</th><th>Il buco che si apre</th></tr>
+        <tr><td>«la memoria è tutta uguale»</td><td>scorrere un array è molto più veloce che scorrere una lista concatenata con gli stessi dati: la cache carica byte <em>vicini</em></td></tr>
+        <tr><td>«la rete è come una chiamata di funzione»</td><td>una chiamata locale costa nanosecondi, una remota millisecondi: sei ordini di grandezza, e il codice non lo dice</td></tr>
+        <tr><td>«l'ORM è come manipolare oggetti»</td><td>un ciclo su cento oggetti diventa centouno interrogazioni al database</td></tr>
+        <tr><td>«i numeri sono numeri»</td><td><code>0.1 + 0.2 != 0.3</code>, e il ciclo del <a href="Il-Primo-Soffio.dc.html#c5">libro 1</a> non finisce</td></tr>
+        <tr><td>«il garbage collector si occupa della memoria»</td><td>una pausa di raccolta nel momento sbagliato, e la tua richiesta va in timeout</td></tr>
+      </table>
+
+      <div class="w-note w-note--demo">
+        <span class="w-note-title">Analogia: la staccionata, e le due facce dell'errore</span>
+        <p>Chi resta sempre al di sopra della staccionata scrive codice pulito che ogni tanto è misteriosamente lento o misteriosamente rotto, e non ha nemmeno il vocabolario per fare la domanda giusta. Chi resta sempre al di sotto ottimizza cicli che vengono eseguiti tre volte, riscrive a mano cose che il compilatore fa meglio di lui, e consegna in ritardo. <strong>La maestria non è stare in alto o stare in basso: è la capacità di saltare da una parte all'altra senza sforzo, e soprattutto di sapere in che momento saltare.</strong></p>
+      </div>
+
+      <h3 class="w-h3">La regola pratica</h3>
+      <p>Il momento di scendere è uno solo, ed è <em>dopo aver misurato</em>. Non prima. La sequenza che funziona è sempre la stessa: scrivi il codice più chiaro che sai scrivere; se è troppo lento, <strong>misura</strong> con un profiler e scopri dove se ne va davvero il tempo — non dove pensi tu, perché su questo l'intuizione umana ha un tasso di errore comico; poi scendi di un livello <em>solo lì</em>, capisci cosa succede sotto, e risali. La discesa è mirata e temporanea. Chi scende «per principio» sta facendo un'altra cosa: si sta divertendo — il che è legittimo, ed è metà del motivo per cui esiste questa serie, ma va chiamato con il suo nome.</p>
+
+      <div class="w-note w-note--key">
+        <span class="w-note-title">Da ricordare</span>
+        <p>Una volta che impari ad astrarre, il processo diventa <strong>ricorsivo</strong>: cominci a vedere astrazioni ovunque, e ogni cosa diventa insieme un'implementazione (di ciò che sta sopra) e un'interfaccia (per ciò che sta sotto). Il linguaggio è un'astrazione sul bytecode, il bytecode sul processore, il processore sui transistor, i transistor sulla fisica. <strong>Non c'è un fondo: c'è solo il livello in cui hai deciso di fermarti oggi.</strong> E il giorno in cui ti accorgi che anche le tue funzioni sono staccionate per qualcun altro, hai smesso di usare l'astrazione e hai cominciato a progettarla.</p>
+      </div>
+
+      <div class="w-note w-note--paper">
+        <span class="w-note-title">I testi che lo dimostrano</span>
+        <ul>
+          <li>Spolsky, <em>The Law of Leaky Abstractions</em> (11 novembre 2002) — <span class="w-ref">joelonsoftware.com</span></li>
+          <li>Drepper, <em>What Every Programmer Should Know About Memory</em> (2007) — perché la località di memoria conta più dell'algoritmo, con i numeri</li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- ===== EPILOGO — non viene numerato ===== -->
+    <section class="w-tappa w-tappa--fine" id="fine">
+      <div class="w-tappa-kicker">Tutto insieme</div>
+      <h2 class="w-tappa-title">Il fantasma era una fila di caselle</h2>
+      <p class="w-tappa-lead">Cinque libri fa una variabile cambiava valore e sembrava magia. Adesso sai che quella magia è una <code>mov</code>, un indirizzo e uno stack pointer che scende.</p>
+
+      <p>Guarda cosa è successo ai debiti lasciati per strada. Il <em>foglietto</em> del libro 2 era uno stack frame, e l'indirizzo di ritorno che Wheeler scriveva a mano nel 1951 oggi lo mette il processore nello stesso posto. Le <em>chiusure</em> stanno sullo heap perché devono sopravvivere al frame che le ha viste nascere. La <em>ricorsione</em> costa memoria perché ogni chiamata è una sottrazione allo stack pointer. La <em>pila</em> dei linguaggi concatenativi è l'architettura vera della macchina virtuale su cui gira metà del software aziendale del mondo. E <code>x = x + 1</code>, il primo soffio di vita, sono tre istruzioni: leggi, somma, riscrivi.</p>
+
+      <p>Nessuno di questi livelli è più «vero» degli altri. Il codice Python che scrivi non è una bugia sopra l'assembly, e l'assembly non è una bugia sopra i transistor: sono <strong>descrizioni della stessa cosa a risoluzioni diverse</strong>, e ognuna rende facili domande che l'altra rende impossibili. Chi sa muoversi fra le risoluzioni ha uno strumento che non si acquista con l'esperienza in un solo linguaggio: <em>vede il fantasma e vede la macchina, e sa che sono la stessa cosa</em>.</p>
+
+      <div class="w-note w-note--memory">
+        <span class="w-note-title">Dal livello medio all'esperto assoluto: la palestra</span>
+        <ol>
+          <li><strong>Dieci minuti, subito.</strong> Vai su <a href="https://godbolt.org">godbolt.org</a>, scrivi una funzione di tre righe in C e guarda l'assembly. Poi cambia il livello di ottimizzazione da <code>-O0</code> a <code>-O2</code> e guarda il codice dimezzarsi. Poi scrivi un ciclo che somma i primi mille numeri e scopri, con un certo sgomento, che il compilatore lo ha sostituito con una formula.</li>
+          <li><strong>Misura la cache.</strong> Scrivi due programmi che sommano un milione di interi: uno su un array, uno su una lista concatenata costruita in ordine sparso. Stesso numero di somme, stesso algoritmo. Cronometrali: la differenza — di solito grande — non è nell'algoritmo, è nella distanza fra le celle.</li>
+          <li><strong>Guarda il bytecode.</strong> Compila una classe Java e lancia <code>javap -c</code>. Cerca <code>iinc</code> dentro un <code>for</code>. In Python è ancora più facile: <code>import dis; dis.dis(f)</code>, e vedrai una macchina a pila stampata a video.</li>
+          <li><strong>Fatti male con i puntatori, in sicurezza.</strong> In C: scrivi un programma che restituisce il puntatore a una variabile locale e stampalo. A volte funziona, a volte no — e proprio quel «a volte» è la lezione. Poi compila con <code>-fsanitize=address</code> e leggi cosa ti dice.</li>
+          <li><strong>Trova un leak vero.</strong> Prendi un tuo programma con un collector (Java, Python, Node) e fallo girare a lungo tenendo d'occhio la memoria. Se cresce, cerca chi tiene il riferimento: una cache, un ascoltatore, una lista statica. È l'esercizio che ti insegna a pensare in termini di raggiungibilità.</li>
+          <li><strong>Le letture, in quest'ordine.</strong> <em>Computer Systems: A Programmer's Perspective</em> di Bryant e O'Hallaron — se ne leggi solo tre capitoli, prendi quelli su memoria virtuale e gerarchia di memoria. Poi <em>What Every Programmer Should Know About Memory</em> di Drepper. Poi, per il piacere di vedere costruita tutta la staccionata dal basso, <em>The Elements of Computing Systems</em> (Nand2Tetris): si parte da un NAND e si arriva a un sistema operativo, e alla fine non ci sono più livelli misteriosi.</li>
+        </ol>
+      </div>
+
+      <div class="w-note w-note--bridge">
+        <span class="w-note-title">Il ponte con il libro 06</span>
+        <p>Cinque libri di comprensione profonda. Resta la domanda che qualcuno, prima o poi, ti farà — e che forse ti sei già fatto tu: <strong>ha ancora senso studiare tutto questo, adesso che un modello scrive il codice al posto tuo?</strong> La risposta merita un libro intero, ed è l'ultimo. Vai a <a href="Perche-Studiare-Oggi.dc.html">Perché studiare, oggi</a>.</p>
+      </div>
+    </section>
+
+    <footer class="w-footer">
+      ~ · fine del quaderno · ~<br>
+      <a href="Biblioteca.dc.html">torna alla Biblioteca</a>
+    </footer>
+
+  </main>
+</div>
+
+</x-dc>
+
+<!-- Logica delle demo interattive. -->
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    /* demo 1 — puntatori */
+    mpc: 0, x: null, p: null, y: null,
+    /* demo 2 — stack frame */
+    frames: [], errore: '',
+    /* demo 3 — bytecode */
+    bcProg: 0, bcPc: 0, bcPila: [], bcX: 5
+  }
+
+  _funzioni() {
+    return [
+      { nome: 'main()',        loc: '—',            byte: 32 },
+      { nome: 'leggi_file()',  loc: 'char buf[64]', byte: 96 },
+      { nome: 'analizza()',    loc: 'int n, i',     byte: 48 },
+      { nome: 'aiuto()',       loc: 'double t',     byte: 40 }
+    ];
+  }
+
+  _bytecode() {
+    return [
+      {
+        nome: 'la forma esplicita',
+        istr: [
+          { txt: 'iload_1     // carica x sullo stack degli operandi', op: 'load' },
+          { txt: 'iconst_1    // carica la costante 1', op: 'const' },
+          { txt: 'iadd        // toglie due valori, ne rimette uno', op: 'add' },
+          { txt: 'istore_1    // scrive la cima nella variabile locale x', op: 'store' }
+        ]
+      },
+      {
+        nome: 'la forma con iinc',
+        istr: [
+          { txt: 'iinc 1, 1   // incrementa la locale 1 di 1, senza toccare la pila', op: 'iinc' }
+        ]
+      }
+    ];
+  }
+
+  renderVals() {
+    var self = this, s = this.state;
+
+    /* ============ demo 1: puntatori ============ */
+    var testi = [
+      'int  x = 7;        // una casella con dentro un numero',
+      'int *p = &x;       // una casella con dentro un INDIRIZZO',
+      '*p = 9;            // "vai all\'indirizzo scritto in p, e scrivici 9"',
+      'int  y = x;        // …e adesso? x non è mai stata nominata a sinistra'
+    ];
+    var memRighe = testi.map(function (t, k) {
+      return { txt: t, cls: 'w-riga' + (k === s.mpc ? ' is-now' : '') };
+    });
+    var memCelle = [
+      { val: (s.x === null ? '—' : s.x), eti: 'x  ·  0x1000', cls: 'w-cell' + (s.x === null ? ' is-off' : ' is-on') },
+      { val: (s.p === null ? '—' : '0x' + s.p.toString(16)), eti: 'p  ·  0x1004', cls: 'w-cell' + (s.p === null ? ' is-off' : ' is-ko') },
+      { val: (s.y === null ? '—' : s.y), eti: 'y  ·  0x1008', cls: 'w-cell' + (s.y === null ? ' is-off' : ' is-ok') }
+    ];
+    var memStati = [
+      'nessuna riga eseguita: le tre caselle esistono ma non contengono ancora niente di sensato',
+      'x contiene il valore 7',
+      'p contiene 0x1000, cioè l\'indirizzo di x. Non è un dato: è un numero civico',
+      'la scrittura è passata per p: x adesso vale 9 senza essere mai comparsa a sinistra di un uguale',
+      'y ha copiato il valore attuale di x: 9. Il bigliettino ha cambiato una cosa che sembrava al sicuro'
+    ];
+    var passoMem = function (st) {
+      if (st.mpc === 0) return { x: 7, mpc: 1 };
+      if (st.mpc === 1) return { p: 0x1000, mpc: 2 };
+      if (st.mpc === 2) return { x: 9, mpc: 3 };
+      if (st.mpc === 3) return { y: 9, mpc: 4 };
+      return {};
+    };
+
+    /* ============ demo 2: stack frame ============ */
+    var fn = self._funzioni();
+    var LIMITE = 3;                        /* oltre: stack overflow */
+    var base = 0x7FFF0000;
+    var usati = 0;
+    var stkFrames = s.frames.map(function (i, k) {
+      usati += fn[i].byte;
+      var inCima = (k === s.frames.length - 1);
+      return {
+        txt: fn[i].nome + '   locali: ' + fn[i].loc + '   ·   ritorno a 0x' + (base - (usati - fn[i].byte)).toString(16),
+        cls: 'w-frame' + (inCima ? ' is-top' : '')
+      };
+    });
+    var totale = s.frames.reduce(function (a, i) { return a + fn[i].byte; }, 0);
+    if (!stkFrames.length) stkFrames = [{ txt: '(pila vuota: nessuna funzione in esecuzione)', cls: 'w-frame is-done' }];
+    var prossima = fn[Math.min(s.frames.length, fn.length - 1)].nome;
+    var stkStato = s.errore ? s.errore
+      : (s.frames.length
+          ? 'in esecuzione: ' + fn[s.frames[s.frames.length - 1]].nome + ' — il suo frame è in cima, gli altri aspettano sotto'
+          : 'premi «chiama» e guarda lo stack pointer scendere: chiamare è sottrarre');
+
+    /* ============ demo 3: bytecode ============ */
+    var prog = self._bytecode()[s.bcProg];
+    var bcRighe = prog.istr.map(function (i, k) {
+      return { txt: i.txt, cls: 'w-riga' + (k === s.bcPc ? ' is-now' : '') };
+    });
+    var pilaCelle = s.bcPila.map(function (v, k) {
+      return { v: v, eti: (k === s.bcPila.length - 1 ? 'cima della pila' : 'operando ' + k), cls: 'w-cell is-on' };
+    });
+    if (!pilaCelle.length) pilaCelle = [{ v: '—', eti: 'pila operandi vuota', cls: 'w-cell is-off' }];
+    var bcFinito = s.bcPc >= prog.istr.length;
+    var bcStato = bcFinito
+      ? 'finito · x vale ' + s.bcX + ' e la pila degli operandi è di nuovo vuota, come dev\'essere'
+      : 'prossima istruzione: ' + prog.istr[s.bcPc].txt.split('//')[0].trim();
+    var passoBc = function (st) {
+      var pr = self._bytecode()[st.bcProg];
+      if (st.bcPc >= pr.istr.length) return {};
+      var op = pr.istr[st.bcPc].op, pila = st.bcPila.slice(), x = st.bcX;
+      if (op === 'load') pila.push(x);
+      else if (op === 'const') pila.push(1);
+      else if (op === 'add') { var b = pila.pop(), a = pila.pop(); pila.push(a + b); }
+      else if (op === 'store') x = pila.pop();
+      else if (op === 'iinc') x = x + 1;
+      return { bcPila: pila, bcX: x, bcPc: st.bcPc + 1 };
+    };
+
+    return {
+      /* demo 1 */
+      memRighe: memRighe, memCelle: memCelle, memStato: memStati[s.mpc],
+      memPasso: function () { self.setState(passoMem); },
+      memTutto: function () {
+        self.setState(function (st) {
+          var cur = { mpc: st.mpc, x: st.x, p: st.p, y: st.y };
+          for (var k = 0; k < 6 && cur.mpc < 4; k++) {
+            var d = passoMem(cur);
+            for (var key in d) cur[key] = d[key];
+          }
+          return cur;
+        });
+      },
+      memReset: function () { self.setState({ mpc: 0, x: null, p: null, y: null }); },
+
+      /* demo 2 */
+      stkFrames: stkFrames,
+      stkSp: '0x' + (base - totale).toString(16),
+      stkProf: s.frames.length,
+      stkUsati: totale,
+      stkStato: stkStato,
+      stkProssima: prossima,
+      stkChiama: function () {
+        self.setState(function (st) {
+          if (st.frames.length > LIMITE) {
+            return { errore: 'stack overflow: lo stack pointer è sceso sotto il limite della zona. Il programma muore qui.' };
+          }
+          return { frames: st.frames.concat([Math.min(st.frames.length, fn.length - 1)]), errore: '' };
+        });
+      },
+      stkRitorna: function () {
+        self.setState(function (st) {
+          if (!st.frames.length) return { errore: '' };
+          return { frames: st.frames.slice(0, -1), errore: '' };
+        });
+      },
+      stkReset: function () { self.setState({ frames: [], errore: '' }); },
+
+      /* demo 3 */
+      bcRighe: bcRighe, bcPila: pilaCelle, bcX: s.bcX, bcStato: bcStato,
+      bcAltra: self._bytecode()[(s.bcProg + 1) % 2].nome,
+      bcPasso: function () { self.setState(passoBc); },
+      bcTutto: function () {
+        self.setState(function (st) {
+          var pr = self._bytecode()[st.bcProg];
+          var cur = { bcProg: st.bcProg, bcPc: st.bcPc, bcPila: st.bcPila, bcX: st.bcX };
+          for (var k = 0; k < 8 && cur.bcPc < pr.istr.length; k++) {
+            var d = passoBc(cur);
+            for (var key in d) cur[key] = d[key];
+          }
+          return cur;
+        });
+      },
+      bcCambia: function () { self.setState(function (st) { return { bcProg: (st.bcProg + 1) % 2, bcPc: 0, bcPila: [], bcX: 5 }; }); },
+      bcReset: function () { self.setState({ bcPc: 0, bcPila: [], bcX: 5 }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

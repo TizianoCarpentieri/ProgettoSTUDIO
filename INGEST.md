@@ -140,6 +140,7 @@ Non è finita finché non passa tutto:
 ```bash
 node wiki/verifica.js            # 0 errori. Struttura del libro, indice laterale,
                                  # concetti ↔ tappe, i due divieti di AGENTS.md
+node strumenti/verifica-pagine.js # 0 problemi a schermo, a 390px e 1280px
 node wiki/graph/valida.js        # 0 problemi: nessun id inesistente, nessun orfano
 ```
 

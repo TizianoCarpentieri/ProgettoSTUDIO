@@ -1,17 +1,24 @@
 /* ==========================================================================
    WIKI · ESPLORATORE 3D  (il cervello del sapere)
    --------------------------------------------------------------------------
-   Trasforma la home in un grafo 3D navigabile: lo scheletro del sapere con i
-   rami spenti visibili e i rami scritti illuminati. Si espande ramo per ramo,
-   vola sul nodo scelto e apre la pagina dove c'è contenuto.
+   Il grafo del sapere in fondo alla homepage: lo scheletro con i rami spenti
+   visibili e i rami scritti illuminati. Si espande ramo per ramo, vola sul
+   nodo scelto e apre la pagina dove c'è contenuto.
 
    Costruito su `3d-force-graph` (three.js + d3-force), caricato da CDN come
    React e MathJax: nessuna build. Legge il grafo da wiki/graph/graph-model.js.
 
+   TRE REGOLE DI CONVIVENZA con l'esposizione classica (scaffali e card), che
+   resta la via principale della Biblioteca:
+     1. il cervello sta DOPO le card, dentro una cornice: non le sostituisce;
+     2. si avvia solo quando entra in vista — chi legge le card non paga né
+        WebGL né rotazione;
+     3. si apre con POCHI nodi: i quattro domini, e aperti solo quelli in cui
+        abbiamo già scritto qualcosa. Il resto si rivela cliccando.
+
    POTENZIAMENTO PROGRESSIVO, non sostituzione: se manca WebGL o la libreria
-   (offline, file:// senza rete) o l'utente ha chiesto meno movimento, il
-   cervello non parte e restano le card della Biblioteca, che vivono altrove
-   nella pagina. Un'animazione non può mai nascondere contenuto.
+   (offline, file:// senza rete), il cervello non parte, compare una riga di
+   avviso e la biblioteca sopra è intatta.
    ========================================================================== */
 
 (function () {
@@ -54,16 +61,37 @@
     var host = document.getElementById(ID_HOST);
     if (!host) return;                                   /* non è la home */
 
+    var cornice = host.closest ? host.closest('.w-brainwrap') : host.parentNode;
+    var avviso = cornice ? cornice.querySelector('.w-brain-nope') : null;
+    var btnFull = cornice ? cornice.querySelector('.w-brain-full') : null;
+
     /* Requisiti: la libreria, WebGL e il modello del grafo. Se manca qualcosa,
-       ci si ritira in silenzio e restano le card. */
+       si dichiara l'assenza e si resta con le card. */
     if (typeof ForceGraph3D === 'undefined' || !webglOk() || !window.WIKI_GRAPH || !window.WIKI_SKELETON) {
       host.classList.add('is-fallback');
+      if (avviso) avviso.hidden = false;
       return;
     }
+
+    /* Avvio pigro: il cervello è in fondo alla pagina e non deve costare
+       niente a chi sta leggendo l'indice. Parte quando entra in vista. */
+    if (window.IntersectionObserver) {
+      var osserva = new IntersectionObserver(function (voci) {
+        for (var i = 0; i < voci.length; i++) {
+          if (voci[i].isIntersecting) { osserva.disconnect(); avvia(); return; }
+        }
+      }, { rootMargin: '200px' });
+      osserva.observe(host);
+    } else {
+      avvia();
+    }
+
+    function avvia() {
 
     /* Mostra il contenitore PRIMA di costruire il grafo: da nascosto avrebbe
        dimensioni 0×0 e il canvas nascerebbe invisibile. */
     host.classList.add('is-live');
+    if (btnFull) btnFull.hidden = false;
 
     var G = window.WIKI_GRAPH.build();                   /* { nodes, links, byId, figliDi } */
     var figliDi = G.figliDi;
@@ -77,14 +105,20 @@
     }
 
     /* --- Stato di espansione: quali nodi hanno i figli rivelati ------------
-       All'avvio: i domini (per mostrare i campi) e la catena ACCESA fino ai
-       moduli — così i rami scritti sbocciano subito, ma i moduli restano
-       "boccioli" da cliccare per rivelare i concetti. */
-    var espansi = {};
-    G.nodes.forEach(function (n) {
-      if (n.level === 'dominio') espansi[n.id] = true;
-      else if (n.acceso && (n.level === 'campo' || n.level === 'sottocampo')) espansi[n.id] = true;
-    });
+       All'avvio si apre SOLO la catena accesa: i domini in cui abbiamo
+       scritto qualcosa, e sotto di loro i campi e i sottocampi accesi, fino
+       ai moduli. Gli altri tre domini restano quattro sfere chiuse, da
+       cliccare; i moduli restano "boccioli" che rivelano i concetti al clic.
+       È la differenza fra una mappa e una matassa. */
+    function espansioneIniziale() {
+      var e = {};
+      G.nodes.forEach(function (n) {
+        if (!n.acceso) return;
+        if (n.level === 'dominio' || n.level === 'campo' || n.level === 'sottocampo') e[n.id] = true;
+      });
+      return e;
+    }
+    var espansi = espansioneIniziale();
 
     function visibile(n) {
       if (n.level === 'dominio') return true;
@@ -175,12 +209,8 @@
     var ui = document.createElement('div');
     ui.className = 'w-brain-ui';
     ui.innerHTML =
-      '<div class="w-brain-head">' +
-        '<div class="w-brain-kicker">Base di conoscenza · il cervello</div>' +
-        '<h2 class="w-brain-title">Esplora il <span>sapere</span></h2>' +
-        '<p class="w-brain-hint">Ogni ramo è un campo del sapere. Quelli accesi li abbiamo scritti. ' +
-        'Clicca un nodo per aprirlo ramo per ramo · trascina per ruotare · scorri per lo zoom.</p>' +
-      '</div>' +
+      '<p class="w-brain-hint">I rami accesi li abbiamo scritti. Clicca un nodo per aprirlo · ' +
+      'trascina per ruotare · scorri per lo zoom.</p>' +
       '<div class="w-brain-panel" hidden></div>' +
       '<button type="button" class="w-brain-reset" hidden>↺ ricomponi</button>';
     host.appendChild(ui);
@@ -207,21 +237,38 @@
     }
 
     reset.addEventListener('click', function () {
-      espansi = {};
-      G.nodes.forEach(function (n) {
-        if (n.level === 'dominio') espansi[n.id] = true;
-        else if (n.acceso && (n.level === 'campo' || n.level === 'sottocampo')) espansi[n.id] = true;
-      });
+      espansi = espansioneIniziale();
       ridisegna();
       seleziona(null);
       reset.hidden = true;
       setTimeout(function () { try { Graph.zoomToFit(700, 80); } catch (e) {} }, 300);
     });
 
-    /* --- Ridimensionamento ------------------------------------------------ */
+    /* --- Ridimensionamento e schermo intero -------------------------------- */
     function misura() { Graph.width(host.clientWidth).height(host.clientHeight); }
     misura();
     window.addEventListener('resize', misura);
+
+    /* Lo schermo intero è l'unico momento in cui il cervello prende tutta la
+       pagina: perché l'utente l'ha chiesto. Si esce col pulsante o con Esc. */
+    function schermoIntero(attivo) {
+      if (!cornice || !btnFull) return;
+      cornice.classList.toggle('is-full', attivo);
+      btnFull.textContent = attivo ? '✕ esci dallo schermo intero' : '⛶ schermo intero';
+      /* il canvas deve rimisurarsi DOPO che il layout è cambiato */
+      setTimeout(function () {
+        misura();
+        try { Graph.zoomToFit(600, 40); } catch (e) {}
+      }, 60);
+    }
+    if (btnFull) {
+      btnFull.addEventListener('click', function () {
+        schermoIntero(!cornice.classList.contains('is-full'));
+      });
+      document.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Escape' && cornice.classList.contains('is-full')) schermoIntero(false);
+      });
+    }
 
 
     /* ====================================================================
@@ -285,6 +332,8 @@
       requestAnimationFrame(aggiornaEtichette);
     }
     requestAnimationFrame(aggiornaEtichette);
+
+    }   /* fine avvia() */
   });
 
 })();
