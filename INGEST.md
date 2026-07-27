@@ -138,8 +138,14 @@ Senza questo passo la pagina esiste ma resta **spenta** nel cervello.
 Non è finita finché non passa tutto:
 
 ```bash
+node wiki/verifica.js            # 0 errori. Struttura del libro, indice laterale,
+                                 # concetti ↔ tappe, i due divieti di AGENTS.md
 node wiki/graph/valida.js        # 0 problemi: nessun id inesistente, nessun orfano
 ```
+
+`verifica.js` distingue **errori** (rompono la navigazione o violano un divieto:
+vanno risolti) da **avvisi** (segnali di deriva: li valuti tu). Un libro con
+errori non è finito, qualunque cosa sembri a schermo.
 
 Poi, nel browser:
 

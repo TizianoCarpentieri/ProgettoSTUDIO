@@ -243,8 +243,14 @@ comunica più niente.**
 
 ## Come si verifica un libro
 
-Domande da farsi a libro finito, non caselle da spuntare. Ognuna, se la risposta
-è no, indica cosa aggiustare.
+Prima: `node wiki/verifica.js`. Non giudica la scrittura — non può — ma tre di
+queste otto domande le controlla da solo e le altre te le mette davanti come
+avvisi (una tappa senza `w-tappa-lead`, un libro senza `w-note--paper`, tre
+`w-note--expert` nella stessa tappa). Serve a non arrivare alla rilettura con
+la testa già occupata dalle cose meccaniche.
+
+Poi le domande, a libro finito. Non sono caselle da spuntare: ognuna, se la
+risposta è no, indica cosa aggiustare.
 
 1. **La prima frase di ogni tappa si aggancia a qualcosa che il lettore già ha?**
    Se apre con una definizione, riscrivila.

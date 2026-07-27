@@ -245,6 +245,14 @@ mjx-container[display="true"] { margin: .2em 0 !important; }
 .a-verde   { --accent: var(--verde); }
 .a-arancio { --accent: var(--arancio); }
 .a-viola   { --accent: var(--viola); }
+.a-ink     { --accent: var(--ink); }      /* "struttura": la prima voce della legenda */
+
+/* Enfasi colorata dentro una frase. Il colore lo porta il modificatore, mai un
+   valore scritto a mano: <b class="w-em a-rosso">Attenzione.</b> */
+.w-em { color: var(--accent); font-weight: 700; }
+
+/* Lista fuori da un riquadro (dentro un riquadro ci pensa già `.w-note ul`). */
+.w-list { margin: 0 0 1em; padding-left: 20px; }
 
 
 /* ==========================================================================
@@ -437,6 +445,7 @@ html.w-anim .w-mark { animation: w-draw .9s var(--ease) .1s; }
   border-left: 4px solid var(--accent);
   padding: 10px 18px; margin: 16px 0; overflow-x: auto;
 }
+.w-formula code { font-size: 14px; }
 .w-formula-note { display: block; font-size: 13.5px; color: var(--ink-soft); font-style: italic; margin-top: 6px; }
 
 /* --- Demo interattiva -------------------------------------------------------- */
@@ -522,12 +531,20 @@ a.w-card:hover { color: var(--ink); transform: translate(-3px, -3px); box-shadow
 
 /* --- Legenda ------------------------------------------------------------------ */
 
+/* Il riquadro "la legenda delle penne" apre ogni libro: sta qui, non copiato a
+   mano in ogni pagina. Usa i token, quindi in tema scuro cambia ombra e carta
+   come tutto il resto — cosa che la versione scritta a mano non faceva. */
+.w-legenda { background: var(--paper-raised); border: var(--border) solid var(--ink);
+  border-radius: var(--radius); padding: 18px 22px; margin: 32px 0; box-shadow: var(--shadow); }
+.w-legenda .w-note-title { font-size: 26px; }
+
 .w-legend { list-style: none; margin: 0; padding: 0; }
 .w-legend li { display: flex; align-items: center; gap: 10px; padding: 3px 0; font-size: var(--size-small); }
 .w-legend i { width: 34px; height: 5px; border-radius: 3px; flex-shrink: 0; background: var(--accent); }
 
 /* --- Sommario a inizio pagina -------------------------------------------------- */
 
+.w-summary-nav { display: block; margin: 30px 0 10px; }   /* il <nav> che avvolge titolo + sommario */
 .w-summary { list-style: none; margin: 0; padding: 0; }
 .w-summary li { padding: 7px 0; border-bottom: 1px dashed var(--rule); }
 .w-summary a { border: none; color: var(--ink); display: flex; gap: 12px; align-items: baseline; transition: padding-left var(--dur-fast) var(--ease); }

@@ -33,15 +33,21 @@ la richiesta lo ricordi — è il modo di lavorare predefinito del progetto.
    precedente riapre.
 5. Scrivi partendo da `_TEMPLATE.dc.html`.
 6. Registra il modulo in `wiki/wiki-index.js` — senza quel passo la pagina
-   esiste ma non compare nella Biblioteca.
-7. Verifica: la checklist di contenuto in `docs/AgentAutore.md`, quella di forma in
-   `docs/AgentFE.md`.
+   esiste ma non compare nella Biblioteca. Ogni concetto dichiara la sua
+   `tappa` (`"c4"`): è l'àncora con cui il grafo apre il libro al punto giusto.
+7. **Esegui `node wiki/verifica.js`.** Zero errori, sempre. Controlla la
+   struttura del libro, la catena che fa esistere l'indice laterale, la
+   corrispondenza concetti ↔ tappe e i due divieti qui sotto.
+8. Verifica il resto a mano: la checklist di contenuto in `docs/AgentAutore.md`,
+   quella di forma in `docs/AgentFE.md`.
 
 ## I due divieti che contano
 
 - **Mai `style="..."`, mai colori scritti a mano.** Tutto passa dalle classi
-  `w-` e dai token di `wiki/wiki.css`. Le altre tre regole di forma stanno in
-  `docs/AgentFE.md`.
+  `w-` e dai token di `wiki/wiki.css`. Unica eccezione: dentro una demo, dove
+  lo stile calcolato è il punto stesso della demo. Le altre tre regole di forma
+  stanno in `docs/AgentFE.md`. Non è un principio morale: è controllato da
+  `node wiki/verifica.js`, e fallisce.
 - **Mai un dato non verificato.** Nessun numero, primato, data o attribuzione
   che non regga a un controllo. È l'unica regola di questo progetto senza
   eccezioni: vedi il principio 4 in `docs/AgentAutore.md`.
