@@ -296,6 +296,37 @@ function verificaStili(file, html) {
 }
 
 /* ==========================================================================
+   3-bis. LE ICONE LE METTE IL FOGLIO DI STILE
+   --------------------------------------------------------------------------
+   Diverse classi disegnano da sole la loro icona (`.w-nav-next::after` la
+   freccia, i `w-note--*` il loro simbolo). Scriverla anche nel testo la
+   raddoppia — un difetto che si vede a schermo e non si vede nel markup, e
+   che infatti è già successo convertendo i due libri.
+   ========================================================================== */
+
+var SIMBOLI = /[←-⇿☀-➿⬀-⯿️\u{1F300}-\u{1FAFF}]/u;
+
+function verificaIcone(file, html) {
+  var re = /<a\b[^>]*class="[^"]*\bw-nav-next\b[^"]*"[^>]*>([\s\S]*?)<\/a>/g;
+  var m;
+  while ((m = re.exec(html))) {
+    if (SIMBOLI.test(m[1])) {
+      errore(file, '`w-nav-next` contiene una freccia scritta a mano: la disegna già ' +
+                   '`.w-nav-next::after`, quindi a schermo se ne vedono due', riga(html, m.index));
+    }
+  }
+
+  var note = regioni(html, 'w-note');
+  var titolo = /<span\b[^>]*class="[^"]*\bw-note-title\b[^"]*"[^>]*>([\s\S]*?)<\/span>/g;
+  while ((m = titolo.exec(html))) {
+    if (dentro(note, m.index) && SIMBOLI.test(m[1])) {
+      avviso(file, 'emoji nel titolo di un riquadro («' + m[1].trim().slice(0, 30) +
+                   '»): l\'icona la mette già il foglio di stile', riga(html, m.index));
+    }
+  }
+}
+
+/* ==========================================================================
    4. L'IMPALCATURA DEL LIBRO
    --------------------------------------------------------------------------
    Le parti che rendono un libro riconoscibile come tale. Sono avvisi, non
@@ -459,6 +490,7 @@ function verificaLibro(modulo) {
   verificaIndiceLaterale(modulo.file, html);
   var tappe = verificaTappe(modulo.file, html);
   verificaStili(modulo.file, html);
+  verificaIcone(modulo.file, html);
   verificaImpalcatura(modulo.file, html);
   verificaConcetti(modulo.file, html, modulo, tappe);
 }
@@ -474,6 +506,7 @@ function verificaTemplate() {
   verificaIndiceLaterale(file, html);
   verificaTappe(file, html);
   verificaStili(file, html);
+  verificaIcone(file, html);
   verificaImpalcatura(file, html);
 }
 

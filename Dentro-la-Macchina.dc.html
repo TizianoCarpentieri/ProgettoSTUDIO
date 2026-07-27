@@ -28,7 +28,7 @@
     <a class="w-nav-home" href="Biblioteca.dc.html">← BIBLIOTECA</a>
     <span class="w-nav-sep">/</span>
     <span class="w-nav-here">Modulo 01 · Come genera testo</span>
-    <a class="w-nav-next a-blu" href="Fondamenti-Matematici-LLM.dc.html">Modulo 02: la matematica →</a>
+    <a class="w-nav-next a-blu" href="Fondamenti-Matematici-LLM.dc.html">Modulo 02: la matematica</a>
   </nav>
 
   <header class="w-hero">
@@ -303,7 +303,7 @@
     <p>Una GPU ha due memorie molto diverse: la <strong>HBM</strong> (decine di GB, ma "lontana") e la <strong>SRAM</strong> on-chip (pochi MB, ma ~10× più veloce). L'implementazione ingenua materializza l'intera matrice \(n\times n\) dei punteggi in HBM, la rilegge per la softmax, la riscrive, la rilegge per moltiplicarla con V… Con \(n=8192\), quella matrice ha 67 milioni di celle <em>per testa per strato</em>. Il tempo se ne va tutto in viaggi.</p>
 
     <div class="w-note w-note--demo">
-      <span class="w-note-title">‍🍳 Analogia: il cuoco e la dispensa</span>
+      <span class="w-note-title">Analogia: il cuoco e la dispensa</span>
       <p>La HBM è la dispensa in cantina; la SRAM è il piano di lavoro accanto ai fornelli. Il cuoco ingenuo scende in cantina per ogni singolo ingrediente e riporta giù ogni risultato intermedio. FlashAttention è il cuoco esperto: porta su un <em>cestello</em> di ingredienti (un blocco di Q, K, V), completa <em>tutta</em> la ricetta di quel blocco sul piano di lavoro — punteggi, softmax, prodotto con V — e scende in cantina solo per il piatto finito. Stessa ricetta, un decimo dei viaggi.</p>
     </div>
 
