@@ -26,5 +26,6 @@ Sette documenti, sette domande diverse. Parti da quello che risponde alla tua.
 | far comparire un modulo nella homepage | [wiki/wiki-index.js](wiki/wiki-index.js) |
 | agganciare un modulo al grafo del sapere | i campi `nodo` / `concetti` / `collegamenti` in [wiki/wiki-index.js](wiki/wiki-index.js) |
 | capire il cervello 3D e il grafo | [wiki/graph/](wiki/graph/) e lo spec del cervello in [docs/decisioni/](docs/decisioni/) |
+| capire come cambierà la navigazione (sala → scaffale → libro) | [la decisione del 27-07-2026](docs/decisioni/2026-07-27-navigazione-biblioteca-design.md) |
 | controllare che il grafo sia coerente | `node wiki/graph/valida.js` |
 | pubblicare le modifiche | [OVERVIEW.md](docs/OVERVIEW.md) § *Pubblicazione su GitHub* |
