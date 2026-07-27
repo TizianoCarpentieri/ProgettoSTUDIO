@@ -60,9 +60,9 @@ tocca: copertina → cosa impari → sommario → tappe `#c1 … #cN` → epilog
 
   // Campi del grafo: è ciò che accende la pagina nel cervello 3D.
   nodo: "sub-1710",                       // dove si aggancia nello scheletro
-  concetti: [                             // uno per tappa, id "mNN-slug"
-    { id: "m03-retriever", label: "Il recupero" },
-    { id: "m03-agente",    label: "L'agente" }
+  concetti: [                             // uno per tappa, nello stesso ordine
+    { id: "m03-retriever", label: "Il recupero", tappa: "c1" },
+    { id: "m03-agente",    label: "L'agente",    tappa: "c2" }
   ],
   collegamenti: [                         // i "ponti" resi dati
     { da: "m03-retriever", a: "m01-embedding", tipo: "approfondisce" }
@@ -70,11 +70,17 @@ tocca: copertina → cosa impari → sommario → tappe `#c1 … #cN` → epilog
 }
 ```
 
+Il campo `tappa` è l'àncora dentro il file: è ciò che permette di aprire il
+libro **al punto giusto** invece che in cima. Deve esserci un concetto per
+tappa, nello stesso ordine.
+
 Senza il passo 3 la pagina esiste ma non compare nella Biblioteca. Senza i
 campi del grafo (`nodo`, `concetti`, `collegamenti`) compare come card ma resta
 **spenta** nel cervello 3D. La procedura completa — dove agganciare e quanto
 lunga fare la pagina — è in **[INGEST.md](INGEST.md)** (o la skill
 `/biblioteca-ingest`).
+
+**Passo 4.** `node wiki/verifica.js`. Zero errori, sempre.
 
 Per **una materia nuova** (non un modulo, uno scaffale intero) aggiungi un
 blocco al livello superiore dello stesso file:
@@ -178,11 +184,24 @@ riquadro sono già impaginate: scrivi `<ul>` o `<ol>` senza toccare i rientri.
 `w-label`, `w-btn`. I valori dinamici usano i binding `{{ }}` collegati alla
 classe `Component` in fondo al file.
 
+### Apertura del libro
+
+| Classe | Uso |
+|---|---|
+| `w-legenda` | il riquadro «la legenda delle penne», che apre ogni libro |
+| `w-legend` | l'elenco dentro: `<li class="a-blu"><i></i> Calcolo — …</li>` |
+| `w-summary-nav` | il `<nav>` che avvolge titolo e sommario delle tappe |
+
 ### Altro
 
 `w-formula` + `w-formula-note` · `w-summary` + `w-summary-n` +
 `w-summary-tag` · `w-card` + `w-card--ghost` + `w-grid` · `w-chip` +
-`w-chips` · `w-legend` · `w-table` · `w-figure` · `w-ref`
+`w-chips` · `w-table` · `w-figure` · `w-ref` · `w-list` (lista fuori da un
+riquadro) · `w-em` (enfasi colorata: `<b class="w-em a-rosso">`)
+
+Le pastiglie colorate, le enfasi e i titoli prendono il colore dal
+**modificatore d'accento** sul loro elemento — `a-blu`, `a-rosso`, `a-verde`,
+`a-arancio`, `a-viola`, `a-ink` — mai da un valore scritto a mano.
 
 ---
 
@@ -247,7 +266,20 @@ Un'animazione non deve mai poter far sparire del contenuto. Con
 
 ## Come si verifica una pagina
 
-Prima di considerarla finita:
+Prima di tutto, la parte che non dipende dal giudizio:
+
+```bash
+node wiki/verifica.js                        # tutta la biblioteca
+node wiki/verifica.js NomePagina.dc.html     # una pagina sola
+```
+
+Controlla la struttura del libro, la **catena che fa esistere l'indice
+laterale** (`w-page--toc` → `w-main` → `section.w-tappa[id]`: se una salta,
+l'indice sparisce in silenzio), le tappe `c1…cN` consecutive più `#fine`, la
+corrispondenza concetti ↔ tappe e i due divieti. Gli **errori** vanno risolti;
+gli **avvisi** dicono dove guardare.
+
+Poi, quello che serve un paio d'occhi:
 
 1. aprila nel browser in tema chiaro **e** scuro;
 2. scorri fino in fondo: il reticolo deve coprire tutta l'altezza;
@@ -277,6 +309,7 @@ Se non stampa nulla, i binding sono a posto.
 | `wiki/graph/skeleton.js` | lo scheletro del sapere: 282 nodi da OpenAlex (una delle due fonti del grafo) |
 | `wiki/graph/graph-model.js` | fonde scheletro e moduli nel grafo del cervello (logica pura, testabile) |
 | `wiki/graph/explorer.js` | il cervello 3D della homepage (3d-force-graph via CDN) |
+| `wiki/verifica.js` | il contratto dei libri: `node wiki/verifica.js` |
 | `wiki/graph/valida.js` | controllo di coerenza del grafo: `node wiki/graph/valida.js` |
 | `_TEMPLATE.dc.html` | lo scheletro da copiare |
 | `support.js` | runtime `dc-runtime` (generato altrove, **non modificare**) |

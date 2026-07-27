@@ -53,6 +53,7 @@ graph TD
 | `wiki/graph/skeleton.js` | **Lo scheletro del sapere**: 282 nodi (4 domini → 26 campi → 252 sottocampi) derivati dalla gerarchia Topics di OpenAlex (CC0). È lo strato "sempre visibile ma per lo più spento" del cervello. |
 | `wiki/graph/graph-model.js` | Fonde scheletro e moduli in `{ nodes, links }`. Logica pura (niente three.js, niente DOM): gira nel browser **e** in Node per la validazione. |
 | `wiki/graph/explorer.js` | **Il cervello 3D** della homepage: grafo navigabile su `3d-force-graph` (via CDN). Si espande ramo per ramo, i nodi accesi aprono la pagina. Potenziamento progressivo: senza WebGL restano le card. |
+| `wiki/verifica.js` | Il contratto dei libri: `node wiki/verifica.js`. Struttura, catena dell'indice laterale, concetti ↔ tappe, i due divieti. Errori (bloccanti) e avvisi (segnali di deriva). |
 | `wiki/graph/valida.js` | Controllo di coerenza del grafo da riga di comando: `node wiki/graph/valida.js`. |
 | `INGEST.md` | La pipeline in sei passi per creare una pagina nuova, dall'idea/fonti fino all'aggancio al grafo. |
 | `.claude/skills/biblioteca-ingest/` | La skill di Claude Code che esegue la pipeline di `INGEST.md`. |

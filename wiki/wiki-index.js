@@ -8,7 +8,18 @@
 
    PER AGGIUNGERE UN MODULO: aggiungi una voce a `moduli`. Nient'altro.
    PER AGGIUNGERE UNO SCAFFALE (una nuova materia): aggiungi un blocco
-   { scaffale: "...", moduli: [...] } a questo array.
+   { scaffale, slug, accento, descrizione, moduli: [...] } a questo array.
+
+   Dopo ogni modifica: `node wiki/verifica.js`. Controlla che ciò che è scritto
+   qui e ciò che sta nei file non abbiano preso strade diverse.
+
+   Campi di uno scaffale
+   ---------------------
+     scaffale     il nome della materia
+     slug         identificatore della sua vista: Biblioteca.dc.html#scaffale=llm
+                  (minuscole, cifre, trattini)
+     accento      blu | rosso | verde | arancio | viola — il colore della materia
+     descrizione  una frase: di cosa tratta questo scaffale
 
    Campi di un modulo
    ------------------
@@ -26,9 +37,12 @@
      nodo         id di uno nodo di skeleton.js a cui il modulo si aggancia:
                   lo ACCENDE nel cervello. Es. "sub-1702" (Intelligenza
                   Artificiale). L'intera catena di genitori si illumina con lui.
-     concetti     [{ id, label }] — i nodi interni del modulo (le sue tappe).
-                  Diventano i "rami" che sbocciano quando apri il modulo nel
-                  cervello. Convenzione id: "mNN-slug" (es. "m01-embedding").
+     concetti     [{ id, label, tappa }] — i nodi interni del modulo. Sono le
+                  sue tappe: uno per tappa, nello stesso ordine, e `tappa` è
+                  l'àncora dentro il file ("c4"). È ciò che permette al grafo di
+                  aprire il libro AL PUNTO GIUSTO invece che in cima, e quindi di
+                  essere l'indice della biblioteca al livello del paragrafo.
+                  Convenzione id: "mNN-slug" (es. "m01-embedding").
      collegamenti [{ da, a, tipo }] — archi in più fra nodi del grafo (i "ponti"
                   resi dati anziché prosa). `da`/`a` sono id di concetti, di
                   moduli ("mod-01") o di skeleton. `tipo`:
@@ -43,6 +57,9 @@ window.WIKI_INDEX = [
 
   {
     scaffale: "Large Language Models",
+    slug: "llm",
+    accento: "rosso",
+    descrizione: "Come una macchina arriva a scrivere: il percorso che fa una frase dentro il modello, e la matematica che lo rende possibile.",
     moduli: [
 
       {
@@ -57,15 +74,15 @@ window.WIKI_INDEX = [
 
         nodo: "sub-1702",   /* Informatica › Intelligenza Artificiale */
         concetti: [
-          { id: "m01-tokenizer",   label: "Tokenizer" },
-          { id: "m01-embedding",   label: "Embedding" },
-          { id: "m01-transformer", label: "Blocco Transformer" },
-          { id: "m01-kv-cache",    label: "KV Cache" },
-          { id: "m01-flash",       label: "FlashAttention" },
-          { id: "m01-lm-head",     label: "LM Head" },
-          { id: "m01-sampling",    label: "Sampling" },
-          { id: "m01-speculative", label: "Speculative Decoding" },
-          { id: "m01-detokenizer", label: "Detokenizer" }
+          { id: "m01-tokenizer",   label: "Tokenizer",             tappa: "c1" },
+          { id: "m01-embedding",   label: "Embedding",             tappa: "c2" },
+          { id: "m01-transformer", label: "Blocco Transformer",    tappa: "c3" },
+          { id: "m01-kv-cache",    label: "KV Cache",              tappa: "c4" },
+          { id: "m01-flash",       label: "FlashAttention",        tappa: "c5" },
+          { id: "m01-lm-head",     label: "LM Head",               tappa: "c6" },
+          { id: "m01-sampling",    label: "Sampling",              tappa: "c7" },
+          { id: "m01-speculative", label: "Speculative Decoding",  tappa: "c8" },
+          { id: "m01-detokenizer", label: "Detokenizer",           tappa: "c9" }
         ],
         collegamenti: [
           { da: "m01-embedding",   a: "m02-embedding", tipo: "approfondisce" },
@@ -86,13 +103,13 @@ window.WIKI_INDEX = [
 
         nodo: "sub-2604",   /* Matematica › Matematica Applicata */
         concetti: [
-          { id: "m02-vettori",   label: "Vettori" },
-          { id: "m02-matrici",   label: "Matrici" },
-          { id: "m02-embedding", label: "Embedding come geometria" },
-          { id: "m02-softmax",   label: "Softmax" },
-          { id: "m02-gradienti", label: "Derivate e Gradienti" },
-          { id: "m02-attention", label: "Attention" },
-          { id: "m02-sintesi",   label: "Dall'algebra al Transformer" }
+          { id: "m02-vettori",   label: "Vettori",                      tappa: "c1" },
+          { id: "m02-matrici",   label: "Matrici",                      tappa: "c2" },
+          { id: "m02-embedding", label: "Embedding come geometria",     tappa: "c3" },
+          { id: "m02-softmax",   label: "Softmax",                      tappa: "c4" },
+          { id: "m02-gradienti", label: "Derivate e Gradienti",         tappa: "c5" },
+          { id: "m02-attention", label: "Attention",                    tappa: "c6" },
+          { id: "m02-sintesi",   label: "Dall'algebra al Transformer",  tappa: "c7" }
         ],
         collegamenti: [
           { da: "mod-02", a: "mod-01", tipo: "prerequisito" }

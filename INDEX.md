@@ -19,12 +19,14 @@ Sette documenti, sette domande diverse. Parti da quello che risponde alla tua.
 | creare una pagina nuova dall'idea o dalle fonti | [INGEST.md](INGEST.md) — o la skill `/biblioteca-ingest` |
 | aggiungere un modulo nuovo (lo standard grafico) | [AgentFE.md](docs/AgentFE.md) § *Aggiungere una pagina in tre passi* |
 | capire come si scrive un libro che insegna davvero | [AgentAutore.md](docs/AgentAutore.md) § *I sette principi* |
-| verificare un libro prima di considerarlo finito | [AgentAutore.md](docs/AgentAutore.md) § *Come si verifica un libro* (contenuto) e [AgentFE.md](docs/AgentFE.md) § *Come si verifica una pagina* (forma) |
+| verificare un libro prima di considerarlo finito | `node wiki/verifica.js` — poi [AgentAutore.md](docs/AgentAutore.md) § *Come si verifica un libro* (contenuto) e [AgentFE.md](docs/AgentFE.md) § *Come si verifica una pagina* (forma) |
+| capire perché un libro non ha l'indice laterale | `node wiki/verifica.js`: controlla la catena `w-page--toc` → `w-main` → `section.w-tappa[id]` |
 | cambiare colori, caratteri o spaziature di tutta la wiki | il blocco `:root` in [wiki/wiki.css](wiki/wiki.css) |
 | cambiare o aggiungere un'icona | i token `--ico-*` in [wiki/wiki.css](wiki/wiki.css) |
 | capire perché il tema scuro non usa `invert` | [AgentFE.md](docs/AgentFE.md) § *Il tema scuro* |
 | far comparire un modulo nella homepage | [wiki/wiki-index.js](wiki/wiki-index.js) |
 | agganciare un modulo al grafo del sapere | i campi `nodo` / `concetti` / `collegamenti` in [wiki/wiki-index.js](wiki/wiki-index.js) |
 | capire il cervello 3D e il grafo | [wiki/graph/](wiki/graph/) e lo spec del cervello in [docs/decisioni/](docs/decisioni/) |
+| capire come cambierà la navigazione (sala → scaffale → libro) | [la decisione del 27-07-2026](docs/decisioni/2026-07-27-navigazione-biblioteca-design.md) |
 | controllare che il grafo sia coerente | `node wiki/graph/valida.js` |
 | pubblicare le modifiche | [OVERVIEW.md](docs/OVERVIEW.md) § *Pubblicazione su GitHub* |

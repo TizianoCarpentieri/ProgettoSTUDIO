@@ -45,10 +45,12 @@ Crea un todo per ciascuno di questi passi e completali in ordine.
    Ricorda: una tappa = un concetto = un nodo del grafo.
 
 5. **Aggancio.** Aggiungi la voce a `wiki/wiki-index.js` con i campi base +
-   `nodo`, `concetti` (uno per tappa, id `mNN-slug`), `collegamenti` (i ponti
+   `nodo`, `concetti` (uno per tappa, id `mNN-slug`, e `tappa: "cN"` — l'àncora
+   con cui il grafo apre il libro al punto giusto), `collegamenti` (i ponti
    verso i vicini: `{da,a,tipo}`, tipo `prerequisito|approfondisce|collegato`).
 
-6. **Verifica.** Esegui `node wiki/graph/valida.js` (deve dare 0 problemi).
+6. **Verifica.** Esegui `node wiki/verifica.js` (deve dare **0 errori**: gli
+   avvisi valutali e riferiscili) e `node wiki/graph/valida.js` (0 problemi).
    Poi ricorda all'utente il controllo nel browser: pagina in chiaro/scuro,
    reticolo su tutta l'altezza, indice laterale, demo funzionanti, nessun
    binding `{{ }}` irrisolto, e il nodo **acceso** nel cervello della
