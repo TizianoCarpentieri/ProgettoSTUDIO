@@ -103,14 +103,19 @@ r = radice(2.0)</pre>
         <p>Una funzione non nasce per "organizzare meglio" il codice: nasce per avere <strong>un solo posto da correggere</strong>. Ogni volta che duplichi della logica non stai risparmiando tempo, stai comprando a rate la certezza di dimenticarti una delle copie.</p>
       </div>
 
-      <div class="w-note w-note--paper">
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Dare un nome costa: una chiamata è un salto, più il lavoro di preparare e smontare il contesto. Per questo i compilatori fanno <em>inlining</em> — ricopiano il corpo della funzione al posto della chiamata quando è piccola — e ti restituiscono l'astrazione gratis. La conseguenza pratica è che «spezzare in funzioni rallenta» è quasi sempre falso, e resta vero solo dove l'inlining non può arrivare: chiamate indirette, funzioni virtuali, confini fra moduli compilati separatamente.</p>
+    </div>
+
+          <div class="w-note w-note--paper">
         <span class="w-note-title">I paper che lo dimostrano</span>
         <ul>
           <li>Wilkes, Wheeler &amp; Gill, <em>The Preparation of Programs for an Electronic Digital Computer</em> (1951) — il primo libro di programmazione, fondato su una libreria di subroutine</li>
           <li>Wheeler, <em>The use of sub-routines in programmes</em> (1952) — <span class="w-ref">Proc. 1952 ACM National Meeting (Pittsburgh), 235–236</span></li>
         </ul>
       </div>
-    </section>
+</section>
 
 
     <!-- ======================= TAPPA 02 ======================= -->
@@ -121,7 +126,7 @@ r = radice(2.0)</pre>
       <p class="w-tappa-lead">Dare un nome a sei righe è solo metà dell'invenzione. L'altra metà è decidere <em>di che cosa quelle righe hanno bisogno</em> — e giurare che non toccheranno nient'altro.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Una subroutine che lavora sempre sulle stesse celle globali è poco più di un'abbreviazione tipografica. Diventa uno strumento nel momento in cui dichiara i suoi <strong>parametri</strong>: "dammi un numero, io ti restituisco la sua radice". Da quel momento non stai più leggendo codice, stai leggendo un <em>contratto</em>: c'è un ingresso, c'è un'uscita, e in mezzo c'è qualcosa che non sei obbligato a guardare.</p>
+      <p>Una subroutine che lavora sempre sulle stesse celle globali è poco più di un'abbreviazione tipografica. Diventa uno strumento nel momento in cui dichiara i suoi <strong>parametri</strong>: "dammi un numero, io ti restituisco la sua radice". Da quel momento non stai più leggendo codice, stai leggendo un <em>contratto</em>: c'è un ingresso, c'è un'uscita, e in mezzo c'è qualcosa che non sei obbligato a guardare.</p>
 
       <p>La parola giusta è quella del titolo di questo libro: <strong>cristallizzazione</strong>. Una logica sparsa e liquida diventa un solido con delle facce nette. E come ogni cristallo, da quel momento la puoi prendere in mano senza sapere com'è fatta dentro.</p>
 
@@ -163,6 +168,19 @@ print(miei)                   <span class="w-com">[1, 2, 0]  ← e non [99]</spa
         <span class="w-note-title">Da ricordare</span>
         <p>Il contratto di una funzione non è la sua firma: è la firma <strong>più tutto ciò che tocca senza dirlo</strong>. Variabili globali lette, oggetti dei parametri modificati, file scritti, orologio consultato. Se la firma dice una cosa e il corpo ne fa un'altra, il chiamante non sta usando una funzione: sta correndo un rischio.</p>
       </div>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>«Il parametro è una copia» va precisato, perché è la fonte di metà dei malintesi del mestiere. Copia <em>del valore</em> in C per i tipi semplici; copia <em>del riferimento</em> in Java, Python o JavaScript per gli oggetti — quindi il chiamato non può sostituire il tuo oggetto, ma può modificarlo. È la stessa distinzione che Strachey chiamava l-value e r-value, e da lì viene tutta la nomenclatura sui modi di passaggio.</p>
+    </div>
+
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>Strachey, <em>Fundamental Concepts in Programming Languages</em> (lezioni di Copenaghen, 1967) — l-value, r-value e i modi di passaggio dei parametri</li>
+        <li>Hoare, <em>An Axiomatic Basis for Computer Programming</em> (1969) — <span class="w-ref">CACM 12(10), 576–580</span>: il contratto scritto come precondizione e postcondizione</li>
+      </ul>
+    </div>
+
     </section>
 
 
@@ -174,7 +192,7 @@ print(miei)                   <span class="w-com">[1, 2, 0]  ← e non [99]</spa
       <p class="w-tappa-lead">Il contratto promette che ciò che accade dentro resta dentro. Perché quella promessa sia mantenuta serve un meccanismo — e quel meccanismo è una pila di foglietti.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Ogni volta che una funzione viene chiamata, la macchina prepara un <strong>foglietto</strong> nuovo: ci scrive i parametri ricevuti, lo spazio per le variabili locali, e l'indirizzo di ritorno — la cella di Wheeler della tappa 01. Il foglietto si appoggia sopra quelli già presenti, formando una pila. Quando la funzione finisce, il suo foglietto viene <strong>strappato</strong>: le variabili locali cessano di esistere e si riprende dal foglietto sotto, esattamente dove si era rimasti.</p>
+      <p>Ogni volta che una funzione viene chiamata, la macchina prepara un <strong>foglietto</strong> nuovo: ci scrive i parametri ricevuti, lo spazio per le variabili locali, e l'indirizzo di ritorno — la cella di Wheeler della tappa 01. Il foglietto si appoggia sopra quelli già presenti, formando una pila. Quando la funzione finisce, il suo foglietto viene <strong>strappato</strong>: le variabili locali cessano di esistere e si riprende dal foglietto sotto, esattamente dove si era rimasti.</p>
 
       <p>Questa struttura spiega tre cose che di solito si imparano a memoria come regole separate:</p>
       <ul>
@@ -199,6 +217,15 @@ print(miei)                   <span class="w-com">[1, 2, 0]  ← e non [99]</spa
         <span class="w-note-title">Livello esperto</span>
         <p>«Le variabili locali muoiono col foglietto» ha un'eccezione che vale la pena conoscere subito: la <strong>chiusura</strong> (<em>closure</em>). Se una funzione interna cattura una variabile della funzione esterna e sopravvive a quest'ultima, quella variabile non può stare sul foglietto — verrebbe strappata. I linguaggi che hanno le chiusure la spostano allora sullo <em>heap</em>, la zona di memoria che non segue l'ordine delle chiamate (libro 5, tappa 03). È il motivo tecnico per cui in JavaScript un contatore catturato da una funzione continua a vivere per anni dentro un browser, e il motivo per cui in C, dove le chiusure non ci sono, restituire il puntatore a una variabile locale è un errore classico e catastrofico.</p>
       </div>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>Dijkstra, <em>Recursive Programming</em> (1960) — <span class="w-ref">Numerische Mathematik 2, 312–318</span>: la pila di chiamata descritta per la prima volta come meccanismo</li>
+        <li>Wilkes, Wheeler &amp; Gill, <em>The Preparation of Programs for an Electronic Digital Computer</em> (1951) — il primo libro di programmazione, costruito attorno alle subroutine</li>
+        <li>Wheeler, <em>The use of sub-routines in programmes</em> (1952) — <span class="w-ref">Proc. 1952 ACM National Meeting, 235–236</span></li>
+      </ul>
+    </div>
+
     </section>
 
 
@@ -210,7 +237,7 @@ print(miei)                   <span class="w-com">[1, 2, 0]  ← e non [99]</spa
       <p class="w-tappa-lead">Adesso hai il contratto e hai il foglietto che lo fa rispettare. Resta una domanda che sembra filosofica e invece è la più pratica del libro: la funzione, oltre a restituire un valore, <em>fa</em> qualcosa?</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Una funzione si dice <strong>pura</strong> se rispetta due condizioni, e sono solo due. Primo: dati gli stessi argomenti restituisce sempre lo stesso risultato — sempre, oggi, domani, sull'altro continente, alla millesima chiamata. Secondo: non modifica niente fuori da sé — non scrive su variabili globali, non muta gli oggetti ricevuti, non tocca file, rete, schermo, orologio.</p>
+      <p>Una funzione si dice <strong>pura</strong> se rispetta due condizioni, e sono solo due. Primo: dati gli stessi argomenti restituisce sempre lo stesso risultato — sempre, oggi, domani, sull'altro continente, alla millesima chiamata. Secondo: non modifica niente fuori da sé — non scrive su variabili globali, non muta gli oggetti ricevuti, non tocca file, rete, schermo, orologio.</p>
 
       <p>Detto così sembra una rinuncia. È invece il permesso di fare una cosa straordinaria: <strong>sostituire la chiamata con il suo risultato</strong> senza cambiare il significato del programma. Se <code>quadrato(4)</code> vale 16 ed è pura, allora ovunque nel tuo codice compaia <code>quadrato(4)</code> puoi cancellarlo e scriverci <code>16</code>, e nulla al mondo se ne accorge. Questa proprietà ha un nome — <strong>trasparenza referenziale</strong> — che Christopher Strachey prese dalla logica di Quine e portò nell'informatica nelle sue lezioni del 1967, le stesse in cui battezzò l'<em>l-value</em> e l'<em>r-value</em> che hai incontrato nel libro 1.</p>
 
@@ -265,14 +292,19 @@ print(miei)                   <span class="w-com">[1, 2, 0]  ← e non [99]</spa
         <p>La domanda da farsi davanti a ogni funzione è una sola: <strong>«posso cancellare questa chiamata e scriverci il suo risultato?»</strong>. Se sì, è pura, e allora è tua: la sposti, la memorizzi, la parallelizzi, la provi. Se no, non è un difetto — ma d'ora in poi devi sapere <em>perché</em> no.</p>
       </div>
 
-      <div class="w-note w-note--paper">
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>La purezza non è una virtù morale: è una licenza di ottimizzazione. Se una funzione è pura, il compilatore può calcolarla una volta sola quando gli argomenti si ripetono, spostarla fuori da un ciclo, eseguirla in parallelo o non eseguirla affatto se il risultato non serve. Tu guadagni la stessa cosa sul piano umano: una funzione pura si prova senza impalcature, perché non c'è nessun mondo da preparare prima e da ripulire dopo.</p>
+    </div>
+
+          <div class="w-note w-note--paper">
         <span class="w-note-title">I paper che lo dimostrano</span>
         <ul>
           <li>Strachey, <em>Fundamental Concepts in Programming Languages</em> (lezioni di Copenaghen, 1967) — introduce in informatica <em>referential transparency</em>, <em>l-value</em> e <em>r-value</em> — <span class="w-ref">ripubblicato in Higher-Order and Symbolic Computation 13, 2000</span></li>
           <li>Michie, <em>"Memo" Functions and Machine Learning</em> (1968) — <span class="w-ref">Nature 218</span></li>
         </ul>
       </div>
-    </section>
+</section>
 
 
     <!-- ======================= TAPPA 05 ======================= -->
@@ -283,7 +315,7 @@ print(miei)                   <span class="w-com">[1, 2, 0]  ← e non [99]</spa
       <p class="w-tappa-lead">Hai appena visto la matematica senza macchia. Adesso la notizia che rende quel concetto utile invece che snob: un programma fatto solo di funzioni pure non serve rigorosamente a niente.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Un programma composto interamente di funzioni pure scalda il processore e non lascia traccia. Nessun pixel sullo schermo, nessuna riga in un database, nessun pacchetto sulla rete: tutte cose che cambiano lo stato del mondo, cioè per definizione <strong>side-effect</strong>. Il tuo lavoro esiste perché qualcuno vuole vedere qualcosa cambiare. La purezza non è la meta: <strong>è il materiale con cui si costruisce la parte grande</strong>.</p>
+      <p>Un programma composto interamente di funzioni pure scalda il processore e non lascia traccia. Nessun pixel sullo schermo, nessuna riga in un database, nessun pacchetto sulla rete: tutte cose che cambiano lo stato del mondo, cioè per definizione <strong>side-effect</strong>. Il tuo lavoro esiste perché qualcuno vuole vedere qualcosa cambiare. La purezza non è la meta: <strong>è il materiale con cui si costruisce la parte grande</strong>.</p>
 
       <p>Il salto di qualità, quello irreversibile, non è "usare funzioni pure". È accorgersi che ogni funzione appartiene a una delle due specie, saperlo dire ad alta voce per ognuna, e — questa è la mossa — <strong>disegnare il confine apposta</strong> invece di lasciarlo cadere dove capita.</p>
 
@@ -336,6 +368,14 @@ def applica_sconto(id_cliente):                <span class="w-com">← il guscio
         <span class="w-note-title">Livello esperto</span>
         <p>Alcuni linguaggi rendono il confine <em>visibile nei tipi</em> invece che nella disciplina. In Haskell una funzione che tocca il mondo ha tipo <code>IO qualcosa</code>, e il compilatore rifiuta di far passare quel valore per puro: il confine della camera bianca è controllato a compilazione. Rust fa una mossa diversa e altrettanto radicale sulla mutazione: <code>&amp;mut</code> garantisce che, mentre uno modifica un dato, nessun altro lo veda — l'aliasing del libro 1 diventa un errore di compilazione anziché un bug in produzione. Sono due risposte allo stesso problema che hai incontrato alla tappa 06 del primo libro.</p>
       </div>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>Backus, <em>Can Programming Be Liberated from the von Neumann Style?</em> (Turing Award Lecture 1977) — <span class="w-ref">CACM 21(8), 613–641, 1978</span></li>
+        <li>Strachey, <em>Fundamental Concepts in Programming Languages</em> (1967) — la distinzione fra ciò che un'espressione vale e ciò che fa</li>
+      </ul>
+    </div>
+
     </section>
 
 
@@ -347,7 +387,7 @@ def applica_sconto(id_cliente):                <span class="w-com">← il guscio
       <p class="w-tappa-lead">Sai racchiudere la logica dietro un nome e sai di che specie è. Ultimo passo, ed è quello che apre la porta a tutto il resto della serie: e se il valore che passi a una funzione fosse <em>un'altra funzione</em>?</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Guarda tre cicli qualsiasi del tuo codice. Uno somma, uno filtra, uno trasforma. Sono diversissimi in quello che fanno e <em>identici</em> nell'impalcatura: prendi il primo elemento, fai qualcosa, passa al successivo, fermati alla fine. L'impalcatura la riscrivi ogni volta; il "qualcosa" cambia. La tappa 01 ci ha insegnato che riscrivere la stessa cosa è un debito. Ma l'impalcatura non si può racchiudere in una funzione normale, perché il pezzo variabile non è un dato: è <strong>un'azione</strong>.</p>
+      <p>Guarda tre cicli qualsiasi del tuo codice. Uno somma, uno filtra, uno trasforma. Sono diversissimi in quello che fanno e <em>identici</em> nell'impalcatura: prendi il primo elemento, fai qualcosa, passa al successivo, fermati alla fine. L'impalcatura la riscrivi ogni volta; il "qualcosa" cambia. La tappa 01 ci ha insegnato che riscrivere la stessa cosa è un debito. Ma l'impalcatura non si può racchiudere in una funzione normale, perché il pezzo variabile non è un dato: è <strong>un'azione</strong>.</p>
 
       <p>A meno che le azioni non siano dati anche loro. Se una funzione può essere messa in una variabile, passata come argomento e restituita come risultato — si dice allora che è di <strong>prima classe</strong> — allora l'impalcatura si scrive una volta sola.</p>
 
@@ -405,13 +445,18 @@ doppi  = map(lambda n: n * 2, numeri)</pre>
         <p>Quando le funzioni sono valori, "combinare" diventa un'operazione come la somma: hai dei mattoni e un modo di attaccarli. Da qui in poi tutto il resto della serie è una variazione su questo tema — la <a href="La-Vertigine.dc.html">ricorsione</a> è una funzione che compone se stessa, i <a href="Eleganza-Esoterica.dc.html">linguaggi concatenativi</a> sono linguaggi in cui la composizione è l'unica cosa che esiste.</p>
       </div>
 
-      <div class="w-note w-note--paper">
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Una funzione che viaggia si porta dietro l'ambiente in cui è nata: è questo che la rende una <em>chiusura</em> e non un puntatore a codice. Da lì vengono due conseguenze pratiche. La prima è un costo: quell'ambiente va allocato, e vive finché la chiusura vive. La seconda è una trappola classica: una chiusura creata dentro un ciclo cattura la variabile, non il suo valore in quell'istante — il motivo per cui in JavaScript <code>let</code> e <code>var</code> danno risultati diversi.</p>
+    </div>
+
+          <div class="w-note w-note--paper">
         <span class="w-note-title">I paper che lo dimostrano</span>
         <ul>
           <li>Backus, <em>Can Programming Be Liberated from the von Neumann Style? A Functional Style and Its Algebra of Programs</em> — Turing Award Lecture 1977 — <span class="w-ref">CACM 21(8), agosto 1978, 613–641</span></li>
         </ul>
       </div>
-    </section>
+</section>
 
 
     <!-- ===== EPILOGO — non viene numerato ===== -->

@@ -84,6 +84,18 @@
         <span class="w-note-title">Da ricordare</span>
         <p>La domanda giusta non è «l'IA sa scrivere questo codice?». Quasi sempre sì. La domanda giusta è: <strong>«io sono in grado di dire se questo codice è giusto?»</strong>. Perché quella è l'unica parte del lavoro che non puoi delegare a chi non è responsabile del risultato.</p>
       </div>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>«Tradurre senza sapere la lingua» è un'immagine, e come tutte le immagini va dichiarato dove si rompe. Non si rompe sul fatto che il risultato sia spesso giusto: lo è. Si rompe sul <em>tipo</em> di errore che resta possibile. Chi conosce la lingua sbaglia per distrazione, e l'errore suona sbagliato; chi traduce per corrispondenza produce errori che suonano perfetti, perché la forma è esattamente quella giusta. È il motivo per cui la rilettura veloce non li trova.</p>
+    </div>
+
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>Bahdanau, Cho &amp; Bengio, <em>Neural Machine Translation by Jointly Learning to Align and Translate</em> (2014) — <span class="w-ref">arXiv:1409.0473</span>: tradurre allineando, senza un modello della lingua</li>
+      </ul>
+    </div>
+
     </section>
 
 
@@ -95,7 +107,7 @@
       <p class="w-tappa-lead">L'unico modo di sapere dove uno strumento è formidabile e dove è cieco è sapere <em>come</em> è fatto. Fortunatamente, in questa biblioteca c'è già un libro intero che lo spiega.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Un modello linguistico produce codice nello stesso modo in cui produce qualsiasi altro testo: <strong>un token alla volta, scegliendo ogni volta il pezzo più probabile dato tutto quello che c'è prima</strong>. Non c'è, nel mezzo, un momento in cui esegue mentalmente il programma; non c'è una fase in cui controlla che l'indice non esca dall'array. C'è una distribuzione di probabilità e un campionamento, ripetuti. Se questa frase ti sembra una semplificazione ingiusta, il posto per verificarla è <a href="Dentro-la-Macchina.dc.html">Dentro la Macchina</a>, che segue il percorso completo dal tasto Invio all'ultima parola; la matematica sotto sta in <a href="Fondamenti-Matematici-LLM.dc.html">La Matematica nascosta</a>.</p>
+      <p>Un modello linguistico produce codice nello stesso modo in cui produce qualsiasi altro testo: <strong>un token alla volta, scegliendo ogni volta il pezzo più probabile dato tutto quello che c'è prima</strong>. Non c'è, nel mezzo, un momento in cui esegue mentalmente il programma; non c'è una fase in cui controlla che l'indice non esca dall'array. C'è una distribuzione di probabilità e un campionamento, ripetuti. Se questa frase ti sembra una semplificazione ingiusta, il posto per verificarla è <a href="Dentro-la-Macchina.dc.html">Dentro la Macchina</a>, che segue il percorso completo dal tasto Invio all'ultima parola; la matematica sotto sta in <a href="Fondamenti-Matematici-LLM.dc.html">La Matematica nascosta</a>.</p>
 
       <p>Da questo unico fatto discendono, in modo abbastanza rigido, sia i punti di forza sia i punti ciechi. Vale la pena metterli in due colonne, perché quasi tutte le discussioni sull'argomento nascono dal confondere le due.</p>
 
@@ -113,6 +125,18 @@
         <span class="w-note-title">Attenzione</span>
         <p>Il rischio non è il codice palesemente rotto: quello lo scopre il primo lancio. Il rischio è il codice <strong>quasi giusto</strong>. Funziona sui casi che provi, sbaglia sul caso limite, e ha l'aspetto rassicurante del codice scritto bene — nomi sensati, struttura ordinata, perfino i commenti. È il tipo di errore più costoso che esista, perché supera la revisione: <em>sembra giusto</em>. Nella prossima tappa ne trovi tre da smascherare con le tue mani.</p>
       </div>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Un modello di linguaggio non esegue il codice che scrive: lo <em>prevede</em>, un token alla volta, sulla base di ciò che ha visto. Non ha uno stato del programma da consultare né un modo di sapere se una funzione che sta invocando esiste davvero. Da qui la mappa delle sue forze e delle sue cecità: è formidabile dove la forma porta il significato — impalcature, conversioni, codice ripetitivo — ed è cieco dove il significato dipende da uno stato che non è scritto nel testo che ha davanti.</p>
+    </div>
+
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>Vaswani et al., <em>Attention Is All You Need</em> (2017) — <span class="w-ref">arXiv:1706.03762</span>: l'architettura di cui sopra, e il <a href="Dentro-la-Macchina.dc.html">Modulo 01</a> di questa biblioteca per il percorso completo</li>
+      </ul>
+    </div>
+
     </section>
 
 
@@ -124,7 +148,7 @@
       <p class="w-tappa-lead">Su questo argomento tutti hanno un aneddoto e nessuno ha una misura. Le misure però esistono, sono due, e messe una accanto all'altra dicono una cosa molto più precisa di entrambe da sole.</p>
 
       <h3 class="w-h3">Il primo: l'accelerazione è vera</h3>
-      <p class="w-drop">Nel 2022 GitHub e Microsoft hanno condotto un esperimento controllato: novantacinque sviluppatori professionisti, divisi a caso in due gruppi, con il compito di scrivere un server HTTP in JavaScript. Chi aveva Copilot ha finito in media in 1 ora e 11 minuti; chi non l'aveva, in 2 ore e 41. Circa il <strong>55% più veloce</strong>, con significatività statistica. Il risultato è pubblicato (Peng et al., <em>The Impact of AI on Developer Productivity</em>, 2023) ed è solido per ciò che misura.</p>
+      <p>Nel 2022 GitHub e Microsoft hanno condotto un esperimento controllato: novantacinque sviluppatori professionisti, divisi a caso in due gruppi, con il compito di scrivere un server HTTP in JavaScript. Chi aveva Copilot ha finito in media in 1 ora e 11 minuti; chi non l'aveva, in 2 ore e 41. Circa il <strong>55% più veloce</strong>, con significatività statistica. Il risultato è pubblicato (Peng et al., <em>The Impact of AI on Developer Productivity</em>, 2023) ed è solido per ciò che misura.</p>
 
       <h3 class="w-h3">Il secondo: e allo stesso tempo è falsa</h3>
       <p>Nel luglio 2025 METR ha pubblicato un esperimento randomizzato di forma diversa: sedici sviluppatori <em>esperti</em>, 246 compiti <em>veri</em> presi dai loro progetti maturi — repository su cui lavoravano da cinque anni in media — con strumenti di frontiera. Risultato: con l'IA hanno impiegato il <strong>19% di tempo in più</strong>. Non il 19% in meno: in più.</p>
@@ -163,14 +187,19 @@
 
       <p>Nessuno di questi tre errori è esotico, e nessuno dei tre viene dal fatto che il modello sia scadente: vengono dal fatto che il codice più <em>tipico</em> per quella richiesta è quello sbagliato. Un revisore che conosce l'aliasing, i side-effect e il costo dello stack li vede in dieci secondi. Un revisore che non li conosce approva, e il bug esce con la prossima versione.</p>
 
-      <div class="w-note w-note--paper">
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>I due studi non si contraddicono: misurano cose diverse. Uno misura un compito circoscritto e nuovo, l'altro il lavoro dentro un codice che gli sviluppatori conoscevano già a fondo. E c'è un dettaglio che vale più dei numeri: nel secondo, i partecipanti <em>credevano</em> di essere andati più veloci. La percezione dell'accelerazione e l'accelerazione sono due grandezze distinte, e solo una delle due si misura col cronometro.</p>
+    </div>
+
+          <div class="w-note w-note--paper">
         <span class="w-note-title">Gli studi citati</span>
         <ul>
           <li>Peng, Kalliamvakou, Cihon &amp; Demirer, <em>The Impact of AI on Developer Productivity: Evidence from GitHub Copilot</em> (2023) — 95 sviluppatori, compito nuovo, ~55% più veloci — <span class="w-ref">arXiv:2302.06590</span></li>
           <li>METR, <em>Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity</em> (luglio 2025) — 16 sviluppatori esperti, 246 compiti reali su repository maturi: 19% più lenti, mentre si stimavano il 20% più veloci — <span class="w-ref">arXiv:2507.09089</span></li>
         </ul>
       </div>
-    </section>
+</section>
 
 
     <!-- ======================= TAPPA 04 ======================= -->
@@ -181,7 +210,7 @@
       <p class="w-tappa-lead">Fin qui abbiamo argomentato con i numeri, e i numeri servono per convincere gli altri. Adesso la ragione per cui studierai davvero, che con la produttività non ha niente a che fare.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Tutto quello che hai letto in questa serie è <strong>archeologia</strong>. La cella di Wheeler del 1951, dove si scriveva a mano l'indirizzo di ritorno. La <code>eval</code> che McCarthy aveva messo su carta come dimostrazione e Steve Russell tradusse in codice macchina ridendogli in faccia. Chuck Moore che nel 1968 costruisce un linguaggio intero per far girare un radiotelescopio con pochi kilobyte. La lettera di Dijkstra, ribattezzata da un direttore di rivista, che ha dato al mondo il modello di titolo polemico più imitato di sempre.</p>
+      <p>Tutto quello che hai letto in questa serie è <strong>archeologia</strong>. La cella di Wheeler del 1951, dove si scriveva a mano l'indirizzo di ritorno. La <code>eval</code> che McCarthy aveva messo su carta come dimostrazione e Steve Russell tradusse in codice macchina ridendogli in faccia. Chuck Moore che nel 1968 costruisce un linguaggio intero per far girare un radiotelescopio con pochi kilobyte. La lettera di Dijkstra, ribattezzata da un direttore di rivista, che ha dato al mondo il modello di titolo polemico più imitato di sempre.</p>
 
       <p>Toccare con mano quelle variabili antiche non serve a lavorare meglio. Serve a un'altra cosa, e questa serie esiste per quella: <strong>capire come funziona il pensiero umano specchiato nella macchina</strong>. Perché è di questo che si tratta, ogni volta. L'assegnazione è il tempo. La funzione è il nome dato a un gesto. La ricorsione è il coraggio di fidarsi di se stessi su un problema più piccolo. La continuazione è la memoria del futuro. Ogni concetto di questi cinque libri è un pezzo di mente umana reso eseguibile, e vederlo funzionare è un piacere che non somiglia a nessun altro.</p>
 
@@ -199,6 +228,19 @@
         <span class="w-note-title">Da ricordare</span>
         <p>Chi sa saltare la staccionata farà la differenza. Non perché scriverà più codice degli altri — anzi, probabilmente meno. Perché sarà <strong>l'unico nella stanza in grado di dire perché quella cosa non funziona</strong>, e di dirlo prima che sia in produzione. In un mondo in cui produrre soluzioni plausibili costa quasi zero, l'unica competenza scarsa è saperle giudicare.</p>
       </div>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>La ragione per cui questo mestiere resta interessante è che il collo di bottiglia non è mai stato scrivere codice: è <em>capirlo</em>. Ogni riga che scrivi verrà letta molte più volte di quante è stata scritta — spesso da te, mesi dopo, senza il contesto che avevi in testa quel giorno. Uno strumento che scrive in fretta sposta il lavoro sulla lettura, non lo elimina: aumenta la quantità di codice da capire per unità di tempo. È esattamente la capacità che questa serie di libri allena.</p>
+    </div>
+
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>Spolsky, <em>The Law of Leaky Abstractions</em> (11 novembre 2002) — joelonsoftware.com: perché non si può usare bene ciò di cui si ignora il funzionamento</li>
+        <li>Drepper, <em>What Every Programmer Should Know About Memory</em> (2007) — un esempio di che cosa significhi, in concreto, sapere cosa c'è sotto</li>
+      </ul>
+    </div>
+
     </section>
 
 

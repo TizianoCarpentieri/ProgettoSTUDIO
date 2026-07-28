@@ -142,6 +142,15 @@
     <p>In alta dimensione accade una cosa contro-intuitiva (la <em>maledizione della dimensionalità</em>): due vettori casuali sono quasi sempre <strong>quasi ortogonali</strong>, con coseno vicino a 0. Questo è un regalo, non un problema: significa che uno spazio a \(d\) dimensioni può ospitare un numero enorme di concetti "quasi indipendenti" — molti più di \(d\). È la base della <em>superposizione</em>, per cui un modello immagazzina più feature che neuroni.</p>
     <p>Nota pratica: nei modelli si normalizzano spesso i vettori a norma 1 (con la <em>RMSNorm</em>). Così il prodotto scalare <em>è</em> direttamente il coseno, e i conti restano stabili strato dopo strato.</p>
   </div>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>G. Strang, <em>Introduction to Linear Algebra</em> — vettori, norme e prodotto scalare, dal principio</li>
+        <li>3Blue1Brown, <em>Essence of Linear Algebra</em> — la stessa materia, ma vista</li>
+        <li>Zhang &amp; Sennrich, <em>Root Mean Square Layer Normalization</em> (RMSNorm) — <span class="w-ref">arXiv:1910.07467</span></li>
+      </ul>
+    </div>
+
 </section>
 
 <!-- ============ CAP 02 — MATRICI ============ -->
@@ -198,6 +207,15 @@
     <p>I "pesi" di un LLM <em>sono</em> matrici. In un blocco Transformer le più importanti sono \(W_Q, W_K, W_V\) (proiettano l'embedding in <em>query, key, value</em>) e le due matrici enormi della FFN (\(W_{\text{up}}\) e \(W_{\text{down}}\), spesso 4× più larghe). Un modello da 8 miliardi di parametri <em>è</em>, letteralmente, ~8·10⁹ numeri sistemati dentro qualche centinaio di queste griglie.</p>
     <p>Il costo di far girare il modello è dominato dalle moltiplicazioni matrice×matrice (GEMM): è per questo che le GPU, macchine specializzate proprio in questo, sono indispensabili. La <em>decomposizione</em> di queste matrici (es. LoRA: \(W+BA\) con \(B,A\) piccole) è la chiave del fine-tuning economico.</p>
   </div>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>G. Strang, <em>Introduction to Linear Algebra</em> — la matrice come trasformazione, non come tabella</li>
+        <li>Golub &amp; Van Loan, <em>Matrix Computations</em> — come si moltiplicano davvero, e a che prezzo</li>
+        <li>Hu et al., <em>LoRA: Low-Rank Adaptation of Large Language Models</em> — <span class="w-ref">arXiv:2106.09685</span></li>
+      </ul>
+    </div>
+
 </section>
 
 <!-- ============ CAP 03 — EMBEDDING ============ -->
@@ -240,6 +258,15 @@
     <p>Attenzione a due sfumature. Primo: gli embedding "statici" (Word2Vec, GloVe) danno <em>una</em> freccia per parola; dentro un Transformer gli embedding sono <strong>contestuali</strong> — "banca" del fiume e "banca" dei soldi finiscono in punti diversi dopo che l'attention li ha rielaborati. Secondo: la posizione nella frase non è nell'embedding di partenza; va iniettata a parte con il <em>positional encoding</em> (oggi quasi sempre <strong>RoPE</strong>, che <em>ruota</em> ogni coppia di dimensioni di un angolo proporzionale alla posizione — di nuovo pura geometria).</p>
     <p>Per vedere questo spazio in 2D si usano proiezioni come <em>PCA</em>, <em>t-SNE</em> o <em>UMAP</em>: comprimono \(d\) dimensioni in 2 mantenendo le vicinanze. Ricorda però che sono ombre: la vera struttura vive nelle centinaia di dimensioni originali.</p>
   </div>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>Mikolov et al., <em>Efficient Estimation of Word Representations in Vector Space</em> (Word2Vec) — <span class="w-ref">arXiv:1301.3781</span></li>
+        <li>Elhage et al., <em>Toy Models of Superposition</em> — Anthropic, 2022: perché lo spazio contiene più significati che dimensioni</li>
+        <li>McInnes &amp; Healy, <em>UMAP</em> — <span class="w-ref">arXiv:1802.03426</span>: come si guarda in due dimensioni ciò che ne ha centinaia</li>
+      </ul>
+    </div>
+
 </section>
 
 <!-- ============ CAP 04 — SOFTMAX ============ -->
@@ -286,6 +313,14 @@
     <p>Tre dettagli che distinguono chi ha davvero implementato una softmax. <strong>(1) Stabilità numerica:</strong> \(e^{z}\) esplode facilmente, perciò si sottrae sempre il massimo — \(e^{z_i-\max z}\) — senza cambiare il risultato ma evitando l'overflow. <strong>(2)</strong> La softmax appare due volte nel modello: qui in uscita (sul vocabolario) e <em>dentro</em> ogni testa di attention (cap. 6). <strong>(3)</strong> In addestramento non si guarda la probabilità ma il suo logaritmo, tramite la <em>cross-entropy</em>: \(L=-\log p_{\text{corretto}}\). Predire bene = grande \(p\) = piccola perdita.</p>
     <p>La coppia log-softmax + cross-entropy si semplifica in una forma numericamente comoda (il famoso <em>logsumexp</em>): è il motivo per cui le librerie offrono <code>cross_entropy</code> come singola funzione ottimizzata.</p>
   </div>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>J. S. Bridle, <em>Probabilistic Interpretation of Feedforward Classification Network Outputs</em> — Neurocomputing, NATO ASI Series vol. 68, Springer 1990: è qui che il softmax entra nelle reti</li>
+        <li>Goodfellow, Bengio &amp; Courville, <em>Deep Learning</em> (2016), cap. 6 — softmax, log-softmax e cross-entropy trattati insieme</li>
+      </ul>
+    </div>
+
 </section>
 
 <!-- ============ CAP 05 — GRADIENTI ============ -->
@@ -339,6 +374,14 @@
     <p>Come si calcola il gradiente rispetto a miliardi di pesi senza impazzire? Con la <strong>backpropagation</strong>: la regola della catena \((f\circ g)'=f'\!\cdot g'\) applicata all'indietro lungo tutta la rete, riusando i risultati intermedi. Un solo passaggio all'indietro dà <em>tutte</em> le derivate. In pratica non si usa la discesa "pura" ma <strong>Adam/AdamW</strong>, che tiene una media mobile di gradiente e sua varianza per dare a ogni peso il proprio passo adattivo.</p>
     <p>Due parole chiave che ora hanno un senso preciso: la non-linearità tra gli strati (cap. 2) — <em>ReLU</em>, <em>GELU</em>, <em>SwiGLU</em> — serve proprio perché la sua derivata non è costante, permettendo alla catena di apprendere curve e non solo rette. E il <em>learning rate schedule</em> (warmup + decadimento) è la versione professionale del cursore \(\eta\) che hai appena mosso.</p>
   </div>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>Rumelhart, Hinton &amp; Williams, <em>Learning representations by back-propagating errors</em> — <span class="w-ref">Nature 323, 533–536 (1986)</span>: la regola della catena che diventa un algoritmo</li>
+        <li>Kingma &amp; Ba, <em>Adam: A Method for Stochastic Optimization</em> — <span class="w-ref">arXiv:1412.6980</span></li>
+      </ul>
+    </div>
+
 </section>
 
 <!-- ============ CAP 06 — ATTENTION ============ -->
@@ -389,6 +432,15 @@
     <p><strong>Multi-head:</strong> non c'è una sola attention ma decine in parallelo (le <em>teste</em>), ognuna con le sue \(W_Q,W_K,W_V\): una può seguire l'accordo soggetto-verbo, un'altra i riferimenti pronominali. I risultati si concatenano e si proiettano con \(W_O\). <strong>Maschera causale:</strong> nei modelli generativi ogni parola può guardare solo quelle precedenti — si mette \(-\infty\) sui punteggi "futuri" prima della softmax (che li azzera). <strong>Costo:</strong> \(QK^{\top}\) è \(n\times n\), quindi cresce col <em>quadrato</em> della lunghezza del contesto — il vero collo di bottiglia, che FlashAttention e la KV-cache (Modulo 01) attaccano.</p>
     <p>Varianti moderne che sentirai nominare: <em>GQA/MQA</em> (teste che condividono Key e Value per risparmiare memoria), <em>RoPE</em> per la posizione dentro Q e K, e l'attention "a finestra" per contesti lunghissimi. Tutte, però, ruotano attorno a questa singola formula.</p>
   </div>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>Vaswani et al., <em>Attention Is All You Need</em> — <span class="w-ref">arXiv:1706.03762</span>: la formula di questa tappa, per intero</li>
+        <li>Bahdanau, Cho &amp; Bengio, <em>Neural Machine Translation by Jointly Learning to Align and Translate</em> — <span class="w-ref">arXiv:1409.0473</span>: l'attention prima dei Transformer</li>
+        <li>Ainslie et al., <em>GQA: Training Generalized Multi-Query Transformer Models</em> — <span class="w-ref">arXiv:2305.13245</span></li>
+      </ul>
+    </div>
+
 </section>
 
 <!-- ============ CAP 07 — SINTESI ============ -->
@@ -430,6 +482,20 @@
   </table>
 
   <div class="w-note w-note--warn"><b class="w-em a-rosso">Il ponte col Modulo 01.</b> Ora che padroneggi la matematica, rileggi <a href="Dentro-la-Macchina.dc.html">"Dentro la Macchina"</a>: quello che lì era descritto a parole — token, embedding, attention, KV-cache, softmax, sampling — qui ha una formula precisa. I due libri sono la stessa storia raccontata a due profondità.</div>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Fra queste formule e un Transformer vero restano tre pezzi, e non sono matematica: sono <em>impalcatura</em>. Le <strong>connessioni residue</strong> (\(x + f(x)\) invece di \(f(x)\)), che lasciano al gradiente una strada dritta fino in fondo; la <strong>normalizzazione</strong>, oggi quasi sempre <em>prima</em> del blocco e non dopo (pre-norm), che è ciò che rende addestrabili le decine di strati; e la <strong>rete densa</strong> dopo l'attention, dove sta la maggior parte dei parametri. L'attention decide <em>chi guarda chi</em>; quella rete decide <em>cosa farsene</em>.</p>
+    </div>
+
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>He et al., <em>Deep Residual Learning for Image Recognition</em> — <span class="w-ref">arXiv:1512.03385</span>: le connessioni residue</li>
+        <li>Ba, Kiros &amp; Hinton, <em>Layer Normalization</em> — <span class="w-ref">arXiv:1607.06450</span></li>
+        <li>Su et al., <em>RoFormer: Enhanced Transformer with Rotary Position Embedding</em> (RoPE) — <span class="w-ref">arXiv:2104.09864</span></li>
+      </ul>
+    </div>
+
 </section>
 
 <!-- ============ EPILOGO ============ -->

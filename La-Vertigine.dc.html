@@ -123,6 +123,19 @@ def fattoriale(n):
         <span class="w-note-title">Da ricordare</span>
         <p>Una funzione ricorsiva non si <em>simula</em>, si <em>legge</em>. Se ti trovi a seguire con il dito la seconda o la terza chiamata annidata, non stai capendo meglio: stai facendo a mano il lavoro della macchina. Fidati del caso base, fidati della chiamata più piccola, controlla che il problema decresca. Sono le uniche tre cose che devi verificare.</p>
       </div>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Il «salto di fede» ha un nome preciso: è l'induzione. Una funzione ricorsiva si dimostra corretta come si dimostra un teorema — vale sul caso base, e se vale sui casi più piccoli allora vale su questo. Da qui la regola operativa: la ricorsione è comoda quanto la struttura su cui lavora è ricorsiva. Un albero, una lista, un'espressione annidata si trattano quasi da soli; un array piatto quasi mai.</p>
+    </div>
+
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>McCarthy, <em>Recursive Functions of Symbolic Expressions and Their Computation by Machine, Part I</em> (1960) — <span class="w-ref">CACM 3(4), 184–195</span></li>
+        <li>Abelson &amp; Sussman, <em>Structure and Interpretation of Computer Programs</em> (MIT Press, 1985; 2ª ed. 1996) — cap. 1: processi ricorsivi e processi iterativi</li>
+      </ul>
+    </div>
+
     </section>
 
 
@@ -134,7 +147,7 @@ def fattoriale(n):
       <p class="w-tappa-lead">La ricorsione, in Python, è una possibilità fra le altre. Esiste un linguaggio in cui è quasi l'unica — e per arrivarci ha dovuto rinunciare a qualcosa che tutti gli altri linguaggi considerano irrinunciabile: una sintassi.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Nel 1960 John McCarthy pubblica sulle <em>Communications of the ACM</em> un articolo che si chiama <em>Recursive Functions of Symbolic Expressions and Their Computation by Machine, Part I</em>. Non voleva costruire un linguaggio di programmazione: voleva un <strong>formalismo matematico</strong> per ragionare su funzioni che manipolano simboli. Per farlo gli servivano due sole cose: un modo di scrivere liste, e la ricorsione. Ne uscì il Lisp — e la parte II, promessa dal titolo, non arrivò mai.</p>
+      <p>Nel 1960 John McCarthy pubblica sulle <em>Communications of the ACM</em> un articolo che si chiama <em>Recursive Functions of Symbolic Expressions and Their Computation by Machine, Part I</em>. Non voleva costruire un linguaggio di programmazione: voleva un <strong>formalismo matematico</strong> per ragionare su funzioni che manipolano simboli. Per farlo gli servivano due sole cose: un modo di scrivere liste, e la ricorsione. Ne uscì il Lisp — e la parte II, promessa dal titolo, non arrivò mai.</p>
 
       <p>La scelta radicale è nella notazione. Una lista si scrive fra parentesi: <code>(1 2 3)</code>. Una chiamata di funzione si scrive… anch'essa fra parentesi, con il nome della funzione al primo posto: <code>(+ 1 2)</code>. Le due cose sono <strong>indistinguibili come forma</strong>. Non è un'ambiguità: è la decisione fondativa da cui discende tutto ciò che rende Lisp diverso, e la sua conseguenza — la tappa 05 — cambia la definizione stessa di cosa sia un programma.</p>
 
@@ -189,7 +202,7 @@ def fattoriale(n):
       <p class="w-tappa-lead">Il salto di fede della tappa 01 ti fa scrivere codice giusto. Non ti dice niente su quanto costa — e su questo la ricorsione sa essere spietata come nessun'altra costruzione.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Il fattoriale chiama se stesso una volta sola per livello: la pila scende dritta, come la fila allo sportello. Ma guarda cosa succede quando una funzione chiama se stessa <strong>due volte</strong>. La forma delle chiamate smette di essere una fila e diventa un albero — e gli alberi, con la profondità, esplodono.</p>
+      <p>Il fattoriale chiama se stesso una volta sola per livello: la pila scende dritta, come la fila allo sportello. Ma guarda cosa succede quando una funzione chiama se stessa <strong>due volte</strong>. La forma delle chiamate smette di essere una fila e diventa un albero — e gli alberi, con la profondità, esplodono.</p>
 
       <pre class="w-codice" data-lang="python">
 def fib(n):
@@ -235,6 +248,14 @@ def fib(n):
         <span class="w-note-title">Livello esperto</span>
         <p>La ricorsione doppia non è di per sé un male: è la forma naturale del <em>divide et impera</em>. Mergesort e quicksort chiamano se stessi due volte e restano <em>n</em>·log <em>n</em>, perché i due rami lavorano su <strong>metà dati ciascuno</strong> e non si sovrappongono mai. La differenza fra mergesort e la Fibonacci ingenua non è il numero di chiamate: è che nel primo caso l'unione dei sottoproblemi copre esattamente i dati una volta sola, nel secondo si accavalla. Quando i sottoproblemi si sovrappongono e si possono memorizzare, il nome tecnico di ciò che stai facendo è <em>programmazione dinamica</em>.</p>
       </div>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>Abelson &amp; Sussman, <em>Structure and Interpretation of Computer Programs</em> — cap. 1.2: l'ordine di crescita in tempo <em>e</em> in spazio</li>
+        <li>Dijkstra, <em>Recursive Programming</em> (1960) — <span class="w-ref">Numerische Mathematik 2, 312–318</span>: dove si vede che la profondità si paga in pila</li>
+      </ul>
+    </div>
+
     </section>
 
 
@@ -246,7 +267,7 @@ def fib(n):
       <p class="w-tappa-lead">Hai appena visto che la profondità si paga in memoria. Adesso il colpo di scena: esiste una forma di ricorsione che non costa <em>niente</em> in memoria — e non perché sia più furba, ma perché non è più una ricorsione.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Torna all'immagine della fila allo sportello. Il foglietto di ogni chiamata serve a ricordare <em>che cosa fare con la risposta quando arriva</em>: nel fattoriale, moltiplicarla per <code>n</code>. Ma se la funzione, dopo aver chiamato se stessa, <strong>non ha più niente da fare con il risultato</strong> — se lo restituisce e basta — allora quel foglietto non serve a nessuno. Si può strappare <em>prima</em> di fare la chiamata, riusando il suo posto.</p>
+      <p>Torna all'immagine della fila allo sportello. Il foglietto di ogni chiamata serve a ricordare <em>che cosa fare con la risposta quando arriva</em>: nel fattoriale, moltiplicarla per <code>n</code>. Ma se la funzione, dopo aver chiamato se stessa, <strong>non ha più niente da fare con il risultato</strong> — se lo restituisce e basta — allora quel foglietto non serve a nessuno. Si può strappare <em>prima</em> di fare la chiamata, riusando il suo posto.</p>
 
       <p>Una chiamata di questo tipo si chiama <strong>chiamata in coda</strong> (<em>tail call</em>): è l'ultima cosa che la funzione fa. E un linguaggio che se ne accorge trasforma la ricorsione in un salto all'indietro — cioè, letteralmente, nel ciclo del libro 1.</p>
 
@@ -287,7 +308,12 @@ def fib(n):
         <p>Ricorsione e iterazione non sono due filosofie in lotta: sono <strong>la stessa cosa scritta in due modi</strong>. Un ciclo con un accumulatore e una ricorsione in coda con un accumulatore compilano nello stesso salto all'indietro. Ciò che cambia è che nella forma ricorsiva ciò che si accumula è <em>dichiarato negli argomenti</em>, sotto gli occhi, invece di essere una variabile che qualcuno modifica in un angolo del corpo del ciclo.</p>
       </div>
 
-      <div class="w-note w-note--paper">
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>In Scheme l'eliminazione della chiamata in coda è <em>obbligatoria</em>, non un'ottimizzazione concessa: lo standard richiede che un ciclo scritto per ricorsione giri in spazio costante, ed è per questo che il linguaggio può fare a meno dei costrutti di ciclo. Altrove non c'è: sulla JVM e in Python, per esempio, la ricorsione profonda esaurisce la pila. La contromisura, dove serve, è il <em>trampolino</em>: la funzione non si richiama, restituisce la prossima chiamata e un ciclo esterno la esegue.</p>
+    </div>
+
+          <div class="w-note w-note--paper">
         <span class="w-note-title">I paper che lo dimostrano</span>
         <ul>
           <li>Sussman &amp; Steele, <em>Scheme: An Interpreter for Extended Lambda Calculus</em> (1975) — <span class="w-ref">MIT AI Memo 349</span></li>
@@ -295,7 +321,7 @@ def fib(n):
           <li><em>Revised<sup>7</sup> Report on the Algorithmic Language Scheme</em> (R7RS, 2013) — la proper tail recursion come requisito, non come ottimizzazione</li>
         </ul>
       </div>
-    </section>
+</section>
 
 
     <!-- ======================= TAPPA 05 ======================= -->
@@ -306,7 +332,7 @@ def fib(n):
       <p class="w-tappa-lead">Nella tappa 02 hai lasciato in sospeso un fatto che sembrava una curiosità tipografica: in Lisp una chiamata di funzione e una lista di dati si scrivono nello stesso identico modo. È il momento di scoprire che cosa ci si può fare.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">In quasi tutti i linguaggi il tuo programma, prima di essere eseguito, viene tradotto in una struttura ad albero che si chiama AST — <em>abstract syntax tree</em>. L'albero esiste, ma vive dentro il compilatore: tu non lo vedi, non lo puoi toccare, e il testo che hai scritto è solo un modo di descriverlo a parole. In Lisp quella traduzione <strong>non serve</strong>, perché ciò che scrivi <em>è già</em> l'albero: le parentesi non descrivono la struttura, sono la struttura.</p>
+      <p>In quasi tutti i linguaggi il tuo programma, prima di essere eseguito, viene tradotto in una struttura ad albero che si chiama AST — <em>abstract syntax tree</em>. L'albero esiste, ma vive dentro il compilatore: tu non lo vedi, non lo puoi toccare, e il testo che hai scritto è solo un modo di descriverlo a parole. In Lisp quella traduzione <strong>non serve</strong>, perché ciò che scrivi <em>è già</em> l'albero: le parentesi non descrivono la struttura, sono la struttura.</p>
 
       <p>La proprietà ha un nome, coniato nel 1965 da Calvin Mooers per il suo linguaggio TRAC: <strong>omoiconico</strong>, dal greco <em>homo</em> (stesso) e <em>icon</em> (rappresentazione) — perché il programma ha la stessa rappresentazione dentro e fuori dall'elaboratore. Alan Kay riprese il termine nella sua tesi di dottorato del 1969, ed è da lì che è arrivato fino a noi.</p>
 
@@ -356,7 +382,12 @@ def fib(n):
         <p>Omoiconico non vuol dire "pieno di parentesi": vuol dire che <strong>il programma è un valore del linguaggio</strong>, manipolabile con le stesse funzioni con cui manipoli qualsiasi altro dato. È la premessa senza la quale la prossima tappa — le macro — sarebbe una funzionalità del compilatore anziché una cosa che puoi scrivere tu, di martedì, in dieci righe.</p>
       </div>
 
-      <div class="w-note w-note--paper">
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Il fatto che <code>eval</code> prenda una lista qualsiasi ha un prezzo che vale conoscere. In Lisp l'interprete metacircolare è un esercizio di eleganza; in un linguaggio con <code>eval</code> su stringhe — JavaScript, Python — è la porta d'ingresso preferita di chi attacca, perché trasforma un dato che arriva da fuori in codice che gira dentro. La lezione è che la potenza è la stessa: cambia solo chi controlla il dato.</p>
+    </div>
+
+          <div class="w-note w-note--paper">
         <span class="w-note-title">I paper che lo dimostrano</span>
         <ul>
           <li>Mooers &amp; Deutsch, <em>TRAC, A Text-Handling Language</em> (1965) — il conio del termine <em>homoiconic</em> — <span class="w-ref">Proc. 20th ACM National Conference</span></li>
@@ -364,7 +395,7 @@ def fib(n):
           <li>Abelson &amp; Sussman, <em>Structure and Interpretation of Computer Programs</em> (MIT Press, 1985; 2ª ed. 1996) — cap. 4, l'interprete metacircolare</li>
         </ul>
       </div>
-    </section>
+</section>
 
 
     <!-- ======================= TAPPA 06 ======================= -->
@@ -375,7 +406,7 @@ def fib(n):
       <p class="w-tappa-lead">Il codice è un dato. Una funzione può leggerlo e costruirne di nuovo. Manca un solo pezzo perché questo diventi il potere più grande del mestiere: che il nuovo codice venga poi <em>eseguito al posto</em> del vecchio.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Una funzione riceve <strong>valori</strong> e restituisce un valore. Una <strong>macro</strong> riceve <em>pezzi di codice non ancora valutati</em> e restituisce <em>altro codice</em>, che il sistema mette al posto della chiamata prima di eseguire. Non è una funzione più potente: lavora in un altro momento della vita del programma. La funzione lavora quando il programma gira; la macro lavora <em>mentre il programma viene costruito</em>.</p>
+      <p>Una funzione riceve <strong>valori</strong> e restituisce un valore. Una <strong>macro</strong> riceve <em>pezzi di codice non ancora valutati</em> e restituisce <em>altro codice</em>, che il sistema mette al posto della chiamata prima di eseguire. Non è una funzione più potente: lavora in un altro momento della vita del programma. La funzione lavora quando il programma gira; la macro lavora <em>mentre il programma viene costruito</em>.</p>
 
       <p>Perché è tanto importante? Perché ti mette nelle mani la cosa che in ogni altro linguaggio è riservata a chi lo ha progettato: <strong>aggiungere costrutti</strong>. Se nel tuo linguaggio manca un <code>unless</code>, in Java aspetti la prossima versione o scrivi una funzione che ci somiglia vagamente; in Lisp lo aggiungi tu in tre righe, e da quel momento è indistinguibile da quelli che c'erano già.</p>
 
@@ -418,14 +449,19 @@ def fib(n):
         <p>Con le macro il confine fra "usare un linguaggio" e "progettarne uno" smette di esistere. Non stai scrivendo un programma in Lisp: stai <strong>costruendo il dialetto</strong> in cui il tuo problema si esprime meglio, e poi scrivendo tre righe in quel dialetto. È la ragione per cui in quel mondo si dice che non si programma in Lisp — si programma <em>verso</em> Lisp, partendo dal problema e andandogli incontro.</p>
       </div>
 
-      <div class="w-note w-note--paper">
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>La domanda vera non è come si scrive una macro, è <em>quando</em>. Una funzione basta ogni volta che gli argomenti possono essere valutati prima: solo se devi controllare <em>se</em> o <em>quante volte</em> valutare qualcosa — o inventare una sintassi — serve una macro. Il costo lo paghi in diagnostica: gli errori arrivano dal codice espanso, che il lettore non ha mai scritto, e chi arriva dopo si trova a debuggare un programma che non compare da nessuna parte.</p>
+    </div>
+
+          <div class="w-note w-note--paper">
         <span class="w-note-title">I paper che lo dimostrano</span>
         <ul>
           <li>Kohlbecker, Friedman, Felleisen &amp; Duba, <em>Hygienic Macro Expansion</em> (1986) — <span class="w-ref">ACM Conf. on LISP and Functional Programming</span></li>
           <li><em>Revised<sup>4</sup> Report on the Algorithmic Language Scheme</em> (1991) — <code>syntax-rules</code> compare in appendice: è il primo standard con le macro igieniche</li>
         </ul>
       </div>
-    </section>
+</section>
 
 
     <!-- ===== EPILOGO — non viene numerato ===== -->

@@ -217,6 +217,18 @@ function verificaIndiceLaterale(file, html) {
    Numerazione consecutiva `c1…cN` più `#fine`. Gli id non sono decorazione:
    sono le àncore su cui puntano l'indice, i ponti fra libri e — da oggi — i
    concetti del grafo.
+
+   Qui vive anche LA CHIUSURA DI TAPPA, la convenzione del Modulo 01 scelta
+   come standard per tutta la biblioteca:
+
+       … → w-note--expert → w-note--paper
+
+   cioè: prima il premio per chi ha letto fino in fondo, poi le fonti che
+   reggono quello che si è appena affermato. Il Modulo 01 la rispetta 9 volte
+   su 9, ed è il motivo per cui si legge come un libro solo invece che come
+   nove pagine affiancate. Sono avvisi, non errori: aggiungere un riquadro
+   fonti significa trovare fonti vere, e quello lo fa una persona, non un
+   controllo.
    ========================================================================== */
 
 function verificaTappe(file, html) {
@@ -249,7 +261,32 @@ function verificaTappe(file, html) {
                    '`w-note--expert`: sopra i due il libro cambia pubblico senza dirlo',
                    riga(html, s.inizio));
     }
+
+    /* La chiusura di tappa del Modulo 01 — vedi il blocco qui sotto. */
+    if (!esperti) {
+      avviso(file, 'tappa `' + (s.id || i + 1) + '` non chiude con `w-note--expert`',
+             riga(html, s.inizio));
+    }
+    if (!conta(s.corpo, 'w-note--paper')) {
+      avviso(file, 'tappa `' + (s.id || i + 1) + '` non chiude con `w-note--paper`: ' +
+                   'le affermazioni si ancorano dove vengono fatte', riga(html, s.inizio));
+    } else {
+      var ultimoE = s.corpo.lastIndexOf('w-note--expert');
+      var ultimoP = s.corpo.lastIndexOf('w-note--paper');
+      if (ultimoE >= 0 && ultimoP < ultimoE) {
+        avviso(file, 'tappa `' + (s.id || i + 1) + '`: le fonti vengono prima del livello ' +
+                     'esperto. L\'ordine è esperto → fonti', riga(html, s.inizio));
+      }
+    }
   });
+
+  /* Il capolettera è un accento, non un'intestazione: se apre ogni tappa
+     smette di segnalare qualcosa. Il Modulo 01 ne usa tre su nove. */
+  var conDrop = normali.filter(function (s) { return /class="[^"]*\bw-drop\b/.test(s.corpo); }).length;
+  if (normali.length >= 4 && conDrop > Math.ceil(normali.length / 2)) {
+    avviso(file, 'il capolettera `w-drop` apre ' + conDrop + ' tappe su ' + normali.length +
+                 ': se è ovunque non comunica più niente (il Modulo 01 ne usa 3 su 9)');
+  }
 
   if (!finali.length) {
     errore(file, 'manca l\'epilogo `<section class="w-tappa w-tappa--fine" id="fine">`');

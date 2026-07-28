@@ -129,14 +129,19 @@ if x == 5: ...</pre>
         <p><code>x = x + 1</code> non è un'affermazione sul mondo: è un <strong>ordine impartito al tempo</strong>. Si legge sempre in due tempi — <em>valuta a destra, scrivi a sinistra</em> — e i due <code>x</code> non sono la stessa cosa: a destra c'è un valore, a sinistra un posto.</p>
       </div>
 
-      <div class="w-note w-note--paper">
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Il simbolo ha una storia che spiega il pasticcio. ALGOL 60 scelse <code>:=</code> proprio per non rubare l'uguale alla matematica; C scelse <code>=</code> per l'assegnazione e dovette inventarsi <code>==</code> per il confronto — da cui trent'anni di bug scritti a mano. I linguaggi funzionali chiudono il cerchio dall'altra parte: vietano la riassegnazione, e un nome vale una volta sola. Anche i compilatori lo fanno di nascosto: la forma <em>SSA</em>, in cui ogni variabile è assegnata esattamente una volta, è come il tuo codice viene riscritto prima di essere ottimizzato.</p>
+    </div>
+
+          <div class="w-note w-note--paper">
         <span class="w-note-title">I paper che lo dimostrano</span>
         <ul>
           <li>Naur (a cura di), <em>Report on the Algorithmic Language ALGOL 60</em> (1960) — introduce e formalizza <code>:=</code> come simbolo di assegnazione, distinto da <code>=</code> — <span class="w-ref">CACM 3(5), 299–314</span></li>
           <li>Backus et al., <em>The FORTRAN Automatic Coding System</em> (1957) — il linguaggio che consegnò <code>=</code> all'assegnazione — <span class="w-ref">Proc. Western Joint Computer Conference</span></li>
         </ul>
       </div>
-    </section>
+</section>
 
 
     <!-- ======================= TAPPA 02 ======================= -->
@@ -147,7 +152,7 @@ if x == 5: ...</pre>
       <p class="w-tappa-lead">Hai appena visto che a sinistra dell'uguale c'è un posto e a destra un valore. Adesso guardiamo quel posto: è lì che vive tutto ciò che un programma sa di sé.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Una variabile non è un numero: è un <strong>indirizzo con un'etichetta sopra</strong>. Da qualche parte, nella memoria della macchina, c'è una casella; il nome <code>x</code> è il post-it appiccicato sopra, che serve a te, non a lei. La macchina il post-it non lo legge nemmeno: il compilatore lo ha già tradotto in un numero, e di quel nome così faticosamente scelto non resta niente nel programma in esecuzione.</p>
+      <p>Una variabile non è un numero: è un <strong>indirizzo con un'etichetta sopra</strong>. Da qualche parte, nella memoria della macchina, c'è una casella; il nome <code>x</code> è il post-it appiccicato sopra, che serve a te, non a lei. La macchina il post-it non lo legge nemmeno: il compilatore lo ha già tradotto in un numero, e di quel nome così faticosamente scelto non resta niente nel programma in esecuzione.</p>
 
       <p>Questa distinzione fra il posto e il contenuto ha perfino due nomi tecnici, che i compilatori usano ancora: <strong>l-value</strong> (ciò che può stare a sinistra: un posto) e <strong>r-value</strong> (ciò che può stare a destra: un valore). Ecco perché <code>x = 5</code> si può scrivere e <code>5 = x</code> no. Non è pignoleria di sintassi: 5 non è un posto, non ha un indirizzo dove metterci qualcosa.</p>
 
@@ -174,6 +179,19 @@ print(b)       <span class="w-com">6</span></pre>
         <span class="w-note-title">Attenzione</span>
         <p>La fotografia vale per i valori semplici. Quando la cella contiene un <em>riferimento</em> a un oggetto — una lista, un dizionario, un array — copi la fotografia dell'indirizzo, non della cosa. Due nomi finiscono per indicare lo stesso oggetto, e modificarlo tramite uno lo modifica anche per l'altro. È la trappola numero uno del linguaggio moderno, e ci torniamo nella tappa 06 con una demo apposta: non è un dettaglio, è metà dei bug della tua carriera.</p>
       </div>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>«Cella» è una semplificazione onesta ma è una semplificazione. In C il nome è davvero un indirizzo con un tipo sopra. In Python, Java o JavaScript il nome è un <em>riferimento</em>: due nomi possono indicare lo stesso oggetto, e assegnare sposta l'etichetta senza toccare il contenuto. La differenza non è accademica — è la stessa che, tre tappe più avanti, farà nascere l'aliasing. E il nome, in quanto nome, non arriva alla macchina: vive nella tabella dei simboli del compilatore e sparisce.</p>
+    </div>
+
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>Naur (a cura di), <em>Report on the Algorithmic Language ALGOL 60</em> (1960) — dove la dichiarazione di una variabile diventa un concetto di linguaggio</li>
+        <li>Backus et al., <em>The FORTRAN Automatic Coding System</em> (1957) — il linguaggio che portò l'assegnazione alle masse</li>
+      </ul>
+    </div>
+
     </section>
 
 
@@ -185,7 +203,7 @@ print(b)       <span class="w-com">6</span></pre>
       <p class="w-tappa-lead">Una cella che cambia valore, da sola, non va da nessuna parte. Serve qualcosa che <em>guardi</em> quel valore e, in base a quello, decida quale riga eseguire dopo.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Dentro il processore c'è una cella speciale, diversa da tutte le altre: il <strong>program counter</strong>. Non contiene i tuoi dati: contiene l'indirizzo della prossima istruzione da eseguire. Il funzionamento normale della macchina è banale fino alla noia: esegui l'istruzione, aumenta il program counter di uno, ricomincia. Una riga dopo l'altra, per sempre, come un dito che scorre l'elenco della spesa.</p>
+      <p>Dentro il processore c'è una cella speciale, diversa da tutte le altre: il <strong>program counter</strong>. Non contiene i tuoi dati: contiene l'indirizzo della prossima istruzione da eseguire. Il funzionamento normale della macchina è banale fino alla noia: esegui l'istruzione, aumenta il program counter di uno, ricomincia. Una riga dopo l'altra, per sempre, come un dito che scorre l'elenco della spesa.</p>
 
       <p>Poi arriva un'istruzione che fa una cosa sola, e cambia tutto: <strong>scrive nel program counter</strong>. Non "più uno": un numero qualsiasi. Il dito, invece di scendere alla riga dopo, salta. Se la scrittura è incondizionata si chiama <code>jmp</code>, salto; se avviene solo quando un certo confronto è andato in un certo modo si chiama <strong>salto condizionale</strong>, ed è l'istruzione da cui discende ogni <code>if</code>, ogni <code>while</code>, ogni <code>for</code>, ogni <code>switch</code>, ogni gestione di eccezione che tu abbia mai scritto.</p>
 
@@ -238,7 +256,7 @@ print(b)       <span class="w-com">6</span></pre>
       <p class="w-tappa-lead">Metti insieme le due cose che hai appena visto — una cella che si modifica da sé e un salto che guarda quella cella — e ottieni la prima cosa davvero magica del mestiere: quattro righe che fanno un milione di cose.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Un ciclo è un salto che va <em>all'indietro</em>. Nient'altro. Il program counter, arrivato in fondo al blocco, invece di proseguire torna su; e ogni volta che ripassa trova lo stato leggermente cambiato dal giro precedente, perché dentro il blocco c'era un <code>i = i + 1</code>. Il salto all'indietro dà la ripetizione; l'autoreferenzialità della tappa 01 dà il <em>progresso</em>. Senza il salto non ci sarebbe ripetizione; senza <code>x = x + 1</code> ci sarebbe una ripetizione identica e sterile, per sempre.</p>
+      <p>Un ciclo è un salto che va <em>all'indietro</em>. Nient'altro. Il program counter, arrivato in fondo al blocco, invece di proseguire torna su; e ogni volta che ripassa trova lo stato leggermente cambiato dal giro precedente, perché dentro il blocco c'era un <code>i = i + 1</code>. Il salto all'indietro dà la ripetizione; l'autoreferenzialità della tappa 01 dà il <em>progresso</em>. Senza il salto non ci sarebbe ripetizione; senza <code>x = x + 1</code> ci sarebbe una ripetizione identica e sterile, per sempre.</p>
 
       <div class="w-note w-note--demo">
         <span class="w-note-title">Analogia: il giradischi e il solco</span>
@@ -293,6 +311,20 @@ while i &lt; 4:
         <span class="w-note-title">Attenzione</span>
         <p>L'errore <em>off-by-one</em> non nasce dalla distrazione, nasce dall'ambiguità dell'italiano: <em>«dal 1 al 4»</em> comprende il 4 o no? Il rimedio non è concentrarsi di più — è scegliere una convenzione e non tradirla mai. Quasi tutto il software moderno usa gli <strong>intervalli semiaperti</strong>: estremo sinistro incluso, destro escluso. È il motivo per cui <code>range(0, 4)</code> in Python dà 0,1,2,3 e per cui le liste partono da zero: con questa convenzione la lunghezza di un intervallo è sempre <code>fine - inizio</code>, e due intervalli adiacenti si incastrano senza buchi né sovrapposizioni.</p>
       </div>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>L'invariante non è un commento: è una <em>precondizione mantenuta</em>, e si può dimostrare. È il cuore della verifica formale — dimostrare che l'invariante vale prima del ciclo, che ogni giro lo preserva, e che alla fine implica ciò che volevi. Per la terminazione serve un secondo ingrediente, il <em>variante</em>: una quantità intera non negativa che cala a ogni giro. E il compilatore fa lo stesso ragionamento per i fatti suoi: riconoscere le variabili d'induzione è ciò che gli permette di srotolare, vettorizzare o cancellare interi cicli.</p>
+    </div>
+
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>Floyd, <em>Assigning Meanings to Programs</em> (1967) — Proc. Symp. on Applied Mathematics, vol. 19, 19–32: l'invariante come oggetto matematico</li>
+        <li>Hoare, <em>An Axiomatic Basis for Computer Programming</em> (1969) — <span class="w-ref">CACM 12(10), 576–580</span></li>
+        <li>Böhm &amp; Jacopini, <em>Flow Diagrams, Turing Machines and Languages with Only Two Formation Rules</em> (1966) — <span class="w-ref">CACM 9(5), 366–371</span></li>
+      </ul>
+    </div>
+
     </section>
 
 
@@ -304,7 +336,7 @@ while i &lt; 4:
       <p class="w-tappa-lead">Hai imparato a chiedere a un ciclo che cosa resta vero a ogni giro. Adesso la domanda scomoda, quella che nessun compilatore può rispondere al posto tuo: sei sicuro che finisca?</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Un ciclo termina se esiste una quantità che <em>diminuisce a ogni giro</em> e che non può scendere sotto un limite. Si chiama <strong>variante</strong>, ed è la gemella della invariante della tappa precedente: quella dice che cosa resta vero, questa dice che cosa si consuma. Nel ciclo di prima la variante era <code>4 - i</code>: parte da 3 e cala di uno ogni giro. Non può calare per sempre, quindi il ciclo finisce. Fine della dimostrazione.</p>
+      <p>Un ciclo termina se esiste una quantità che <em>diminuisce a ogni giro</em> e che non può scendere sotto un limite. Si chiama <strong>variante</strong>, ed è la gemella della invariante della tappa precedente: quella dice che cosa resta vero, questa dice che cosa si consuma. Nel ciclo di prima la variante era <code>4 - i</code>: parte da 3 e cala di uno ogni giro. Non può calare per sempre, quindi il ciclo finisce. Fine della dimostrazione.</p>
 
       <p>I cicli infiniti nascono quindi in tre modi, e sono sempre gli stessi tre:</p>
 
@@ -372,7 +404,7 @@ dispetto(dispetto)        <span class="w-ev">← e adesso? finisce se e solo se 
       <p class="w-tappa-lead">Lo stato ti ha regalato il tempo, e con il tempo tutto il resto. Adesso ti presenta il conto — e il conto ha il nome che avevi promesso di ricordare dalla tappa 02: due targhette sulla stessa cassetta.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Finché nelle celle metti numeri, l'assegnazione è la fotografia innocua che hai visto. Ma appena una cella contiene un <em>oggetto</em> — una lista, un dizionario, un array, un'istanza — quello che ci sta dentro non è l'oggetto: è il suo <strong>indirizzo</strong>. Scrivere <code>b = a</code> copia l'indirizzo, non la cosa. Da quel momento hai due nomi, un solo oggetto, e ogni modifica fatta con un nome è visibile anche all'altro. Si chiama <strong>aliasing</strong>, e non è un difetto di Python o di Java: è la conseguenza inevitabile di avere insieme la memoria e i nomi.</p>
+      <p>Finché nelle celle metti numeri, l'assegnazione è la fotografia innocua che hai visto. Ma appena una cella contiene un <em>oggetto</em> — una lista, un dizionario, un array, un'istanza — quello che ci sta dentro non è l'oggetto: è il suo <strong>indirizzo</strong>. Scrivere <code>b = a</code> copia l'indirizzo, non la cosa. Da quel momento hai due nomi, un solo oggetto, e ogni modifica fatta con un nome è visibile anche all'altro. Si chiama <strong>aliasing</strong>, e non è un difetto di Python o di Java: è la conseguenza inevitabile di avere insieme la memoria e i nomi.</p>
 
       <div class="w-demo">
         <h4 class="w-demo-title">Prova tu — un oggetto, due nomi</h4>
@@ -424,6 +456,19 @@ scrive  6                               6
         <span class="w-note-title">Da ricordare</span>
         <p>Lo stato mutabile è potentissimo e va tenuto <strong>piccolo e visibile</strong>. Le due domande da farsi davanti a qualunque variabile che cambia sono sempre le stesse: <em>chi può scriverci?</em> e <em>fino a dove è visibile?</em> Tutte le grandi idee dei prossimi libri — le funzioni pure, la ricorsione, i linguaggi senza variabili — sono tentativi diversi di rispondere "il meno possibile" a entrambe.</p>
       </div>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Le difese contro lo stato condiviso sono tre, in ordine di costo. La <strong>copia difensiva</strong>: chi riceve un dato mutabile ne prende una copia — semplice, e cara se il dato è grande. L'<strong>immutabilità</strong>: il dato non cambia mai, si producono versioni nuove — è la strada dei linguaggi funzionali, e la <em>copy-on-write</em> la rende praticabile. E il <strong>possesso</strong>: un solo proprietario alla volta, verificato dal compilatore — è la scelta di Rust. Attenzione alla trappola: in molti linguaggi <code>const</code> congela il nome, non l'oggetto.</p>
+    </div>
+
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>Backus, <em>Can Programming Be Liberated from the von Neumann Style?</em> (Turing Award Lecture 1977) — <span class="w-ref">CACM 21(8), 613–641, 1978</span>: la requisitoria contro lo stato che si assegna</li>
+        <li>Dijkstra, <em>Letters to the editor: go to statement considered harmful</em> (1968) — <span class="w-ref">CACM 11(3), 147–148</span></li>
+      </ul>
+    </div>
+
     </section>
 
 
