@@ -111,6 +111,19 @@
         <span class="w-note-title">Da ricordare</span>
         <p>La notazione postfissa non è un modo strano di scrivere le stesse cose: è ciò che resta quando togli i nomi e lasci che sia <strong>l'ordine a portare l'informazione</strong>. Ed è per questo che è la forma preferita dalle macchine — un interprete di postfisso sta in venti righe, un parser di infisso con le precedenze no.</p>
       </div>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Togliere i nomi toglie anche altro: in notazione postfissa non servono parentesi e non serve una tabella di precedenze, perché l'ordine delle operazioni è già l'ordine in cui sono scritte. Non è una curiosità da museo — è il motivo per cui la macchina virtuale di Java, quella di Python e i formati di stampa PostScript sono tutti a pila: la valutazione postfissa si esegue con un ciclo di poche righe e nessuna decisione.</p>
+    </div>
+
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>Hamblin, <em>An addressless coding scheme based on mathematical notation</em> (1957) — Proc. First Australian Conference on Computing and Data Processing: la notazione postfissa e la pila come meccanismo di calcolo</li>
+        <li>Moore, <em>FORTH: A Language for Interactive Computing</em> (1970) — il primo scritto sul linguaggio</li>
+      </ul>
+    </div>
+
     </section>
 
 
@@ -122,7 +135,7 @@
       <p class="w-tappa-lead">La pila da sola è una calcolatrice. Diventa un linguaggio quando qualcuno aggiunge la sola cosa che manca — la possibilità di dare un nome a una sequenza di simboli — e scopre che, fatta bene, è anche l'unica cosa che serve.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Nel 1968, all'osservatorio radioastronomico americano, Charles «Chuck» Moore aveva bisogno di controllare i radiotelescopi con macchine minuscole. Costruì un linguaggio che chiamò Forth, usato da altri programmatori dal 1970 e diffuso dal 1971 con la società che fondò insieme a Elizabeth Rather. Il suo principio è tanto semplice da sembrare povero: un programma Forth è una sequenza di <strong>parole</strong> separate da spazi; ogni parola prende ciò che le serve dalla pila e ci lascia il risultato; e tu puoi definire parole nuove usando quelle esistenti.</p>
+      <p>Nel 1968, all'osservatorio radioastronomico americano, Charles «Chuck» Moore aveva bisogno di controllare i radiotelescopi con macchine minuscole. Costruì un linguaggio che chiamò Forth, usato da altri programmatori dal 1970 e diffuso dal 1971 con la società che fondò insieme a Elizabeth Rather. Il suo principio è tanto semplice da sembrare povero: un programma Forth è una sequenza di <strong>parole</strong> separate da spazi; ogni parola prende ciò che le serve dalla pila e ci lascia il risultato; e tu puoi definire parole nuove usando quelle esistenti.</p>
 
       <pre class="w-codice" data-lang="forth">
 : quadrato  dup * ;              <span class="w-com">dup duplica la cima della pila, * moltiplica</span>
@@ -149,14 +162,19 @@
         <p>Il costo di togliere i nomi è reale e onesto: in <code>: media + 2/ ;</code> non si vede da nessuna parte <em>quali</em> due numeri stai facendo la media. La comunità Forth ha risposto con una disciplina di commenti — <code>( n1 n2 -- media )</code>, che dichiara che cosa la parola si aspetta e cosa lascia — ma resta una convenzione, non un controllo. È il caso puro di un'astrazione che compra potenza pagando in leggibilità, ed è sano riconoscerlo invece di innamorarsene.</p>
       </div>
 
-      <div class="w-note w-note--paper">
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Il dizionario di Forth è la sua idea di fondo: ogni parola nuova entra in un elenco e da quel momento è indistinguibile dalle parole native. Non c'è un confine fra «linguaggio» e «programma», e non c'è quasi compilatore: il corpo di una parola è la sequenza degli indirizzi delle parole che la compongono (<em>threaded code</em>). È il motivo per cui un Forth completo sta in pochi kilobyte, e per cui è finito dentro strumenti scientifici e sonde spaziali.</p>
+    </div>
+
+          <div class="w-note w-note--paper">
         <span class="w-note-title">I paper che lo dimostrano</span>
         <ul>
           <li>Moore, <em>FORTH: A Language for Interactive Computing</em> (1970) — il primo scritto sul linguaggio</li>
           <li>Moore, <em>Forth — The Early Years</em> (1991) — il racconto in prima persona dell'invenzione, dai radiotelescopi in poi</li>
         </ul>
       </div>
-    </section>
+</section>
 
 
     <!-- ======================= TAPPA 03 ======================= -->
@@ -167,7 +185,7 @@
       <p class="w-tappa-lead">Forth è nato per far funzionare i telescopi con pochi kilobyte. Trent'anni dopo, qualcuno ha preso la stessa forma e si è chiesto che <em>algebra</em> ci fosse sotto — e la risposta è più bella dell'ingegneria che l'aveva prodotta.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Nel <a href="La-Cristallizzazione.dc.html#c6">libro 2</a>, comporre due funzioni voleva dire scrivere <code>f(g(x))</code>, o inventarsi un operatore apposta. In un linguaggio dove tutto passa per la pila accade una cosa che sembra un gioco di parole e non lo è: <strong>la composizione di due programmi è la loro concatenazione testuale</strong>. Se <code>A</code> è un programma e <code>B</code> è un programma, allora <code>A B</code> — scritti uno dopo l'altro, con uno spazio in mezzo — è il programma che fa prima l'uno e poi l'altro. Per questo la famiglia si chiama <strong>concatenativa</strong>.</p>
+      <p>Nel <a href="La-Cristallizzazione.dc.html#c6">libro 2</a>, comporre due funzioni voleva dire scrivere <code>f(g(x))</code>, o inventarsi un operatore apposta. In un linguaggio dove tutto passa per la pila accade una cosa che sembra un gioco di parole e non lo è: <strong>la composizione di due programmi è la loro concatenazione testuale</strong>. Se <code>A</code> è un programma e <code>B</code> è un programma, allora <code>A B</code> — scritti uno dopo l'altro, con uno spazio in mezzo — è il programma che fa prima l'uno e poi l'altro. Per questo la famiglia si chiama <strong>concatenativa</strong>.</p>
 
       <p>Il linguaggio che ha reso esplicita questa proprietà è <strong>Joy</strong>, creato da Manfred von Thun e comparso nel 2001. Joy aggiunge a Forth un'idea sola, e cambia tutto: un programma può essere messo fra parentesi quadre, e allora non viene eseguito — diventa un <strong>dato</strong> che sta sulla pila, esattamente come un numero. Si chiama <em>quotation</em>, ed è il cugino a pila del <code>quote</code> di Lisp che hai incontrato nel libro 3.</p>
 
@@ -219,7 +237,7 @@
       <p class="w-tappa-lead">Nella pila di Forth il contesto è esplicito: è lì, lo vedi, ci sono i valori. Adesso la domanda che apre l'ultimo terzo di questo libro: e il contesto <em>del calcolo</em> — cioè quello che il programma farà dopo — dove sta scritto?</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Prendi l'espressione <code>1 + (2 * 3)</code>. Mentre la macchina sta calcolando <code>2 * 3</code>, esiste da qualche parte l'informazione «quando avrai il risultato, sommagli 1 e poi consegna il tutto». Quell'informazione è reale — senza di essa il programma non saprebbe che fare del 6 — ma è invisibile: vive nella pila delle chiamate, nel program counter, nei registri. Si chiama <strong>continuazione</strong>: il resto del calcolo, visto dal punto in cui sei adesso.</p>
+      <p>Prendi l'espressione <code>1 + (2 * 3)</code>. Mentre la macchina sta calcolando <code>2 * 3</code>, esiste da qualche parte l'informazione «quando avrai il risultato, sommagli 1 e poi consegna il tutto». Quell'informazione è reale — senza di essa il programma non saprebbe che fare del 6 — ma è invisibile: vive nella pila delle chiamate, nel program counter, nei registri. Si chiama <strong>continuazione</strong>: il resto del calcolo, visto dal punto in cui sei adesso.</p>
 
       <p>Il modo più utile di raffigurarsela è come un <strong>buco</strong>. Ferma il programma mentre valuta <code>2 * 3</code> e guarda ciò che rimane in attesa: <code>1 + ▢</code>. Quel <code>▢</code> è il posto dove il valore andrà a finire, e tutto ciò che gli sta attorno è la continuazione. Una funzione con un buco, che aspetta un valore — cioè, guarda un po', <strong>una funzione</strong>.</p>
 
@@ -256,14 +274,19 @@ somma(1, 2, function (r) { console.log(r * 10); });   <span class="w-ev">← que
         <p>Una continuazione non è un concetto esotico che qualcuno ha inventato: <strong>c'è sempre stata</strong>, in ogni programma che tu abbia mai scritto, ed è ciò che rende possibile il <code>return</code>. La domanda esotica non è "che cos'è una continuazione", è: <em>e se potessi prenderla in mano?</em></p>
       </div>
 
-      <div class="w-note w-note--paper">
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Rendere esplicito «il resto del programma» ha un nome — stile di passaggio delle continuazioni — ed è una trasformazione meccanica: si può applicare a qualsiasi programma. Dopo, ogni chiamata è in coda, perché non resta più niente da fare al ritorno. Non è teoria: molti compilatori usano CPS (o la sua cugina ANF) come rappresentazione interna proprio perché in quella forma l'ordine di valutazione è scritto nel programma invece che nascosto nelle regole del linguaggio.</p>
+    </div>
+
+          <div class="w-note w-note--paper">
         <span class="w-note-title">I paper che lo dimostrano</span>
         <ul>
           <li>Strachey &amp; Wadsworth, <em>Continuations: A Mathematical Semantics for Handling Full Jumps</em> (1974) — <span class="w-ref">Oxford PRG Technical Monograph PRG-11</span></li>
           <li>Reynolds, <em>The Discoveries of Continuations</em> (1993) — <span class="w-ref">Lisp and Symbolic Computation 6(3–4), 233–247</span></li>
         </ul>
       </div>
-    </section>
+</section>
 
 
     <!-- ======================= TAPPA 05 ======================= -->
@@ -274,7 +297,7 @@ somma(1, 2, function (r) { console.log(r * 10); });   <span class="w-ev">← que
       <p class="w-tappa-lead">Hai visto che il resto del programma è una funzione con un buco. Adesso il costrutto che te la mette in mano come un valore qualsiasi — e con essa la possibilità di tornare in un istante che era già passato.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Scheme ha una procedura dal nome più lungo dell'informatica: <code>call-with-current-continuation</code>, per gli amici <strong>call/cc</strong>. Si usa così: le passi una funzione, e lei la chiama passandole <em>la continuazione corrente</em> — cioè quel <code>▢</code> di cui parlavamo, impacchettato come una normalissima funzione di un argomento. Da quel momento hai in mano un valore che, se lo invochi, <strong>abbandona il calcolo in corso e riprende il programma dal punto in cui la continuazione era stata catturata</strong>, con il valore che gli passi tu.</p>
+      <p>Scheme ha una procedura dal nome più lungo dell'informatica: <code>call-with-current-continuation</code>, per gli amici <strong>call/cc</strong>. Si usa così: le passi una funzione, e lei la chiama passandole <em>la continuazione corrente</em> — cioè quel <code>▢</code> di cui parlavamo, impacchettato come una normalissima funzione di un argomento. Da quel momento hai in mano un valore che, se lo invochi, <strong>abbandona il calcolo in corso e riprende il programma dal punto in cui la continuazione era stata catturata</strong>, con il valore che gli passi tu.</p>
 
       <pre class="w-codice" data-lang="scheme">
 (+ 1 (call/cc (lambda (k) 10)))
@@ -338,14 +361,19 @@ somma(1, 2, function (r) { console.log(r * 10); });   <span class="w-ev">← que
         <p>Le continuazioni di Scheme sono <em>illimitate</em> e <em>riutilizzabili</em>: puoi invocare la stessa <code>k</code> quante volte vuoi, anche molto dopo. Questo è ciò che le rende potentissime e, per gli implementatori, un incubo: se una continuazione può essere risvegliata in futuro, la sua parte di stack <strong>non si può più buttare</strong>. Ed è la ragione principale per cui quasi nessun linguaggio di uso comune ha <code>call/cc</code> pieno: costa troppo a chi implementa, e in mano a chi lo usa produce codice che nessun debugger sa raccontare.</p>
       </div>
 
-      <div class="w-note w-note--paper">
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Il costo dipende da quante volte una continuazione può essere risvegliata. Se una sola — <em>one-shot</em> — si implementa in modo economico, ed è il caso di generatori, <code>yield</code> e <code>async</code>. Se può essere richiamata più volte, l'implementazione deve copiare o conservare la pila, e il prezzo si vede. Per questo i linguaggi mainstream hanno adottato i casi particolari utili e lasciato fuori il costrutto generale.</p>
+    </div>
+
+          <div class="w-note w-note--paper">
         <span class="w-note-title">I paper che lo dimostrano</span>
         <ul>
           <li>Sussman &amp; Steele, <em>Scheme: An Interpreter for Extended Lambda Calculus</em> (1975) — <span class="w-ref">MIT AI Memo 349</span> — il costrutto compare come <code>catch</code></li>
           <li>Il nome <code>call-with-current-continuation</code> è coniato nel 1982, quando si scopre che basta una procedura anziché una forma speciale — <span class="w-ref">cfr. le note storiche dei Revised Report on Scheme</span></li>
         </ul>
       </div>
-    </section>
+</section>
 
 
     <!-- ======================= TAPPA 06 ======================= -->
@@ -356,7 +384,7 @@ somma(1, 2, function (r) { console.log(r * 10); });   <span class="w-ev">← que
       <p class="w-tappa-lead">Un costrutto che cattura "tutto il resto del programma" è troppo potente per essere comodo. La storia degli ultimi quarant'anni è il tentativo — riuscito — di tenerne la sostanza buttando via l'eccesso.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Il problema di <code>call/cc</code> è nella parola <em>tutto</em>. La continuazione catturata comprende il resto del programma fino alla fine dei tempi: se la usi dentro una libreria, ti porti dietro anche il <code>main</code> di chi ti ha chiamato. È un'astrazione che non compone bene, perché non ha confini — e un'astrazione senza confini è difficile da mettere dentro un'altra.</p>
+      <p>Il problema di <code>call/cc</code> è nella parola <em>tutto</em>. La continuazione catturata comprende il resto del programma fino alla fine dei tempi: se la usi dentro una libreria, ti porti dietro anche il <code>main</code> di chi ti ha chiamato. È un'astrazione che non compone bene, perché non ha confini — e un'astrazione senza confini è difficile da mettere dentro un'altra.</p>
 
       <p>La risposta si chiama <strong>continuazione delimitata</strong>: metti un paletto (<code>reset</code>) e cattura solo il pezzo di programma fra il paletto e il punto di cattura (<code>shift</code>). La continuazione diventa allora una funzione onesta — prende un valore, restituisce un valore, finisce — invece di un buco nero che si mangia il futuro. Il costrutto <code>shift/reset</code> è stato introdotto da Olivier Danvy e Andrzej Filinski nel 1990, dopo che Matthias Felleisen aveva proposto l'idea del delimitatore un paio d'anni prima.</p>
 
@@ -388,14 +416,19 @@ somma(1, 2, function (r) { console.log(r * 10); });   <span class="w-ev">← que
         <p>Il percorso di ogni grande astrazione è sempre questo: <strong>qualcuno scopre la forma generale, qualcun altro la rende sicura restringendola.</strong> <code>goto</code> → cicli e funzioni. Puntatori → riferimenti e garbage collector. <code>call/cc</code> → eccezioni, generatori, <code>async</code>. Studiare la forma generale non serve a usarla: serve a capire in un pomeriggio, invece che in un anno, ogni versione ristretta che incontrerai da qui in avanti.</p>
       </div>
 
-      <div class="w-note w-note--paper">
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Dove è finito tutto questo: nelle continuazioni <em>delimitate</em>, che catturano un pezzo di programma invece di tutto il resto, e che sono la base teorica degli <em>effetti algebrici</em>. Se scrivi <code>async</code>/<code>await</code>, se usi le coroutine di Kotlin o i thread virtuali della JVM, stai usando continuazioni delimitate con un nome più rassicurante — catturate dal runtime, non da te. L'idea del 1975 non è stata scartata: è stata addomesticata.</p>
+    </div>
+
+          <div class="w-note w-note--paper">
         <span class="w-note-title">I paper che lo dimostrano</span>
         <ul>
           <li>Danvy &amp; Filinski, <em>Abstracting Control</em> (1990) — introduce <code>shift</code> e <code>reset</code> — <span class="w-ref">ACM Conf. on LISP and Functional Programming</span></li>
           <li>Felleisen, <em>The Theory and Practice of First-Class Prompts</em> (1988) — l'idea del delimitatore — <span class="w-ref">POPL '88</span></li>
         </ul>
       </div>
-    </section>
+</section>
 
 
     <!-- ===== EPILOGO — non viene numerato ===== -->

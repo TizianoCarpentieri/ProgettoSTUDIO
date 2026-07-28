@@ -54,7 +54,12 @@ if (!chrome) {
 
 const SONDA = `
 <script>
-setTimeout(function () {
+/* Non si misura una pagina mentre MathJax sta ancora impaginando: a metà
+   lavoro le formule sporgono davvero, e la pagina risulta larga il doppio per
+   qualche centinaio di millisecondi. Chi misura in quell'istante segnala uno
+   scorrimento orizzontale che nessun lettore vedrà mai. Quindi: si aspetta la
+   promessa di MathJax quando c'è, e comunque il tempo pieno. */
+function misura() {
   var vw = document.documentElement.clientWidth;
   var testo = (document.body.innerText || '').trim();
   var demo = 0;
@@ -115,6 +120,12 @@ setTimeout(function () {
   document.title = 'ESITO|' + document.documentElement.scrollWidth + '|' + vw + '|' +
     testo.length + '|' + (testo.match(/\\{\\{[^}]*\\}\\}/g) || []).length + '|' + demo + '|' +
     unici.slice(0, 10).join(' ;; ');
+}
+
+setTimeout(function () {
+  var pronto = (window.MathJax && window.MathJax.startup && window.MathJax.startup.promise)
+             ? window.MathJax.startup.promise : Promise.resolve();
+  pronto.then(function () { setTimeout(misura, 600); }, function () { misura(); });
 }, ${ATTESA_MS});
 </script>
 `;
@@ -135,7 +146,7 @@ function provaUna(file, larghezza) {
     const dom = execFileSync(chrome, [
       '--headless', '--disable-gpu', '--no-sandbox', '--hide-scrollbars',
       '--window-size=' + larghezza + ',900',
-      '--virtual-time-budget=' + (ATTESA_MS + 5000),
+      '--virtual-time-budget=' + (ATTESA_MS + 9000),
       '--dump-dom', 'file://' + tmp
     ], { encoding: 'utf8', maxBuffer: 80 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] });
 

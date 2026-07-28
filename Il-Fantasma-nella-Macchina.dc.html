@@ -110,6 +110,19 @@
         <span class="w-note-title">Da ricordare</span>
         <p>Ogni linguaggio ti nasconde gli indirizzi in un modo diverso, ma <strong>nessuno li elimina</strong>. In Java e in Python ogni variabile che contiene un oggetto contiene un indirizzo — lo chiamano riferimento e ti vietano di farci aritmetica, ed è un'ottima idea. Ma il <code>NullPointerException</code>, il <code>None</code> inatteso e la lista che cambia sotto i piedi sono tutti fenomeni di superficie di questo unico fatto: sotto il nome c'è un numero civico.</p>
       </div>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>L'indirizzo che vedi non è quello che la RAM vede. Fra i due c'è la <em>memoria virtuale</em>: ogni processo ha il suo spazio di indirizzi, tradotto dal sistema operativo, ed è il motivo per cui un programma non può leggere la memoria di un altro. Da qui due fatti pratici: due esecuzioni dello stesso programma possono stampare indirizzi diversi (è una difesa, si chiama ASLR), e un indirizzo stampato serve a confrontare, non a orientarsi.</p>
+    </div>
+
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>von Neumann, <em>First Draft of a Report on the EDVAC</em> (1945) — la memoria come sequenza di celle indirizzabili</li>
+        <li>Drepper, <em>What Every Programmer Should Know About Memory</em> (2007) — che cosa costa davvero raggiungere un indirizzo</li>
+      </ul>
+    </div>
+
     </section>
 
 
@@ -121,7 +134,7 @@
       <p class="w-tappa-lead">Nel libro 2 ti ho chiesto di credere a un'immagine: ogni chiamata di funzione riceve un foglietto che poi viene strappato. Il foglietto ha un indirizzo, una dimensione e un nome tecnico.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Alla fine della fila di caselle — di solito agli indirizzi alti — il sistema riserva una zona chiamata <strong>stack</strong>, e un registro del processore, lo <em>stack pointer</em>, punta alla sua cima. Ogni chiamata di funzione ci deposita un blocco, lo <strong>stack frame</strong>, che contiene tre cose: i parametri ricevuti, lo spazio per le variabili locali, e l'<em>indirizzo di ritorno</em> — cioè la cella che David Wheeler doveva riempire a mano nel 1951, e che oggi ci mette il processore.</p>
+      <p>Alla fine della fila di caselle — di solito agli indirizzi alti — il sistema riserva una zona chiamata <strong>stack</strong>, e un registro del processore, lo <em>stack pointer</em>, punta alla sua cima. Ogni chiamata di funzione ci deposita un blocco, lo <strong>stack frame</strong>, che contiene tre cose: i parametri ricevuti, lo spazio per le variabili locali, e l'<em>indirizzo di ritorno</em> — cioè la cella che David Wheeler doveva riempire a mano nel 1951, e che oggi ci mette il processore.</p>
 
       <p>Il dettaglio bizzarro, e vero su quasi tutte le architetture: <strong>lo stack cresce verso il basso</strong>, dagli indirizzi alti verso quelli bassi. Chiamare una funzione significa <em>sottrarre</em> dallo stack pointer; ritornare significa sommare. Non c'è nessuna ragione profonda: si è scelto così per far crescere lo stack e i dati l'uno incontro all'altro dai due estremi della memoria, e la convenzione è rimasta.</p>
 
@@ -167,6 +180,14 @@
         <span class="w-note-title">Livello esperto</span>
         <p>Questa è la ragione tecnica per cui <code>call/cc</code> del <a href="Eleganza-Esoterica.dc.html#c5">libro 4</a> costa tanto agli implementatori. Una continuazione riutilizzabile è, in sostanza, una <em>copia dello stack</em> conservata per dopo: se il programma può tornarci in qualunque momento futuro, quei frame non si possono strappare. Le soluzioni sono due, entrambe costose: copiare lo stack alla cattura, oppure allocare i frame sullo heap invece che sullo stack — che è precisamente ciò che fanno i linguaggi con le chiusure, ed è l'argomento della prossima tappa.</p>
       </div>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>Dijkstra, <em>Recursive Programming</em> (1960) — <span class="w-ref">Numerische Mathematik 2, 312–318</span>: il record di attivazione come si usa ancora oggi</li>
+        <li><em>The Java Virtual Machine Specification</em> — il capitolo sui frame: variabili locali, pila degli operandi, indirizzo di ritorno</li>
+      </ul>
+    </div>
+
     </section>
 
 
@@ -178,7 +199,7 @@
       <p class="w-tappa-lead">Lo stack è ordinatissimo: si mette e si toglie sempre dalla stessa parte. Ma metà delle cose che scrivi non ha nessuna intenzione di rispettare quell'ordine — e per loro serve un'altra stanza.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Lo stack funziona per una ragione sola: <strong>la durata dei dati coincide con l'ordine delle chiamate</strong>. Ciò che nasce dentro una funzione muore quando la funzione finisce. Ma prova a scrivere una funzione che costruisce una lista e la restituisce, o un oggetto che sopravvive a chi lo ha creato, o una chiusura che cattura una variabile: in tutti questi casi il dato deve vivere <em>più a lungo</em> del frame che lo ha generato. Per loro c'è lo <strong>heap</strong>: una zona di memoria in cui si può chiedere spazio in qualsiasi momento, di qualsiasi dimensione, e restituirlo in qualsiasi ordine.</p>
+      <p>Lo stack funziona per una ragione sola: <strong>la durata dei dati coincide con l'ordine delle chiamate</strong>. Ciò che nasce dentro una funzione muore quando la funzione finisce. Ma prova a scrivere una funzione che costruisce una lista e la restituisce, o un oggetto che sopravvive a chi lo ha creato, o una chiusura che cattura una variabile: in tutti questi casi il dato deve vivere <em>più a lungo</em> del frame che lo ha generato. Per loro c'è lo <strong>heap</strong>: una zona di memoria in cui si può chiedere spazio in qualsiasi momento, di qualsiasi dimensione, e restituirlo in qualsiasi ordine.</p>
 
       <p>Il prezzo di questa libertà si paga tutto insieme, ed è il grande tema della programmazione di sistema: <strong>chi lo restituisce?</strong> Sullo stack la risposta è automatica. Sullo heap no.</p>
 
@@ -221,6 +242,14 @@ v = NULL;                            <span class="w-ev">← e adesso lo scontrin
         <span class="w-note-title">Livello esperto</span>
         <p>Le tre grandi risposte alla domanda «chi libera?» sono tre filosofie, non tre tecniche. <strong>C</strong>: lo fai tu, massimo controllo e massima responsabilità. <strong>Java, Go, Python, C#</strong>: lo fa un collector, paghi in pause imprevedibili e in memoria occupata. <strong>Rust</strong>: lo decide il compilatore, tracciando chi è il proprietario di ogni dato e quando esce di scena — niente collector e niente <code>free</code> a mano, ma un modello di possesso che va imparato. Rust è, in un certo senso, la risposta più elegante alla tappa 06 del <a href="Il-Primo-Soffio.dc.html#c6">libro 1</a>: rende l'aliasing un errore di compilazione.</p>
       </div>
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>McCarthy, <em>Recursive Functions of Symbolic Expressions and Their Computation by Machine, Part I</em> (1960) — <span class="w-ref">CACM 3(4), 184–195</span>: qui compare la prima raccolta automatica della memoria</li>
+        <li>Drepper, <em>What Every Programmer Should Know About Memory</em> (2007) — perché la memoria sparsa costa più di quella contigua</li>
+      </ul>
+    </div>
+
     </section>
 
 
@@ -232,7 +261,7 @@ v = NULL;                            <span class="w-ev">← e adesso lo scontrin
       <p class="w-tappa-lead">Abbiamo aperto la serie con tre caratteri che spezzavano la matematica. Chiudiamo il cerchio: guardiamo che cosa diventano quei tre caratteri quando arrivano in fondo.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Il processore non sa lavorare direttamente sulla memoria per la maggior parte delle operazioni. Ha una manciata di celle personali, velocissime, dentro di sé: i <strong>registri</strong> — sedici, su un x86-64, con nomi come <code>rax</code> e <code>rbx</code>. Il ciclo della sua vita è sempre lo stesso e non è cambiato dal <em>First Draft</em> di von Neumann del 1945: <em>porta un valore dalla memoria a un registro, fai il conto fra registri, riporta il risultato in memoria</em>.</p>
+      <p>Il processore non sa lavorare direttamente sulla memoria per la maggior parte delle operazioni. Ha una manciata di celle personali, velocissime, dentro di sé: i <strong>registri</strong> — sedici, su un x86-64, con nomi come <code>rax</code> e <code>rbx</code>. Il ciclo della sua vita è sempre lo stesso e non è cambiato dal <em>First Draft</em> di von Neumann del 1945: <em>porta un valore dalla memoria a un registro, fai il conto fra registri, riporta il risultato in memoria</em>.</p>
 
       <pre class="w-codice" data-lang="da x = x + 1 a tre istruzioni">
 <span class="w-com">C:</span>            x = x + 1;
@@ -257,6 +286,19 @@ v = NULL;                            <span class="w-ev">← e adesso lo scontrin
         <span class="w-note-title">Da ricordare</span>
         <p>Non serve saper <em>scrivere</em> assembly. Serve saperlo <strong>leggere</strong> per venti righe, perché è l'unico posto dove certe domande hanno una risposta definitiva: il compilatore ha davvero eliminato quel controllo? questa variabile sta in un registro o in memoria? le mie tre righe eleganti diventano tre istruzioni o trecento? Su <a href="https://godbolt.org">godbolt.org</a> ci vogliono dieci secondi per chiederlo, e la risposta è spesso sorprendente.</p>
       </div>
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>Tre istruzioni sono il modello, non la realtà. Il processore ne esegue diverse per ciclo, fuori ordine, e la somma su un valore già in un registro può costare meno di un ciclo — mentre la stessa somma su un valore che sta in RAM e non in cache ne costa centinaia. È qui che nasce il consiglio più controintuitivo del mestiere: fra due algoritmi con lo stesso numero di operazioni, vince quello che tocca la memoria di fila.</p>
+    </div>
+
+    <div class="w-note w-note--paper">
+      <span class="w-note-title">I paper che lo dimostrano</span>
+      <ul>
+        <li>von Neumann, <em>First Draft of a Report on the EDVAC</em> (1945) — il ciclo carica-calcola-riscrivi</li>
+        <li>Backus, <em>Can Programming Be Liberated from the von Neumann Style?</em> (1977) — <span class="w-ref">CACM 21(8), 613–641, 1978</span>: il «collo di bottiglia di von Neumann» prende il nome qui</li>
+      </ul>
+    </div>
+
     </section>
 
 
@@ -268,7 +310,7 @@ v = NULL;                            <span class="w-ev">← e adesso lo scontrin
       <p class="w-tappa-lead">Fra il tuo codice e il processore, in mezzo mondo del software, c'è un piano in più: una macchina inventata, con le sue istruzioni e la sua memoria, che nessuno ha mai costruito in silicio. Ed è il posto dove due libri di questa serie si incontrano.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Il compilatore Java non produce istruzioni x86. Produce istruzioni per una macchina che non esiste — la <strong>Java Virtual Machine</strong> — e poi un programma, sulla tua macchina vera, le esegue. Il vantaggio ovvio è la portabilità. Quello meno ovvio, e più profondo, è che quel piano intermedio è un <em>punto di osservazione</em>: siccome il codice passa da lì, lì si può misurare, ottimizzare, ricompilare a caldo.</p>
+      <p>Il compilatore Java non produce istruzioni x86. Produce istruzioni per una macchina che non esiste — la <strong>Java Virtual Machine</strong> — e poi un programma, sulla tua macchina vera, le esegue. Il vantaggio ovvio è la portabilità. Quello meno ovvio, e più profondo, è che quel piano intermedio è un <em>punto di osservazione</em>: siccome il codice passa da lì, lì si può misurare, ottimizzare, ricompilare a caldo.</p>
 
       <p>E adesso guarda che forma ha questa macchina inventata: <strong>è una macchina a pila</strong>. Non ha registri per i tuoi conti; ha uno <em>stack degli operandi</em> su cui si caricano i valori e in cui si depositano i risultati. Esattamente il Forth del <a href="Eleganza-Esoterica.dc.html#c1">libro 4</a>. Il linguaggio più aziendale del pianeta, sotto, parla postfisso.</p>
 
@@ -305,14 +347,19 @@ v = NULL;                            <span class="w-ev">← e adesso lo scontrin
         <p>Le macchine virtuali sono la dimostrazione più concreta che «sopra» e «sotto» non sono due mondi ma un <strong>continuo</strong>: la JVM è un programma che fa da macchina, il tuo interprete Lisp del libro 3 era un programma che faceva da linguaggio, il sistema operativo è un programma che fa da macchina per i tuoi. Ogni livello è codice che qualcuno ha scritto, e a ogni livello si può scendere.</p>
       </div>
 
-      <div class="w-note w-note--paper">
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>La macchina inventata non resta inventata a lungo: il bytecode che gira spesso viene tradotto in istruzioni vere mentre il programma è in esecuzione (<em>JIT</em>), usando informazioni che un compilatore statico non ha — quali rami vengono presi davvero, quali tipi arrivano davvero. Da qui due conseguenze quotidiane: il codice è lento finché non si «scalda», e misurare le prestazioni nei primi secondi di esecuzione dà numeri privi di senso.</p>
+    </div>
+
+          <div class="w-note w-note--paper">
         <span class="w-note-title">I documenti che lo dimostrano</span>
         <ul>
           <li><em>The Java Virtual Machine Specification</em> — capitolo sul set di istruzioni: <code>iload</code>, <code>iconst</code>, <code>iadd</code>, <code>istore</code>, e <code>iinc</code>, l'unica che incrementa una variabile locale senza passare dalla pila degli operandi</li>
           <li>von Neumann, <em>First Draft of a Report on the EDVAC</em> (1945) — il ciclo carica-calcola-riscrivi che stiamo ancora eseguendo</li>
         </ul>
       </div>
-    </section>
+</section>
 
 
     <!-- ======================= TAPPA 06 ======================= -->
@@ -323,7 +370,7 @@ v = NULL;                            <span class="w-ev">← e adesso lo scontrin
       <p class="w-tappa-lead">Adesso sai guardare sotto. Resta la domanda che vale più di tutto il resto del libro, e che nessuno insegna: <em>quando</em> conviene farlo — e quando è solo un modo raffinato di perdere tempo.</p>
 
       <h3 class="w-h3">L'idea</h3>
-      <p class="w-drop">Nel novembre del 2002 Joel Spolsky ha scritto un articolo che ha dato un nome a un'esperienza che tutti avevano: la <strong>legge delle astrazioni bucate</strong>. Dice così: <em>tutte le astrazioni non banali, in una certa misura, perdono</em>. L'astrazione ti promette di non doverti occupare di ciò che sta sotto; per il 95% del tempo mantiene la promessa; e nel restante 5% il piano di sotto risale in superficie, e in quel momento chi non sa cosa c'è sotto è <strong>bloccato</strong>. Non lento: bloccato, perché il problema che vede non ha spiegazione nel mondo in cui sa ragionare.</p>
+      <p>Nel novembre del 2002 Joel Spolsky ha scritto un articolo che ha dato un nome a un'esperienza che tutti avevano: la <strong>legge delle astrazioni bucate</strong>. Dice così: <em>tutte le astrazioni non banali, in una certa misura, perdono</em>. L'astrazione ti promette di non doverti occupare di ciò che sta sotto; per il 95% del tempo mantiene la promessa; e nel restante 5% il piano di sotto risale in superficie, e in quel momento chi non sa cosa c'è sotto è <strong>bloccato</strong>. Non lento: bloccato, perché il problema che vede non ha spiegazione nel mondo in cui sa ragionare.</p>
 
       <table class="w-table">
         <tr><th>L'astrazione promette</th><th>Il buco che si apre</th></tr>
@@ -347,14 +394,19 @@ v = NULL;                            <span class="w-ev">← e adesso lo scontrin
         <p>Una volta che impari ad astrarre, il processo diventa <strong>ricorsivo</strong>: cominci a vedere astrazioni ovunque, e ogni cosa diventa insieme un'implementazione (di ciò che sta sopra) e un'interfaccia (per ciò che sta sotto). Il linguaggio è un'astrazione sul bytecode, il bytecode sul processore, il processore sui transistor, i transistor sulla fisica. <strong>Non c'è un fondo: c'è solo il livello in cui hai deciso di fermarti oggi.</strong> E il giorno in cui ti accorgi che anche le tue funzioni sono staccionate per qualcun altro, hai smesso di usare l'astrazione e hai cominciato a progettarla.</p>
       </div>
 
-      <div class="w-note w-note--paper">
+    <div class="w-note w-note--expert">
+      <span class="w-note-title">Livello esperto</span>
+      <p>La regola per scendere è una sola, e non è tecnica: prima misura. Un profilo dice dove il tempo passa davvero, e quasi sempre non è dove pensavi. Scendere senza misura costa leggibilità e non compra niente. Ma esistono i casi in cui è obbligatorio: quando l'astrazione perde — una copia nascosta, un accesso sparso in memoria, una chiamata che attraversa un confine caro — e allora non stai ottimizzando, stai riparando.</p>
+    </div>
+
+          <div class="w-note w-note--paper">
         <span class="w-note-title">I testi che lo dimostrano</span>
         <ul>
           <li>Spolsky, <em>The Law of Leaky Abstractions</em> (11 novembre 2002) — <span class="w-ref">joelonsoftware.com</span></li>
           <li>Drepper, <em>What Every Programmer Should Know About Memory</em> (2007) — perché la località di memoria conta più dell'algoritmo, con i numeri</li>
         </ul>
       </div>
-    </section>
+</section>
 
 
     <!-- ===== EPILOGO — non viene numerato ===== -->
