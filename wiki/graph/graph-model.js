@@ -34,8 +34,11 @@
     return out;
   }
 
-  /* Costruisce { nodes, links, byId, figliDi } dai due strati. */
-  function costruisciGrafo(skeleton, index) {
+  /* Costruisce { nodes, links, byId, figliDi } dagli strati disponibili.
+     `cielo` è facoltativo: senza, il vertice restano i 4 domini OpenAlex;
+     con, il vertice sono le otto regioni e i domini escono dal disegno —
+     restano solo come metadato (`n.dominio`) per dire da dove viene un ramo. */
+  function costruisciGrafo(skeleton, index, cielo) {
     var nodes = [];
     var byId = {};
 
@@ -46,10 +49,29 @@
       return n;
     }
 
+    /* --- Strato 0: il cielo, se c'è -------------------------------------- */
+    var regioneDelCampo = {};
+    (cielo || []).forEach(function (r) {
+      aggiungi({
+        id: r.id, label: r.label, level: 'regione', parent: null,
+        tinta: r.tinta, attesa: r.attesa || null,
+        contenuto: false, acceso: false, file: null, moduloId: null
+      });
+      (r.campi || []).forEach(function (c) { regioneDelCampo[c] = r.id; });
+    });
+
     /* --- Strato 1: lo scheletro (tutto spento all'inizio) ------------------ */
     (skeleton || []).forEach(function (s) {
+      /* Col cielo acceso i domini non si disegnano, e ogni campo appende alla
+         sua regione: è l'unico punto in cui le due gerarchie si saldano. */
+      if (cielo && cielo.length) {
+        if (s.level === 'dominio') return;
+        if (s.level === 'campo' && !regioneDelCampo[s.id]) return;   /* campo senza casa: lo segnala valida */
+      }
       aggiungi({
-        id: s.id, label: s.label, level: s.level, parent: s.parent || null,
+        id: s.id, label: s.label, level: s.level,
+        parent: (cielo && cielo.length && s.level === 'campo') ? regioneDelCampo[s.id] : (s.parent || null),
+        dominioOpenAlex: s.level === 'campo' ? s.parent : null,
         contenuto: false, acceso: false, file: null, moduloId: null
       });
     });
@@ -68,31 +90,34 @@
       (m.concetti || []).forEach(function (c) {
         aggiungi({
           id: c.id, label: c.label, level: 'concetto', parent: modId,
+          tappa: c.tappa || null,          /* l'ancora: apre il libro AL PUNTO GIUSTO */
           contenuto: true, acceso: true, file: m.file || null, moduloId: m.id
         });
       });
     });
 
-    /* --- Dominio radice di ogni nodo (per il colore) ---------------------- */
-    var cacheDom = {};
-    function dominioDi(id) {
-      if (cacheDom[id] !== undefined) return cacheDom[id];
+    /* --- La radice di ogni nodo, da cui prende il colore ------------------
+       Col cielo la radice è la regione: tutta la discendenza di «Le macchine
+       che pensano» condivide la sua tinta, così la mappa si legge per zone
+       anche quando le etichette sono lontane. Senza cielo si ricade sui
+       domini OpenAlex, com'era prima. */
+    var cacheRadice = {};
+    function radiceDi(id) {
+      if (cacheRadice[id] !== undefined) return cacheRadice[id];
       var n = byId[id], visti = {};
-      while (n && n.parent && !visti[n.id]) {
+      while (n && n.parent && byId[n.parent] && !visti[n.id]) {
         visti[n.id] = true;
-        if (byId[n.parent] && byId[n.parent].level === 'dominio') { break; }
         n = byId[n.parent];
       }
-      var domId = n ? (n.level === 'dominio' ? n.id : n.parent) : null;
-      cacheDom[id] = domId || null;
-      return cacheDom[id];
+      cacheRadice[id] = n ? n.id : null;
+      return cacheRadice[id];
     }
     nodes.forEach(function (n) {
-      n.dominio = dominioDi(n.id);
-      /* Colore del cervello: per DOMINIO, così i 4 domini sono 4 regioni
-         cromatiche coerenti. L'accento proprio del modulo (per la card della
-         homepage) resta in n.accento, ma il grafo usa n.dominioAccento. */
-      n.dominioAccento = DOMINIO_ACCENTO[n.dominio] || 'blu';
+      n.radice = radiceDi(n.id);
+      var r = byId[n.radice];
+      n.tinta = (r && r.tinta) || null;                     /* col cielo */
+      n.dominio = (cielo && cielo.length) ? (n.dominioOpenAlex || n.dominio || null) : n.radice;
+      n.dominioAccento = DOMINIO_ACCENTO[n.radice] || 'blu'; /* ripiego senza cielo */
     });
 
     /* --- Propagazione dell'accensione: ogni antenato di un contenuto si
@@ -131,7 +156,7 @@
 
   /* Validazione: torna i problemi trovati e qualche statistica. Nessun effetto
      collaterale. Usata dal check Node prima di dichiarare il grafo a posto. */
-  function validaGrafo(skeleton, index) {
+  function validaGrafo(skeleton, index, cielo) {
     var problemi = [];
     var idVisti = {};
     (skeleton || []).forEach(function (s) {
@@ -142,7 +167,26 @@
       if (s.parent && !idVisti[s.parent]) problemi.push('parent orfano: ' + s.id + ' → ' + s.parent);
     });
 
-    var g = costruisciGrafo(skeleton, index);
+    /* Il cielo deve coprire tutti i campi: un campo senza regione sparirebbe
+       dalla mappa in silenzio, e con lui tutto il suo ramo. */
+    if (cielo && cielo.length) {
+      var casa = {};
+      cielo.forEach(function (r) {
+        if (!r.id || !r.label || !r.tinta) problemi.push('regione senza id/label/tinta: ' + (r.id || '?'));
+        (r.campi || []).forEach(function (c) {
+          if (casa[c]) problemi.push('il campo ' + c + ' sta in due regioni: ' + casa[c] + ' e ' + r.id);
+          casa[c] = r.id;
+          if (!idVisti[c]) problemi.push('la regione ' + r.id + ' contiene un campo inesistente: ' + c);
+        });
+      });
+      (skeleton || []).forEach(function (s2) {
+        if (s2.level === 'campo' && !casa[s2.id]) {
+          problemi.push('il campo ' + s2.id + ' («' + s2.label + '») non sta in nessuna regione del cielo');
+        }
+      });
+    }
+
+    var g = costruisciGrafo(skeleton, index, cielo);
     elencaModuli(index).forEach(function (m) {
       if (m.stato === 'previsto') return;
       if (!m.nodo) { problemi.push('modulo ' + m.id + ' senza campo `nodo`'); return; }
@@ -173,7 +217,7 @@
     costruisciGrafo: costruisciGrafo,
     validaGrafo: validaGrafo,
     /* comodità nel browser: legge le due fonti globali già caricate */
-    build: function () { return costruisciGrafo(root.WIKI_SKELETON, root.WIKI_INDEX); }
+    build: function () { return costruisciGrafo(root.WIKI_SKELETON, root.WIKI_INDEX, root.WIKI_CIELO); }
   };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = API;

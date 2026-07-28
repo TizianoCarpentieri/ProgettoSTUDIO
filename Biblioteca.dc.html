@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>La Biblioteca — base di conoscenza</title>
+<title>La Biblioteca — la mappa del sapere</title>
 
 <!-- ===== CONNETTORE DELLA WIKI — righe fisse, identiche su ogni pagina ===== -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,32 +12,46 @@
 <script src="./support.js"></script>
 <script src="./wiki/wiki-index.js"></script>
 
-<!-- ===== IL CERVELLO 3D — solo la homepage, e solo IN FONDO: è un di più,
-     non la porta d'ingresso. Le due fonti del grafo si caricano via <script>
-     (sicure anche da file://); la libreria 3D è un potenziamento: se non c'è,
-     la biblioteca qui sopra funziona esattamente come prima. ===== -->
+<!-- ===== LA MAPPA DEL SAPERE — solo la homepage, e in CIMA: è la porta
+     d'ingresso della biblioteca. Le tre fonti si caricano via <script> e non
+     via fetch, così funzionano anche aprendo il file con un doppio clic. La
+     libreria 3D è un potenziamento: se non arriva, sotto la mappa c'è già
+     l'indice completo. ===== -->
+<script src="./wiki/graph/cielo.js"></script>
 <script src="./wiki/graph/skeleton.js"></script>
 <script src="./wiki/graph/graph-model.js"></script>
 <script defer src="https://unpkg.com/3d-force-graph@1"></script>
-<script defer src="./wiki/graph/explorer.js"></script>
+<script defer src="./wiki/graph/mappa.js"></script>
 
 <script defer src="./wiki/wiki.js"></script>
 <!-- ======================================================================== -->
 </head>
 <body>
 
-<x-dc>
-<div class="w-page">
+<!-- ===== IL CIELO =====
+     Sta FUORI da <x-dc> perché il runtime dc sostituisce solo quell'elemento:
+     qui React non arriva, e un canvas WebGL non va rimontato a ogni render.
+     Sta PRIMA di tutto perché è la porta d'ingresso: chi apre la biblioteca
+     deve vedere prima l'ampiezza del sapere, poi i libri che ci sono dentro. -->
+<section class="w-cielo" id="cielo">
+  <div class="w-cielo-testa">
+    <div class="w-cielo-kicker">Una biblioteca del sapere · in crescita</div>
+    <h1 class="w-cielo-titolo">La mappa del <span>sapere</span></h1>
+    <p class="w-cielo-sub">Otto regioni, i loro campi, i loro rami. Quelli accesi li abbiamo scritti; tutti gli altri esistono, sono spenti, e aspettano. Entra in una regione, scendi fino a un libro, e scegli la tappa da cui cominciare.</p>
+  </div>
 
-  <header class="w-hero a-blu">
-    <div class="w-hero-kicker">Base di conoscenza · in crescita</div>
-    <h1 class="w-hero-title">La <span class="w-mark">Biblioteca</span></h1>
-    <p class="w-hero-sub">Piccoli libri illustrati per imparare davvero come funzionano le macchine che pensano — e come pensa chi le programma. Un libro alla volta, dallo stesso quaderno: oggi poche pagine, domani un'enciclopedia.</p>
-  </header>
+  <div id="wiki-mappa" class="w-mappa" role="img"
+       aria-label="La mappa del sapere: grafo 3D navigabile delle regioni, dei campi e dei libri della biblioteca"></div>
+
+  <p class="w-mappa-nope" hidden>La mappa 3D non parte qui: servono WebGL e la libreria caricata dalla rete. Non manca niente — l'indice completo della biblioteca è qui sotto.</p>
+</section>
+
+<x-dc>
+<div class="w-page w-sotto-mappa">
 
   <div class="w-note w-note--info">
-    <span class="w-note-title">Da dove cominciare</span>
-    <p>Ogni libro è un file autonomo: si legge da solo e rimanda agli altri. Gli scaffali qui sotto sono l'indice completo — <strong>è questa la via principale</strong>. Se vuoi capire come funziona un modello linguistico, parti da <a href="Dentro-la-Macchina.dc.html">Dentro la Macchina</a>. Se vuoi capire come si pensa in modo computazionale, parti da <a href="Il-Primo-Soffio.dc.html">Il primo soffio di vita</a> e prosegui in ordine. In fondo alla pagina, per gioco, gli stessi contenuti diventano un <a href="#cervello">cervello 3D</a>.</p>
+    <span class="w-note-title">Che cos'è questo posto</span>
+    <p>Una biblioteca di libri illustrati, uno per argomento, scritti per portare un lettore di media competenza fino al livello esperto senza fargli sentire il salto. Oggi sono nove e parlano di macchine che pensano e di come si pensa programmando; domani saranno altri, in altre regioni della mappa. <strong>Ogni libro è un file autonomo:</strong> si legge da solo e rimanda agli altri. Qui sotto ci sono tutti, in chiaro; sopra, la stessa cosa come mappa.</p>
   </div>
 
   <!-- Scaffali e card sono generati da wiki.js leggendo wiki/wiki-index.js.
@@ -46,7 +60,12 @@
 
   <div class="w-note w-note--demo">
     <span class="w-note-title">Come è pensata questa biblioteca</span>
-    <p>Ogni libro è un quaderno a sé, nello stesso stile: tappe numerate, analogie prima delle formule, demo che si toccano, e le fonti in fondo a ogni tappa. Così la base cresce senza diventare un unico blocco ingestibile — si aggiungono scaffali e libri, non capitoli infiniti. I rimandi fra un libro e l'altro sono i <em>ponti</em>: quando ne trovi uno, sai che quel concetto continua altrove.</p>
+    <p>Ogni libro è un quaderno a sé, nello stesso stile: tappe numerate, analogie prima delle formule, demo che si toccano, e in fondo a ogni tappa il livello esperto e le fonti. Così la base cresce senza diventare un unico blocco ingestibile — si aggiungono regioni e libri, non capitoli infiniti. I rimandi fra un libro e l'altro sono i <em>ponti</em>: quando ne trovi uno, sai che quel concetto continua altrove.</p>
+  </div>
+
+  <div class="w-note w-note--key">
+    <span class="w-note-title">I rami spenti sono la parte importante</span>
+    <p>Nella mappa quasi tutto è ancora buio, e non è un difetto: è la dichiarazione di che cosa vuole diventare questo posto. Ogni ramo spento è un libro che non esiste ancora — cliccalo e ti dirà che cosa ci andrebbe. Il vuoto qui è un invito, non un buco.</p>
   </div>
 
   <footer class="w-footer">
@@ -55,29 +74,6 @@
 
 </div>
 </x-dc>
-
-<!-- ===== IL CERVELLO DEL SAPERE =====
-     Sta FUORI da <x-dc> perché il runtime dc sostituisce solo quell'elemento
-     (support.js): qui React non arriva. Sta DOPO l'esposizione classica
-     perché è un di più, non un sostituto: si accende da solo quando lo
-     raggiungi scorrendo, e ha un pulsante per lo schermo intero. Se manca la
-     libreria o WebGL, resta la sola riga di avviso e la biblioteca qui sopra
-     è intatta. -->
-<section class="w-brainwrap" id="cervello">
-  <div class="w-brainwrap-head">
-    <div>
-      <div class="w-brainwrap-kicker">Un di più · da guardare quando hai finito di leggere</div>
-      <h2 class="w-brainwrap-title">Il cervello del sapere</h2>
-    </div>
-    <p class="w-brainwrap-sub">Lo stesso indice, disposto come grafo del sapere: quattro domini, i loro campi, e i rami che abbiamo già scritto — accesi. Clicca un nodo per aprirlo, trascina per ruotare.</p>
-    <button type="button" class="w-btn w-brain-full" hidden>⛶ schermo intero</button>
-  </div>
-
-  <div id="wiki-brain" class="w-brain" role="img"
-       aria-label="Il cervello del sapere: grafo 3D interattivo degli argomenti della biblioteca"></div>
-
-  <p class="w-brain-nope" hidden>Il grafo 3D non è disponibile qui (serve WebGL e la libreria caricata dalla rete). Non manca niente: l'indice completo della biblioteca è quello qui sopra.</p>
-</section>
 
 </body>
 </html>
