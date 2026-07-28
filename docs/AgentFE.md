@@ -93,13 +93,13 @@ blocco al livello superiore dello stesso file:
 }
 ```
 
-### Il cervello 3D non è la porta d'ingresso
+### La mappa È la porta d'ingresso
 
-Nella homepage l'indice (scaffali e card) viene **prima**; il grafo 3D sta in
-fondo, dentro `.w-brainwrap`, incorniciato, e si accende quando entra in vista.
-Qualunque visualizzazione futura segue la stessa regola: si aggiunge in fondo,
-non in cima. Il perché è in
-[decisioni/2026-07-26-cervello-secondario-design.md](decisioni/2026-07-26-cervello-secondario-design.md).
+Nella homepage la **mappa del sapere** viene prima di tutto: è il modo con cui
+si arriva a un libro, e a una sua tappa. Gli scaffali e le card restano sotto
+come indice in chiaro — completo, e unica via quando il 3D non parte. Il perché,
+e perché la decisione del 26-07 diceva l'opposto, è in
+[decisioni/2026-07-27-mappa-del-sapere-design.md](decisioni/2026-07-27-mappa-del-sapere-design.md).
 
 ### Tutto ciò che sta fuori da `<x-dc>` va misurato a schermo
 
@@ -393,7 +393,8 @@ esattamente com'è nata la regola su `#dc-root` più sotto.
 | `wiki/wiki-index.js` | scaffali e moduli + i loro dati di grafo (`nodo`, `concetti`, `collegamenti`) |
 | `wiki/graph/skeleton.js` | lo scheletro del sapere: 282 nodi da OpenAlex (una delle due fonti del grafo) |
 | `wiki/graph/graph-model.js` | fonde scheletro e moduli nel grafo del cervello (logica pura, testabile) |
-| `wiki/graph/explorer.js` | il cervello 3D della homepage (3d-force-graph via CDN) |
+| `wiki/graph/cielo.js` | le otto regioni del sapere: la porta d'ingresso della mappa |
+| `wiki/graph/mappa.js` | la mappa 3D della homepage, a livelli di zoom (3d-force-graph via CDN) |
 | `wiki/verifica.js` | il contratto dei libri: `node wiki/verifica.js` |
 | `wiki/graph/valida.js` | controllo di coerenza del grafo: `node wiki/graph/valida.js` |
 | `_TEMPLATE.dc.html` | lo scheletro da copiare |

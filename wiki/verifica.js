@@ -49,6 +49,7 @@ function caricaFonte(relativo, nome) {
 
 var INDICE = caricaFonte('wiki/wiki-index.js', 'WIKI_INDEX');
 var SCHELETRO = caricaFonte('wiki/graph/skeleton.js', 'WIKI_SKELETON');
+var CIELO = caricaFonte('wiki/graph/cielo.js', 'WIKI_CIELO');
 var MODELLO = require('./graph/graph-model.js');
 
 /* --------------------------------------------------------------------------
@@ -502,7 +503,7 @@ function verificaIndice() {
    ========================================================================== */
 
 function verificaGrafo() {
-  var esito = MODELLO.validaGrafo(SCHELETRO, INDICE);
+  var esito = MODELLO.validaGrafo(SCHELETRO, INDICE, CIELO);
   esito.problemi.forEach(function (p) { errore('wiki/graph/', p); });
   return esito.statistiche;
 }
