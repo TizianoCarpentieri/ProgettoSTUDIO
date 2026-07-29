@@ -17,11 +17,10 @@ var path = require('path');
 var dir = __dirname;
 
 require(path.join(dir, 'skeleton.js'));       /* → global.WIKI_SKELETON */
-require(path.join(dir, 'cielo.js'));          /* → global.WIKI_CIELO */
 require(path.join(dir, '..', 'wiki-index.js')); /* → global.WIKI_INDEX */
 var model = require(path.join(dir, 'graph-model.js'));
 
-var r = model.validaGrafo(global.WIKI_SKELETON, global.WIKI_INDEX, global.WIKI_CIELO);
+var r = model.validaGrafo(global.WIKI_SKELETON, global.WIKI_INDEX);
 console.log('Grafo del sapere — ' + JSON.stringify(r.statistiche));
 
 if (!r.problemi.length) {

@@ -52,8 +52,7 @@ graph TD
 | `wiki/wiki-index.js` | **Il manifest** e una delle due fonti del grafo: scaffali e moduli, ciascuno con i campi di grafo `nodo` / `concetti` / `collegamenti`. La Biblioteca costruisce le card da qui, e il cervello 3D vi legge cosa è "acceso". |
 | `wiki/graph/skeleton.js` | **Lo scheletro del sapere**: 282 nodi (4 domini → 26 campi → 252 sottocampi) derivati dalla gerarchia Topics di OpenAlex (CC0). È lo strato "sempre visibile ma per lo più spento" del cervello. |
 | `wiki/graph/graph-model.js` | Fonde scheletro e moduli in `{ nodes, links }`. Logica pura (niente three.js, niente DOM): gira nel browser **e** in Node per la validazione. |
-| `wiki/graph/cielo.js` | **Le otto regioni del sapere**: lo strato scritto a mano che raggruppa i 26 campi OpenAlex e dà alla mappa una porta d'ingresso umana. |
-| `wiki/graph/mappa.js` | **La mappa 3D** della homepage, a livelli di zoom: cielo → regione → campo → libro → tappa. Potenziamento progressivo: senza WebGL resta l'indice in chiaro sotto. |
+| `wiki/graph/explorer.js` | **Il cervello 3D** della homepage: grafo navigabile su `3d-force-graph` (via CDN). Si espande ramo per ramo, i nodi accesi aprono la pagina. Potenziamento progressivo: senza WebGL restano le card. |
 | `wiki/verifica.js` | Il contratto dei libri: `node wiki/verifica.js`. Struttura, catena dell'indice laterale, concetti ↔ tappe, i due divieti. Errori (bloccanti) e avvisi (segnali di deriva). |
 | `strumenti/verifica-pagine.js` | La prova a schermo: apre ogni pagina in un browser a 390px e 1280px e controlla che si sia resa, che non restino binding visibili, che nulla scorra in orizzontale, che le demo siano vive e che nessun testo finisca sopra altro testo. |
 | `wiki/graph/valida.js` | Controllo di coerenza del grafo da riga di comando: `node wiki/graph/valida.js`. |
