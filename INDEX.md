@@ -26,7 +26,7 @@ Sette documenti, sette domande diverse. Parti da quello che risponde alla tua.
 | capire perché il tema scuro non usa `invert` | [AgentFE.md](docs/AgentFE.md) § *Il tema scuro* |
 | far comparire un modulo nella homepage | [wiki/wiki-index.js](wiki/wiki-index.js) |
 | agganciare un modulo al grafo del sapere | i campi `nodo` / `concetti` / `collegamenti` in [wiki/wiki-index.js](wiki/wiki-index.js) |
-| capire la mappa del sapere e il grafo | [wiki/graph/](wiki/graph/) e [la decisione del 27-07](docs/decisioni/2026-07-27-mappa-del-sapere-design.md) |
+| capire il cervello 3D e il grafo | [wiki/graph/](wiki/graph/) e lo spec del cervello in [docs/decisioni/](docs/decisioni/) |
 | capire come cambierà la navigazione (sala → scaffale → libro) | [la decisione del 27-07-2026](docs/decisioni/2026-07-27-navigazione-biblioteca-design.md) |
 | controllare che il grafo sia coerente | `node wiki/graph/valida.js` |
 | controllare che le pagine reggano a schermo (sovrapposizioni, sfondamenti, demo vive) | `node strumenti/verifica-pagine.js` |
